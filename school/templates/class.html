@@ -1,0 +1,147 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load school_extra %}
+{% block title %}班级{% endblock %}
+{% block page_css %}
+    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
+          rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/bootstrap-timepicker/compiled/timepicker.css' %}"/>
+    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'bootstrap-editable.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-editable.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
+    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    班级
+             <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down"></a>
+                 <!--<a href="javascript:;" class="fa fa-times"></a>-->
+             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <select name="major" id="major" data-placeholder="系所专业">
+                                        <option value selected></option>
+                                        {% getmajor as majordata %}
+                                        {% for key, value in  majordata.items %}
+                                            <optgroup label="{{ key }}">
+                                                <option value="*{{ key }}">全部</option>
+                                                {% for m in value %}
+                                                    <option value="{{ m }}">{{ m }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select name="viewType2" id="schoolyear" data-placeholder="入学年份">
+                                        <option value selected></option>
+                                        {% getschoolyear as schoolyeardata %}
+
+                                        {% for m in schoolyeardata %}
+                                            <option value="{{ m }}">{{ m }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <table id="table"
+                               data-toggle="table"
+                               data-striped="true"
+                               data-search="true"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true"
+                               data-show-export="true"
+                               data-minimum-count-columns="2"
+                               data-pagination="true"
+                               data-id-field="id"
+                               data-page-size="10"
+                               data-page-list="[5,10, 25, 50, 100, ALL]"
+                               data-side-pagination="server"
+                               data-url="{% url 'school:getclassdata' %}"
+                               data-toolbar="#custom-toolbar"
+                               data-query-params="queryParams"
+                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
+                               data-search-text="{{ request.GET.search }}"
+                        ></table>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        {% if request.GET.major %}
+            $("#major").find("option[value='{{ request.GET.major }}']").attr('selected', true);
+        {% elif request.GET.department %}
+            $("#major").find("option[value='*{{ request.GET.department }}']").attr('selected', true);
+        {% endif %}
+        {% if request.GET.schoolyear %}
+            $("#schoolyear").find("option[value='{{ request.GET.schoolyear }}']").attr('selected', true);
+        {% endif %}
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+        $table.bootstrapTable({
+            columns: [{
+                field: 'name',
+                title: '班级',
+                searchable: true
+            }, {
+                field: 'major',
+                title: '专业'
+            }, {
+                field: 'department',
+                title: '系所'
+            }, {
+                field: 'schoolyear',
+                title: '入学学年',
+                visible: false,
+                sortable: true
+            }]
+        });
+        function queryParams(params) {
+            params['schoolyear'] = $('#schoolyear').val();
+            params['major'] = $('#major').val();
+            return params;
+        }
+
+        $('#major').chosen({allow_single_deselect: true, include_group_label_in_selected: true});
+        $('#schoolyear').chosen({allow_single_deselect: true, width: 60});
+
+        $('#schoolyear').on('change', function (evt, params) {
+            $table.bootstrapTable('refresh');
+        });
+        $('#major').on('change', function (evt, params) {
+            $table.bootstrapTable('refresh');
+        });
+    </script>
+{% endblock %}

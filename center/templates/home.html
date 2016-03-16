@@ -1,0 +1,173 @@
+{% extends 'base.html' %}
+{% load center_extra %}
+{% load course_extra %}
+{% block title %}首页{% endblock %}
+
+{% block content %}
+    <section class="panel">
+        <header class="panel-heading">
+            当前学期:{{ term.term }}
+                      <span class="pull-right">
+                          <button type="button" id="loading-btn" class="btn btn-warning btn-xs"><i
+                                  class="fa fa-refresh"></i> 刷新
+                          </button>
+                      </span>
+        </header>
+
+    </section>
+    <!--state overview start-->
+    <div class="row state-overview">
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol terques">
+                    <i class="fa fa-tags"></i>
+                </div>
+                <div class="value">
+                    <h1 class="count">
+                        {{ alreadycount }}
+                    </h1>
+
+                    <p>已上课程</p>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol red">
+                    <i class="fa fa-book"></i>
+                </div>
+                <div class="value">
+                    <h1 class=" count2">
+                        {{ todaylesson | length }}
+                    </h1>
+
+                    <p>今日课程</p>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol yellow">
+                    <i class="fa fa-calendar-o"></i>
+                </div>
+                <div class="value">
+                    <h1 class=" count3">
+                        12
+                    </h1>
+
+                    <p>本周课程</p>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol blue">
+                    <i class="fa fa-bar-chart-o"></i>
+                </div>
+                <div class="value">
+                    <h1 class=" count4">
+                        {{ termcourse|length }}
+                    </h1>
+
+                    <p>学期课程</p>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!--state overview end-->
+    <div class="row">
+        <div class="col-lg-12">
+            <!--work progress start-->
+            <section class="panel">
+                <div class="panel-body progress-panel">
+                    <div class="task-progress">
+                        <h1>课程信息</h1>
+
+                        <p>{{ request.session.username }}</p>
+                    </div>
+                    <div class="task-option">
+                        <select class="styled" id="lessontableselect">
+                            <option value="todaylessontable" selected>今日</option>
+                            <option value="weeklessontable">本周</option>
+                            <option value="termcoursetable">学期</option>
+                        </select>
+                    </div>
+                </div>
+                <table class="table table-hover personal-task lessontable" id="todaylessontable">
+                    <tbody>
+                    {% for lesson in todaylesson %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                            </td>
+                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length }}节</td>
+                            <td>{{ lesson.classroom.location }}</td>
+                            <td>
+                                <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                            </td>
+                            <td>
+                                <div id="work-progress1"></div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <table class="table table-hover personal-task lessontable" id="weeklessontable">
+                    <tbody>
+                    {% for lesson in weeklesson %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                            </td>
+                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length }}节</td>
+                            <td>{{ lesson.classroom.location }}</td>
+                            <td>
+                                <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                            </td>
+                            <td>
+                                <div id="work-progress1"></div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+                <table class="table table-hover personal-task lessontable" id="termcoursetable">
+                    <tbody>
+                    {% for course in termcourse %}
+                        <tr>
+                            <td>{{ forloop.counter }}</td>
+                            <td>
+                                <a href="{% url 'course:information' course.course.id %}">{{ course.course.title }}</a>
+                            </td>
+                            <td>{{ course.course.time }}</td>
+                            <td>{{ course.course.location }}</td>
+                            <td>
+                                <span class="badge bg-{{ course.course.status|COURSE_STATUS_STYLE }}">{{ course.course.status|COURSE_STATUS }}</span>
+                            </td>
+                            <td>
+                                <div id="work-progress1"></div>
+                            </td>
+                        </tr>
+                    {% endfor %}
+                    </tbody>
+                </table>
+            </section>
+            <!--work progress end-->
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_script %}
+    <script>
+        $(".lessontable").hide();
+        $("#todaylessontable").show();
+        $('#lessontableselect').change(function () {
+            var p1 = $(this).children('option:selected').val();//这就是selected的值
+            $(".lessontable").hide();
+            $("#" + p1).show();
+        })
+    </script>
+{% endblock %}

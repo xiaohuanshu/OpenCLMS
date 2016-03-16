@@ -1,0 +1,268 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load school_extra %}
+{% block title %}课表{% endblock %}
+{% block page_css %}
+    <link href="{% static 'schedule/css/calendar.min.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'assets/underscore/underscore-min.js' %}"></script>
+    <script src="{% static 'schedule/js/language/zh-CN.js' %}"></script>
+    <script src="{% static 'schedule/js/calendar.min.js' %}"></script>
+    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    课程表
+
+                    <select name="viewType2" id="schoolterm" data-placeholder="学年学期">
+                        {% getterm as termdata %}
+
+                        {% for m in termdata %}
+                            {% gettermdate m as mdate %}
+                            <option value="{{ m }}" data-startdate="{{ mdate.0|date:"Y-m-d" }}"
+                                    data-enddate="{{ mdate.1|date:"Y-m-d" }}"
+                                    {% if m == term %}selected{% endif %}>{{ m }}</option>
+                        {% endfor %}
+                    </select>
+                </header>
+                <div class="panel-body">
+                    <div class="row">
+                        <div class="col-sm-4 col-xs-7">
+                            <div class="btn-group pull-left">
+                                <button class="btn btn-info btn-xs" data-calendar-nav="prev">&lt;&lt; 前</button>
+                                <button class="btn btn-info btn-xs" data-calendar-nav="next">后 &gt;&gt;</button>
+                                <button class="btn btn-primary btn-xs" data-calendar-nav="today">今天</button>
+                            </div>
+                        </div>
+                        <div class="hidden-xs col-sm-4" style="text-align:center;"><span class="scheduletime"></span>
+                        </div>
+                        <div class="col-sm-4 col-xs-5">
+                            <div class="btn-group pull-right">
+                                <button class="btn btn-warning btn-xs active" data-calendar-view="month">月</button>
+                                <button class="btn btn-warning btn-xs" data-calendar-view="week">周</button>
+                                <button class="btn btn-warning btn-xs" data-calendar-view="day">日</button>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row visible-xs">
+                        <div class="col-xs-12" style="text-align:center;">
+                            <span class="scheduletime">123</span>
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-sm-12">
+                            <div id="calendar"></div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- page end-->
+{% endblock %}
+
+{% block page_script %}
+    <script>
+        var term = '{{ term }}';
+        var startdate = new Date('{{ startdate|date:"Y-m-d" }}');
+        var enddate = new Date('{{ enddate|date:"Y-m-d" }}');
+        var now = new Date();
+        startdate.setHours(0, 0, 0, 0);
+        enddate.setHours(0, 0, 0, 0);
+        enddate.setDate(enddate.getDate() + 1)
+    </script>
+    <script>
+        var options = {
+            language: 'zh-CN',
+            classtime: {{ classtime|safe }},
+            weekbetw: startdate,
+            events_source: function (start, end, timezone) {
+                var events_data = [];
+                if (start < startdate) {
+                    start = startdate;
+                }
+                if (end > enddate) {
+                    end = enddate;
+                }
+                nend=new Date(end);
+                nend.setDate(nend.getDate() - 1);
+                nstart = start.getFullYear() + '-' + (start.getMonth() + 1) + '-' + start.getDate();
+                nend = nend.getFullYear() + '-' + (nend.getMonth() + 1) + '-' + nend.getDate();
+
+                $.ajax({
+                    url: '{% url 'course:schedule_data' %}',
+                    type: 'GET',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        start: nstart,
+                        end: nend,
+                        term: term,
+                    },
+                    async: false,
+                }).done(function (json) {
+                    $(json).each(function () {
+                        $(this).attr('start', $(this).attr('start') * 1000);
+                        $(this).attr('end', $(this).attr('end') * 1000);
+                    });
+                    events_data = json;
+                });
+                return events_data;
+            },
+            view: '{{ view|default:"week" }}',
+            tmpl_path: '{% static 'schedule/tmpls' %}/',
+            tmpl_cache: false,
+            onAfterViewLoad: function (view) {
+                $('.scheduletime').text(this.getTitle());
+                $('.btn-group button').removeClass('active');
+                $('button[data-calendar-view="' + view + '"]').addClass('active');
+                viewend = this.options.position.end;
+                viewstart = this.options.position.start;
+                if (viewend >= enddate) {
+                    $('.btn-group button[data-calendar-nav="next"]').attr("disabled", true);
+                }
+                else {
+                    $('.btn-group button[data-calendar-nav="next"]').removeAttr("disabled")
+                }
+                if (viewstart <= startdate) {
+                    $('.btn-group button[data-calendar-nav="prev"]').attr("disabled", true);
+                }
+                else {
+                    $('.btn-group button[data-calendar-nav="prev"]').removeAttr("disabled")
+                }
+            },
+            classes: {
+                months: {
+                    general: 'label'
+                }
+            }
+        };
+
+        var $calendar = $('#calendar').calendar(options);
+
+        $('.btn-group button[data-calendar-nav]').each(function () {
+            var $this = $(this);
+            $this.click(function () {
+                $calendar.navigate($this.data('calendar-nav'));
+            });
+        });
+
+        $('.btn-group button[data-calendar-view]').each(function () {
+            var $this = $(this);
+            $this.click(function () {
+                $calendar.view($this.data('calendar-view'));
+            });
+        });
+    </script>
+    <script>
+        {% if day %}
+            $calendar.navigate(new Date('{{ day }}'));
+        {% else %}
+            if (now > enddate || now < startdate) {
+                $calendar.navigate(startdate);
+                $('.btn-group button[data-calendar-nav="today"]').hide();
+            }
+        {% endif %}
+        $('#schoolterm').chosen();
+        $('#schoolterm').on('change', function (evt, params) {
+            var sel = $('#schoolterm option:selected');
+            startdate = new Date(sel.attr('data-startdate'));
+            enddate = new Date(sel.attr('data-enddate'));
+            term = sel.val();
+            if (now > enddate || now < startdate) {
+                $('.btn-group button[data-calendar-nav="today"]').hide();
+                $calendar.navigate(startdate);
+            } else {
+                $('.btn-group button[data-calendar-nav="today"]').show();
+                $calendar.navigate('today');
+            }
+        });
+    </script>
+{% endblock %}
+{% comment %}
+{% block page_script %}
+    <script>
+
+        $('#calendar').fullCalendar({
+            lang: 'zh-cn',
+            defaultView: 'agendaWeek',
+            allDaySlot: false,
+            minTime: "08:00:00",
+            maxTime: "21:00:00",
+            slotDuration: "00:30:00",
+            slotEventOverlap: false,
+            firstDay: 0,
+            header: {
+                left: 'prev,next today',
+                center: 'title',
+                right: 'month,agendaWeek,agendaDay'
+            },
+            editable: false,
+            droppable: false, // this allows things to be dropped onto the calendar !!!
+            events: function (start, end, timezone, callback) {
+                if (start < startdate) {
+                    start = startdate.getFullYear() + '-' + (startdate.getMonth() + 1) + '-' + startdate.getDate();
+                } else {
+                    start = start.format('YYYY-MM-DD');
+                }
+                if (end > enddate) {
+                    end = enddate.getFullYear() + '-' + (enddate.getMonth() + 1) + '-' + enddate.getDate();
+                } else {
+                    end = end.format('YYYY-MM-DD');
+                }
+                $.ajax({
+                    url: '{% url 'course:schedule_data' %}',
+                    type: 'GET',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        start: start,
+                        end: end,
+                        term: term,
+                    },
+                    success: function (data) {
+                        $(data).each(function () {
+                            var clickurl = "";
+                            clickurl = clickurl.substring(0, clickurl.length - 1);
+                            $(this).attr('url', clickurl+$(this).attr('id'));
+                        });
+                        callback(data);
+                    }
+                });
+            },
+            viewRender: function (view, element) {
+                viewend = view.end.toDate();
+                viewend.setHours(23, 59, 59, 0);
+                viewstart = view.start.toDate();
+                viewstart.setHours(0, 0, 0, 0);
+                if (viewend >= enddate) {
+                    $("#calendar .fc-next-button").hide();
+                    return false;
+                }
+                else {
+                    $("#calendar .fc-next-button").show();
+                }
+                if (viewstart <= startdate) {
+                    $("#calendar .fc-prev-button").hide();
+                    return false;
+                }
+                else {
+                    $("#calendar .fc-prev-button").show();
+                }
+
+                if (now > enddate || now < startdate) {
+                    $('#calendar .fc-today-button').hide();
+                } else {
+                    $('#calendar .fc-today-button').show();
+                }
+            }
+        });
+    </script>
+
+{% endblock %}
+{% endcomment %}

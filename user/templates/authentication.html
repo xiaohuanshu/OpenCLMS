@@ -1,0 +1,139 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}用户信息验证{% endblock %}
+{% block page_css %}
+    <link href="{% static 'assets/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block page_js %}
+    <script type="text/javascript" src="{% static 'assets/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <!-- page start-->
+    <div class="row">
+        <div class="col-lg-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    用户信息验证
+                </header>
+                <div class="panel-body">
+                    <form role="form" class="form-horizontal" id="authform" method="post">
+                        {% csrf_token %}
+                        {% if request.GET.error %}
+                            <label class="login-wrap error">{{ request.GET.error }}</label>
+                        {% endif %}
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label col-lg-2">姓名</label>
+
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="fullname" name="fullname"
+                                       placeholder="请输入姓名" data-bv-notempty data-bv-notempty-message="请输入姓名">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label col-lg-2">身份证号:</label>
+
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="idnumber" name="idnumber"
+                                       placeholder="请输入身份证号" data-bv-notempty data-bv-notempty-message="请输入身份证号码">
+                            </div>
+                        </div>
+                        <div class="form-group">
+                            <label class="col-sm-2 control-label col-lg-2">身份选择</label>
+
+                            <div class="col-lg-10" id="identity">
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="identity1" name="identity" value="1" data-bv-notempty
+                                           data-bv-notempty-message="请选择身份"> 学生
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="identity2" name="identity" value="2"> 教师
+                                </label>
+                                <label class="checkbox-inline">
+                                    <input type="checkbox" id="identity3" name="identity" value="3"> 管理员
+                                </label>
+
+                            </div>
+                        </div>
+                        <div class="form-group" id="group-studentid">
+                            <label class="col-sm-2 control-label col-lg-2">学号:</label>
+
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="studentid" name="studentid"
+                                       placeholder="请输入学号" data-bv-notempty data-bv-notempty-message="请输入学号">
+                            </div>
+                        </div>
+                        {% comment %}
+                        <div class="form-group" id="group-studenttype">
+                            <label class="col-sm-2 control-label col-lg-2">学生类型</label>
+
+                            <div class="col-lg-10">
+                                <select class="form-control m-bot15" name="studenttype" id="studenttype">
+                                    <option value="1" selected>正式生</option>
+                                    <option value="2">外籍生</option>
+                                    <option value="3">交流生</option>
+                                    <option value="4">研修生</option>
+                                </select>
+
+                            </div>
+                        </div>
+                        {% endcomment %}
+                        <div class="form-group" id="group-teacherid">
+                            <label class="col-sm-2 control-label col-lg-2">教职工号:</label>
+
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="teacherid" name="teacherid"
+                                       placeholder="请输入教职工号" data-bv-notempty data-bv-notempty-message="请输入教职工号">
+                            </div>
+                        </div>
+                        <div class="form-group" id="group-safenumber">
+                            <label class="col-sm-2 control-label col-lg-2">安全号码:</label>
+
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" id="safenumber" name="safenumber"
+                                       placeholder="请输入安全号码" data-bv-notempty data-bv-notempty-message="请输入安全号码">
+                            </div>
+                        </div>
+                        <div class="checkbox">
+                            <label>
+                                <input type="checkbox" name="check" id="check" data-bv-notempty
+                                       data-bv-notempty-message="请确认您的信息"> 我确认上述信息无误
+                            </label>
+                        </div>
+                        <button type="submit" class="btn btn-info" disabled>提交</button>
+                    </form>
+
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- page end-->
+{% endblock %}
+{% block page_script %}
+    <script type="text/javascript">
+        $(function () {
+            showCont();
+            $("#identity").click(function () {
+                showCont();
+            });
+            $('#authform').bootstrapValidator();
+        });
+        function showCont() {
+            if ($("#identity1").is(':checked')) {
+                $("#group-studentid").slideDown("fast");
+            } else {
+                $("#group-studentid").slideUp("fast");
+            }
+            if ($("#identity2").is(':checked')) {
+                $("#group-teacherid").slideDown("fast");
+            } else {
+                $("#group-teacherid").slideUp("fast");
+            }
+            if ($("#identity3").is(':checked')) {
+                $("#group-safenumber").slideDown("fast");
+            } else {
+                $("#group-safenumber").slideUp("fast");
+            }
+        }
+
+    </script>
+{% endblock %}

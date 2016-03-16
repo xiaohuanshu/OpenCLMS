@@ -1,0 +1,151 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load center_extra %}
+{% block title %}上课时间{% endblock %}
+{% block page_css %}
+    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+
+    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
+          rel="stylesheet"/>
+    <link rel="stylesheet" type="text/css" href="{% static 'assets/bootstrap-timepicker/compiled/timepicker.css' %}"/>
+
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'bootstrap-editable.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-editable.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'assets/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    上课时间
+             <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down"></a>
+                <!--<a href="javascript:;" class="fa fa-times"></a>-->
+             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="adv-table">
+                        <table id="table"
+                               data-toggle="table"
+                               data-striped="true"
+                                >
+                            <thead>
+                            <tr>
+                                <th>节数</th>
+                                <th>开始时间</th>
+                                <th>结束时间</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for m in classtimedata %}
+                                <tr>
+                                    <td>{{ m.id }}</td>
+                                    <td>{{ m.starttime | date:'H:i:s' }}</td>
+                                    <td>{{ m.endtime | date:'H:i:s' }}</td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+        $table.bootstrapTable({
+            columns: [{
+                field: 'id',
+                title: '节数'
+            }, {
+                field: 'starttime',
+                title: '开始时间',
+                editable: {
+                    type: 'text',
+                    title: '开始时间',
+                    validate: function (value) {
+                        value = $.trim(value);
+                        if (!value) {
+                            return '请输入开始时间';
+                        }
+                        return '';
+                    },
+                    url: '{% url 'school:classtime' %}',
+                    ajaxOptions: {
+                        type: 'post',
+                        dataType: 'json'
+                    },
+                    error: function (response, newValue) {
+                        if (response.status === 500) {
+                            return '服务器出现故障';
+                        } else {
+                            return '修改时间失败';
+                        }
+                    },
+                }
+            }, {
+                field: 'endtime',
+                title: '结束时间',
+                editable: {
+                    type: 'text',
+                    title: '结束时间',
+                    validate: function (value) {
+                        value = $.trim(value);
+                        if (!value) {
+                            return '请输入结束时间';
+                        }
+                        return '';
+                    },
+                    url: '{% url 'school:classtime' %}',
+                    ajaxOptions: {
+                        type: 'post',
+                        dataType: 'json'
+                    },
+                    error: function (response, newValue) {
+                        if (response.status === 500) {
+                            return '服务器出现故障';
+                        } else {
+                            return '修改时间失败';
+                        }
+                    },
+                }
+            }]
+        });
+        $('.editable').on('shown', function (e, editable) {
+            editable.input.$input.timepicker({
+                autoclose: true,
+                minuteStep: 1,
+                showSeconds: true,
+                showMeridian: false,
+                defaultTime: false
+            });
+        });
+        $('.editable').each(function () {
+            var data = $table.bootstrapTable('getData'),
+                    index = $(this).parents('tr').data('index');
+            console.log(data[index].id);
+            $(this).editable('option', 'pk', data[index].id);
+        })
+    </script>
+{% endblock %}

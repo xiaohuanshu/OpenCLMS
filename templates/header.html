@@ -1,0 +1,140 @@
+{% load staticfiles %}
+<!--header start-->
+<header class="header white-bg">
+    <div class="sidebar-toggle-box">
+        {% comment %}<div data-original-title="切换导航" data-placement="right" class="fa fa-bars tooltips"></div>{% endcomment %}
+        <div class="fa fa-bars tooltips"></div>
+    </div>
+    <!--logo start-->
+    <a href="{% url 'home' %}" class="logo">Check<span>in</span></a>
+    <!--logo end-->
+    <div class="nav notify-row" id="top_menu">
+        <!--  notification start -->
+        <ul class="nav top-menu">
+            <!-- settings start -->
+            <li class="dropdown">
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <i class="fa fa-tasks"></i>
+                    <span class="badge bg-success">{{ todaylesson | length }}</span>
+                </a>
+                <ul class="dropdown-menu extended tasks-bar">
+                    <div class="notify-arrow notify-arrow-green"></div>
+                    <li>
+                        <p class="green">你今天有{{ todaycourse | length }}節課</p>
+                    </li>
+
+
+                    {% for lesson in todaylesson %}
+                    <li>
+                        <a href="{% url 'course:information' lesson.course.id %}">
+                            <div class="task-info">
+                                <div class="desc">{{ lesson.course.title }}</div>
+                                {% comment %}<div class="percent">40%</div>{% endcomment %}
+                            </div>
+                            {% comment %}
+                            <div class="progress progress-striped">
+                                <div class="progress-bar progress-bar-success" role="progressbar" aria-valuenow="40"
+                                     aria-valuemin="0" aria-valuemax="100" style="width: 40%">
+                                    <span class="sr-only">40% Complete (success)</span>
+                                </div>
+                            </div>
+                            {% endcomment %}
+                        </a>
+                    </li>
+                    {% endfor %}
+
+                    <li class="external">
+                        <a href="{% url 'course:schedule' %}">查看課表</a>
+                    </li>
+                </ul>
+            </li>
+            <!-- settings end -->
+            {% comment %}
+            <!-- notification dropdown start-->
+            <li id="header_notification_bar" class="dropdown">
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+
+                    <i class="fa fa-bell-o"></i>
+                    <span class="badge bg-warning">7</span>
+                </a>
+                <ul class="dropdown-menu extended notification">
+                    <div class="notify-arrow notify-arrow-yellow"></div>
+                    <li>
+                        <p class="yellow">你有7個提醒</p>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-danger"><i class="fa fa-bolt"></i></span>
+                            Server #3 overloaded.
+                            <span class="small italic">34 mins</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-warning"><i class="fa fa-bell"></i></span>
+                            Server #10 not respoding.
+                            <span class="small italic">1 Hours</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-danger"><i class="fa fa-bolt"></i></span>
+                            Database overloaded 24%.
+                            <span class="small italic">4 hrs</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-success"><i class="fa fa-plus"></i></span>
+                            New user registered.
+                            <span class="small italic">Just now</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">
+                            <span class="label label-info"><i class="fa fa-bullhorn"></i></span>
+                            Application error.
+                            <span class="small italic">10 mins</span>
+                        </a>
+                    </li>
+                    <li>
+                        <a href="#">查看所有提醒</a>
+                    </li>
+                </ul>
+            </li>
+            <!-- notification dropdown end -->
+            {% endcomment %}
+        </ul>
+    </div>
+    <div class="top-nav ">
+        <ul class="nav pull-right top-menu">
+            {% comment %}
+            <li>
+                <input type="text" class="form-control TOPsearch" placeholder="搜索">
+            </li>
+            {% endcomment %}
+            <!-- user login dropdown start-->
+            <li class="dropdown">
+                <a data-toggle="dropdown" class="dropdown-toggle" href="#">
+                    <img alt="" src="{% static 'img/avatar1_small.jpg' %}">
+                    <span class="username">{{ request.session.username }}</span>
+                    <b class="caret"></b>
+                </a>
+                <ul class="dropdown-menu extended logout">
+                    <div class="log-arrow-up"></div>
+                    <li><a href="#"><i class="fa fa-suitcase"></i>主頁</a></li>
+                    <li><a href="#"><i class="fa fa-cog"></i> 設置</a></li>
+                    <li><a href="#"><i class="fa fa-bell-o"></i> 提醒</a></li>
+                    <li><a href="{% url 'user:logout' %}"><i class="fa fa-key"></i> 註銷</a></li>
+                </ul>
+            </li>
+            <!-- user login dropdown end -->
+            {% comment %}
+            <li class="sb-toggle-right">
+                <i class="fa  fa-align-right"></i>
+            </li>
+            {% endcomment %}
+        </ul>
+    </div>
+</header>
+<!--header end-->

@@ -1,0 +1,200 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load school_extra %}
+{% block title %}课程列表{% endblock %}
+{% block page_css %}
+    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'js/tableExport.min.js' %}"></script>
+    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    课程列表
+             <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down"></a>
+                <!--<a href="javascript:;" class="fa fa-times"></a>-->
+             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <select name="major" id="major" data-placeholder="开课专业">
+                                        <option value selected></option>
+                                        {% getmajor as majordata %}
+                                        {% for key, value in  majordata.items %}
+                                            <optgroup label="{{ key }}">
+                                                <option value="*{{ key }}">全部</option>
+                                                {% for m in value %}
+                                                    <option value="{{ m }}">{{ m }}</option>
+                                                {% endfor %}
+                                            </optgroup>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select name="viewType2" id="schoolterm" data-placeholder="学年学期">
+                                        <option value selected></option>
+                                        {% getterm as termdata %}
+
+                                        {% for m in termdata %}
+                                            <option value="{{ m }}">{{ m }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                {% comment %}
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox"> 我的课程
+                                    </label>
+                                </div>
+                                <!--<button type="submit" class="btn btn-default">高级搜索</button>-->
+                            {% endcomment %}
+                            </div>
+                        </div>
+                        <table id="table"
+                               data-toggle="table"
+                               data-search="true"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true"
+                               data-show-export="true"
+                               data-minimum-count-columns="2"
+                               data-pagination="true"
+                               data-id-field="id"
+                               data-page-size="5"
+                               data-page-list="[5,10, 25, 50, 100, ALL]"
+                               data-side-pagination="server"
+                               data-url="{% url 'course:course_data' %}"
+                               data-toolbar="#custom-toolbar"
+                               data-striped="true"
+                               data-query-params="queryParams"
+                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf', 'json']"
+                               data-search-text="{{ request.GET.search }}"
+                                >
+
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        {% if request.GET.major %}
+            $("#major").find("option[value='{{ request.GET.major }}']").attr('selected', true);
+        {% elif request.GET.department %}
+            $("#major").find("option[value='*{{ request.GET.department }}']").attr('selected', true);
+        {% endif %}
+        {% if request.GET.schoolterm %}
+            $("#schoolterm").find("option[value='{{ request.GET.schoolterm }}']").attr('selected', true);
+        {% endif %}
+
+        window.operateEvents = {
+            'click .like': function (e, value, row, index) {
+                alert('You click like action, row: ' + JSON.stringify(row));
+            },
+            'click .remove': function (e, value, row, index) {
+                $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: [row.id]
+                });
+            }
+        };
+
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+        $table.bootstrapTable({
+            columns: [{
+                field: 'title',
+                title: '课程名称',
+                searchable: true
+            }, {
+                field: 'serialnumber',
+                title: '课程编号'
+            }, {
+                field: 'time',
+                title: '上课时间'
+            }, {
+                field: 'location',
+                title: '上课地点',
+                visible: false
+            }, {
+                field: 'teacher',
+                title: '教师'
+            }, {
+                field: 'major',
+                title: '开课专业',
+                visible: false
+            }, {
+                field: 'department',
+                title: '开课系所'
+            }, {
+                field: 'number',
+                title: '人数',
+                sortable: true
+            }, {
+                field: 'schoolterm',
+                title: '学年学期',
+                visible: false
+            }, {
+                field: 'operate',
+                title: '操作',
+                align: 'center',
+                events: operateEvents,
+                formatter: operateFormatter
+            }],
+            onClickRow:clickrow
+        });
+        function queryParams(params) {
+            params['schoolterm'] = $('#schoolterm').val();
+            params['major'] = $('#major').val();
+            return params;
+        }
+        function clickrow(row, element){
+            var clickurl="{% url 'course:information' 0 %}";
+            clickurl=clickurl.substring(0,clickurl.length-1);
+            window.location.href=clickurl+row.id;
+        }
+
+        $('#major').chosen({allow_single_deselect: true, include_group_label_in_selected: true});
+        $('#schoolterm').chosen({allow_single_deselect: true});
+
+        $('#schoolterm').on('change', function (evt, params) {
+            $table.bootstrapTable('refresh');
+        });
+        $('#major').on('change', function (evt, params) {
+            $table.bootstrapTable('refresh');
+        });
+
+        function operateFormatter(value, row, index) {
+            return [
+                '<a class="like" href="javascript:void(0)" title="Like">',
+                '<i class="glyphicon glyphicon-heart"></i>',
+                '</a>  ',
+                '<a class="remove" href="javascript:void(0)" title="Remove">',
+                '<i class="glyphicon glyphicon-remove"></i>',
+                '</a>'
+            ].join('');
+        }
+
+
+    </script>
+{% endblock %}

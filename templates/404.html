@@ -1,0 +1,23 @@
+{% extends 'base-body.html' %}
+{% block body %}
+    <body class="body-404">
+
+
+    <div class="container">
+
+        <section class="error-wrapper">
+            <i class="icon-404"></i>
+
+            <h1>404</h1>
+
+            <h2>页面没有找到</h2>
+
+            <p class="page-404">一些错误发生了!我们没有找到你需要的页面. <a href="{% url 'home' %}">返回主页</a></p>
+        </section>
+
+    </div>
+
+
+    </body>
+
+{% endblock %}

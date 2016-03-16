@@ -1,0 +1,217 @@
+# -*- coding: utf-8 -*-
+from django.db import models
+import datetime
+from school.function import getTermDate, getClassTime
+from school.models import Classroom
+from constant import *
+from django.db.models import ObjectDoesNotExist, Q
+import time
+from function import getweek,gettime,getday,t,splitlesson
+
+# Create your models here.
+
+
+class Course(models.Model):
+    serialnumber = models.CharField(max_length=33, blank=True, null=True)
+    number = models.SmallIntegerField(blank=True, null=True)
+    title = models.CharField(max_length=100, blank=True, null=True)
+    teacher = models.ForeignKey('school.Teacher', models.DO_NOTHING, db_column='teacherid', blank=True, null=True)
+    time = models.CharField(max_length=255, blank=True, null=True)
+    location = models.CharField(max_length=255, blank=True, null=True)
+    schoolterm = models.CharField(max_length=20, blank=True, null=True)
+    major = models.ForeignKey('school.Major', models.DO_NOTHING, db_column='majorid', blank=True, null=True)
+    department = models.ForeignKey('school.Department', models.DO_NOTHING, db_column='departmentid', blank=True,
+                                   null=True)
+
+    def lastlessontime(self):
+        lessondata = Lesson.objects.filter(course=self).order_by('-starttime').all()[:1]
+        if lessondata[0].starttime:
+            return lessondata[0].starttime
+        else:
+            return None
+
+    def status(self):
+        try:
+            lessondata = Lesson.objects.filter(course=self, status=LESSON_STATUS_NOW).get()
+        except ObjectDoesNotExist:
+            return 0
+        return 1
+
+    def progress(self):
+        lessoncount = Lesson.objects.filter(course=self).count()
+        lessonallreadycount = Lesson.objects.filter(course=self, status=LESSON_STATUS_END).count()
+        return "%d" % ((lessonallreadycount / (lessoncount * 1.0)) * 100)
+
+    def generatelesson(self):
+        count = 0
+        Lesson.objects.filter(course=self, status=LESSON_STATUS_AWAIT).delete()
+        time = self.time
+        location = self.location
+        term = self.schoolterm
+        for ele in splitlesson(time, location):
+            try:
+                locationid = Classroom.objects.get(location=ele['location'])
+            except ObjectDoesNotExist:
+                return -1
+            if not Lesson.objects.filter(course=self.id, time=ele['time'], term=term,
+                                                    week=ele['week'], day=ele['day'], length=ele['length'],
+                                                    classroom=locationid.id).exists():
+                p = Lesson()
+                p.course = self.id
+                p.classroom = locationid
+                p.length = ele['length']
+                p.status = LESSON_STATUS_AWAIT
+                p.term = term
+                p.week = ele['week']
+                p.time = ele['time']
+                p.day = ele['day']
+                p.save()
+                count = count + 1
+        return count
+
+
+    def __unicode__(self):
+        return u"%s" % (self.title)
+
+    class Meta:
+        managed = False
+        db_table = 'Course'
+
+
+class Lesson(models.Model):
+    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    classroom = models.ForeignKey('school.Classroom', models.DO_NOTHING, db_column='classroomid', blank=True, null=True)
+    length = models.SmallIntegerField(blank=True, null=True)
+    status = models.SmallIntegerField(blank=True, null=True)
+    year = models.SmallIntegerField(blank=True, null=True)
+    term = models.CharField(max_length=20, blank=True, null=True)
+    week = models.SmallIntegerField(blank=True, null=True)
+    time = models.SmallIntegerField(blank=True, null=True)
+    day = models.SmallIntegerField(blank=True, null=True)
+    starttime = models.DateTimeField(blank=True, null=True)
+    endtime = models.DateTimeField(blank=True, null=True)
+    checkincount = models.SmallIntegerField(blank=True, null=True)
+    date = models.DateField(blank=True, null=True)
+
+    def getTime(self):
+        # allowcheckinbeforetime = 10
+        classtime = getClassTime()
+        termtime = getTermDate(self.term)
+        thistermtime = datetime.datetime.strptime(str(termtime[0]), '%Y-%m-%d')
+        dayplus = (self.week - 1) * 7 + self.day
+        thistermtime = thistermtime + datetime.timedelta(days=dayplus)
+        coursestarttime = datetime.datetime.strptime(str(classtime[self.time][0]), '%H:%M:%S')
+        courseendtime = datetime.datetime.strptime(str(classtime[self.time + self.length - 1][1]), '%H:%M:%S')
+        starttime = thistermtime + datetime.timedelta(hours=coursestarttime.hour, minutes=coursestarttime.minute,
+                                                      seconds=coursestarttime.second)
+        endtime = thistermtime + datetime.timedelta(hours=courseendtime.hour, minutes=courseendtime.minute,
+                                                    seconds=courseendtime.second)
+        # allowstarttime = starttime - datetime.timedelta(minutes=allowcheckinbeforetime)
+        return [starttime.timetuple(), endtime.timetuple()]
+
+    def shouldnumber(self):
+        from checkin.models import Checkin
+        from checkin.constant import CHECKIN_STATUS_ASK
+        shouldnumber = Studentcourse.objects.filter(course=self.course).count()
+        leavenumber = Checkin.objects.filter(lesson=self, status=CHECKIN_STATUS_ASK).count()
+        return shouldnumber - leavenumber
+
+    def actuallynumber(self):
+        from checkin.models import Checkin
+        from checkin.constant import CHECKIN_STATUS_EARLY, CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_LATE, \
+            CHECKIN_STATUS_LATEEARLY
+        checkindata = Checkin.objects.filter(lesson=self)
+        realnumber = checkindata.filter(
+                Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_SUCCESS) | Q(status=CHECKIN_STATUS_LATE) | Q(
+                        status=CHECKIN_STATUS_LATEEARLY)).count()
+        return realnumber
+
+    def asknumber(self):
+        from checkin.models import Checkin
+        from checkin.constant import CHECKIN_STATUS_ASK
+        checkindata = Checkin.objects.filter(lesson=self)
+        asknumber = checkindata.filter(status=CHECKIN_STATUS_ASK).count()
+        return asknumber
+
+    def notreachnumber(self):
+        from checkin.models import Checkin
+        from checkin.constant import CHECKIN_STATUS_NORMAL
+        checkindata = Checkin.objects.filter(lesson=self)
+        notreach = checkindata.filter(status=CHECKIN_STATUS_NORMAL).count()
+        return notreach
+
+    def startlesson(self):
+        if self.course.status() != 0:
+            return {'error': 101, 'message': u'课程时间冲突'}
+        if self.status != LESSON_STATUS_AWAIT:
+            return {'error': 101, 'message': u'课程不能开启'}
+        nowtime = time.localtime()
+        self.starttime = time.strftime('%Y-%m-%d %H:%M:%S', nowtime)
+        self.status = LESSON_STATUS_NOW
+        self.save()
+
+        # for checkin
+        from checkin.models import Checkin
+        from checkin.constant import CHECKIN_STATUS_NORMAL
+        nowstudent = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
+        studentcourse = Studentcourse.objects.filter(course=self.course).exclude(student__in=nowstudent)
+        newstudent = []
+        for s in studentcourse:
+            newstudent.append(
+                Checkin(lesson=self, status=CHECKIN_STATUS_NORMAL, student=s.student))
+        Checkin.objects.bulk_create(newstudent)
+
+        return {'error': 0, 'message': u'课程成功开启', 'newstatus': self.status,
+                'starttime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
+
+    def stoplesson(self):
+        if self.status != LESSON_STATUS_NOW:
+            return {'error': 101, 'message': u'现在不能结束'}
+        nowtime = time.localtime()
+        self.endtime = time.strftime('%Y-%m-%d %H:%M:%S', nowtime)
+        self.status = LESSON_STATUS_END
+        self.save()
+        return {'error': 0, 'message': u'课程已结束', 'newstatus': self.status,
+                'endtime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
+
+    def cleardata(self):
+        self.status = LESSON_STATUS_AWAIT
+        self.starttime = None
+        self.endtime = None
+        self.save()
+        return {'error': 0, 'message': u'成功清除', 'newstatus': self.status,
+                'endtime': u'没有数据'}
+
+    def isnow(self):
+        if self.status == LESSON_STATUS_NOW or self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
+            return True
+        else:
+            return False
+
+    def isend(self):
+        if self.status == LESSON_STATUS_CANCLE or self.status == LESSON_STATUS_END or self.status == LESSON_STATUS_END_EARLY:
+            return True
+        else:
+            return False
+
+    def ischeckinnow(self):
+        if self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
+            return True
+        else:
+            return False
+
+    def __unicode__(self):
+        return "%d %s-%d-%d-%d-%d" % (self.id, self.term, self.year, self.week, self.day, self.time)
+
+    class Meta:
+        managed = False
+        db_table = 'Lesson'
+
+
+class Studentcourse(models.Model):
+    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
+    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+
+    class Meta:
+        managed = False
+        db_table = 'StudentCourse'

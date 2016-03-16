@@ -1,0 +1,15 @@
+{
+  "name": "schedule(bootstrap-calendar)",
+  "version": "0.2.4",
+  "description": "Bootstrap full view calendar, modify by yanking",
+  "main": [
+    "./js/calendar.js"
+  ],
+  "scripts": {
+    "test": ""
+  },
+  "keywords": [
+    "calendar"
+  ],
+  "author": "yanking,Sergey Romanov"
+}

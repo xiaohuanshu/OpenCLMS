@@ -1,0 +1,4 @@
+psycopg2
+wechat_sdk
+django-memcached
+python-memcached

@@ -1,0 +1,157 @@
+{% extends 'base-body.html' %}
+{% load staticfiles %}
+{% block title %}注册{% endblock %}
+{% block body %}
+    <body class="login-body">
+
+    <div class="container">
+
+        <form class="form-signin" id="signupForm" action="{% url 'user:registerProcess' %}" method="post">
+            {% csrf_token %}
+            <h2 class="form-signin-heading">注册</h2>
+
+            <div class="login-wrap">
+
+
+                <p> 请输入您的账户资料</p>
+
+                <div class="form-group ">
+                    <input type="text" class="form-control" for="username" name="username" placeholder="用户名"
+                           id="username" autofocus>
+                </div>
+                <div class="form-group ">
+                    <input type="text" class="form-control" for="email" name="email" placeholder="Email" id="email"
+                           autofocus>
+                </div>
+                <div class="form-group ">
+                    <input type="password" class="form-control" for="password" name="password" id="password"
+                           placeholder="密码">
+                </div>
+                <div class="form-group ">
+                    <input type="password" class="form-control" for="repassword" name="repassword" id="repassword"
+                           placeholder="重复密码">
+                </div>
+
+                <div class="btn-group" data-toggle="buttons">
+                    <label class="btn btn-primary active">
+                        <input type="radio" name="sex" id="male" value="1" checked> 男
+                    </label>
+                    <label class="btn btn-primary ">
+                        <input type="radio" name="sex" id="female" value="2"> 女
+                    </label>
+                </div>
+                <div class="form-group checkbox">
+                    <label>
+                        <input type="checkbox" value="agree this condition" for="agree" name="agree" id="agree">
+                        我同意网站服务条款
+                    </label>
+                </div>
+                <button class="btn btn-lg btn-login btn-block" type="submit" disabled>注册</button>
+
+                <div class="registration">
+                    已经拥有账户?
+                    <a class="" href="{% url 'user:login' %}">
+                        登录
+                    </a>
+                </div>
+
+            </div>
+
+        </form>
+
+    </div>
+
+
+    </body>
+
+{% endblock %}
+{% block page_css %}
+    <link href="{% static 'assets/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block page_script %}
+    <script type="text/javascript" src="{% static 'assets/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
+
+    <script>
+        $('#signupForm').bootstrapValidator({
+            feedbackIcons: {
+                valid: 'glyphicon glyphicon-ok',
+                invalid: 'glyphicon glyphicon-remove',
+                validating: 'glyphicon glyphicon-refresh'
+            },
+            fields: {
+                username: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入您的用户名'
+                        },
+                        stringLength: {
+                            min: 4,
+                            max: 20,
+                            message: '您的用户名需要4~20个字符'
+                        },
+                        regexp: {
+                            regexp: /^\w*[a-zA-Z]+\w*$/,
+                            message: '您的用户名只能出现字母数字 下划线,不能全为数字'
+                        },
+                        remote: {
+                            message: '此用户名已被注册',
+                            url: '{% url 'user:check_username' %}',
+                            type: 'POST'
+                        }
+                    }
+                },
+                email: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入E-mail帐号'
+                        },
+                        emailAddress: {
+                            message: '请输入正确的E-mail帐号'
+                        },
+                        remote: {
+                            message: '此E-mail已被注册',
+                            url: '{% url 'user:check_email' %}',
+                            type: 'POST'
+                        },
+                        stringLength: {
+                            max: 40,
+                            message: '邮箱长度不能大于40字符'
+                        },
+                    }
+                }, password: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入您的密码'
+                        },
+                        different: {
+                            field: 'username',
+                            message: '密码不能与用户名相同'
+                        },
+                        stringLength: {
+                            min: 6,
+                            max: 20,
+                            message: '您的密码需要6~20个字符,'
+                        }
+                    }
+                }, repassword: {
+                    validators: {
+                        notEmpty: {
+                            message: '请重复输入您的密码'
+                        },
+                        identical: {
+                            field: 'password',
+                            message: '两次输入的密码不一致'
+                        }
+                    }
+                },
+                agree: {
+                    validators: {
+                        notEmpty: {
+                            message: ' '
+                        }
+                    }
+                },
+            }
+        });
+    </script>
+{% endblock %}

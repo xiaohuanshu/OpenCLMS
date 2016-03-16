@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% include 'head.html' %}
+{% block page_css %}
+{% endblock %}
+<script>document.title = '{% block title %}默认标题{% endblock %} - Checkin system'</script>
+<body>
+
+<section id="container" class="">
+    {% include 'header.html' %}
+    {% include 'sidebar.html' %}
+    <!--main content start-->
+    <section id="main-content">
+        <section class="wrapper site-min-height">
+            {% block content %}
+                <!-- page start-->
+                Page content goes here
+                <!-- page end-->
+            {% endblock %}
+        </section>
+    </section>
+    <!--main content end-->
+    {% comment %}
+    {% include 'right-sidebar.html' %}
+    {% endcomment %}
+    {% include 'footer.html' %}
+</section>
+{% include 'endscript.html' %}
+{% block page_js %}
+{% endblock %}
+{% block page_script %}
+{% endblock %}
+</body>
+<script>
+    function windowHeight() {
+        var de = document.documentElement;
+        return self.innerHeight || (de && de.clientHeight) || document.body.clientHeight;
+    }
+
+    //window.onresize是窗口改变大小的时候，因为窗口改变大小，文档的可见高度或宽度会变化。
+    window.onload = window.onresize = function () {
+        var wh = windowHeight();
+        $('.site-min-height').css('min-height',wh-$('.header').get(0).offsetHeight-$('.site-footer').get(0).offsetHeight)
+    }
+
+    $('#loading-btn').click(function(){
+        window.location.reload();
+    });
+</script>
+</html>

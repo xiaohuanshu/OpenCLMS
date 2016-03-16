@@ -1,0 +1,316 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load course_extra %}
+{% load checkin_extra %}
+{% load center_extra %}
+{% block title %}课程信息{% endblock %}
+{% block page_css %}
+    <link href="{% static 'assets/toastr-master/toastr.css' %}" rel="stylesheet" type="text/css"/>
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'assets/toastr-master/toastr.js' %}"></script>
+{% endblock %}
+
+
+{% block content %}
+    <!-- page start-->
+    <div class="row">
+        <div class="col-md-8">
+            <section class="panel">
+                <div class="bio-graph-heading project-heading">
+                    <strong> [ {{ coursedata.title }} ] </strong>
+                </div>
+                <div class="panel-body bio-graph-info">
+                    <!--<h1>New Dashboard BS3 </h1>-->
+                    <div class="row p-details">
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">任课教师: </span>: {{ coursedata.teacher.name }}</p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">状态 </span>: <span
+                                    class="label label-primary">{{ coursedata.status|COURSE_STATUS }}</span></p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">所属学期 </span>: <a
+                                    href="{% url 'course:list' %}?schoolterm={{ coursedata.schoolterm }}">{{ coursedata.schoolterm }}</a>
+                            </p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span
+                                    class="bold">最后上课时间</span>: {{ coursedata.lastlessontime|date:'Y-m-d H:i:s'|default:'未上课' }}
+                            </p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">教室 </span>: {{ coursedata.location }}</p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">人数 </span>: {{ coursedata.number }}</p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">开课专业 </span>: <a
+                                    href="{% url 'course:list' %}?major={{ coursedata.major.name }}">{{ coursedata.major.name | default:"无" }}</a>
+                            </p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-6">
+                            <p><span class="bold">开课系所 </span>: <a
+                                    href="{% url 'course:list' %}?department={{ coursedata.department.name }}">{{ coursedata.department.name }}</a>
+                            </p>
+                        </div>
+                        <div class="bio-row col-xs-12 col-sm-12">
+                            <p><span class="bold">上课时间 </span>: {{ coursedata.time }}</p>
+                        </div>
+
+                        <div class="col-lg-12">
+                            <dl class="dl-horizontal mtop20 p-progress">
+                                <dt>课程进度:</dt>
+                                <dd>
+                                    <div class="progress progress-striped active ">
+                                        <div style="width: {{ coursedata.progress }}%;"
+                                             class="progress-bar progress-bar-success"></div>
+                                    </div>
+                                    <small>课程进度已完成 <strong>{{ coursedata.progress }}%</strong>
+                                    </small>
+                                </dd>
+                            </dl>
+                        </div>
+                    </div>
+
+                </div>
+
+            </section>
+
+            <section class="panel">
+                <header class="panel-heading">
+                    课程列表
+                    <span class="pull-right">
+                          <button type="button" id="loading-btn" class="btn btn-warning btn-xs"><i
+                                  class="fa fa-refresh"></i> 刷新
+                          </button>
+                      </span>
+                </header>
+                <div class="panel-body">
+                    <table class="table table-hover p-table">
+                        <thead>
+                        <tr>
+                            <th>节数</th>
+                            <th class="hidden-xs">时间</th>
+                            <th>应到</th>
+                            <th>实到</th>
+                            <th class="hidden-xs">开始时间</th>
+                            <th class="hidden-xs">结束时间</th>
+                            <th>状态</th>
+                            <th>其他</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for lesson in lessondata %}
+                            <tr>
+                                <td>
+                                    {{ forloop.counter }}
+                                </td>
+                                <td class="hidden-xs">
+                                    第{{ lesson.week }}周{{ lesson.day|weekdeal }}
+                                    ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length }}节
+                                </td>
+                                <td>
+                                    {{ lesson.shouldnumber }}
+                                </td>
+                                <td>
+                                    {{ lesson.actuallynumber|default:'没有数据' }}
+                                </td>
+                                <td class="hidden-xs lesson-starttime" data-lessonid="{{ lesson.id }}">
+                                    {{ lesson.starttime|date:'Y-m-d H:i:s'|default:'还未开始' }}
+                                </td>
+                                <td class="hidden-xs lesson-endtime" data-lessonid="{{ lesson.id }}">
+                                    {{ lesson.endtime|date:'Y-m-d H:i:s'|default:'还未结束' }}
+                                </td>
+                                <td>
+                                    <span class="label label-{{ lesson.status|LESSON_STATUS_STYLE }} lesson-status"
+                                          data-lessonid="{{ lesson.id }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                </td>
+                                <td>
+                                    <div class="btn-group">
+                                        <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle btn-xs"
+                                                type="button" aria-expanded="false">操作 <span class="caret"></span>
+                                        </button>
+                                        <ul role="menu" class="dropdown-menu">
+                                            <li><a href="{% url 'checkin:startcheckin' lesson.id %}">开始签到</a></li>
+                                            <li><a href="{% url 'checkin:lesson_data' lesson.id %}">学生/签到数据</a></li>
+                                            {% if not lesson.isend %}
+                                                <li class="divider"></li>
+                                                {% if not lesson.isnow %}
+                                                    <li>
+                                                        {% if not coursedata.status %}
+                                                            <a href="#" class="control-lessonstart"
+                                                               data-lessonid="{{ lesson.id }}">设为课程开始</a>
+                                                        {% else %}
+                                                            <a href="#" class="control-lessonstart"
+                                                               style="display: none;"
+                                                               data-lessonid="{{ lesson.id }}">设为课程开始</a>
+                                                        {% endif %}
+                                                    </li>
+                                                {% endif %}
+                                                <li>
+                                                    {% if lesson.isnow %}
+                                                        <a href="#" class="control-lessonstop"
+                                                           data-lessonid="{{ lesson.id }}">设为课程结束</a>
+                                                    {% else %}
+                                                        <a href="#" class="control-lessonstop" style="display: none;"
+                                                           data-lessonid="{{ lesson.id }}">设为课程结束</a>
+                                                    {% endif %}
+                                                </li>
+                                            {% endif %}
+                                        </ul>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+        </div>
+        <div class="col-md-4">
+            <section class="panel">
+                <header class="panel-heading">
+                    课程简介[这个功能还没有做完]
+                </header>
+
+                <div class="panel-body">
+
+                    <p>
+                        C语言程序设计是高等院校计算机专业及相关专业重要的专业基础课，其目的是培养学生的程序设计理念、掌握程序设计的基本方法，为后续课程（数据结构、面向对象程序设计、操作系统、编译原理和软件工程等）打下坚实的基础。
+                        C语言程序设计是一门实践性很强的课程，学生从一开始，普遍给予很高的热情。对于把目标定位在提高实践应用能力的淮海工学院计算机科学系来说，更应该从一开始就很下功夫，尽可能早的让学生对程序设计产生浓厚的兴趣。与其他院校相比，本课题组的绝大部分成员虽年青但有活力，更重要的是有着丰富的工作经历和很强的动手能力，对该门课程有很深的感悟，能很好的把教学与实践应用结合在一起。
+                        C语言程序设计的前期课程通常有计算机导论（或计算机文化基础）。目前，各大专院校的教学内容都是基于Windows 98/2000/XP操作系统，但讲授到C语言程序设计课程时，又大多以Turbo
+                        C为环境，即退回到了DOS操作系统环境下，这样造成两个层次的脱节。有一部分学校使用的教材是基于Turbo C环境的，而学生上机实验环境又采用Visual
+                        C++等，虽然两者类似，但毕竟有较大差异，不便于提高学生的动手能力。因此在讲授该课程时，我们对传统的讲授方法进行了改进，完全以Visual
+                        C++为环境讲授C语言程序设计的基本思想、方法和解决实际问题的技巧，并比较了Turbo C和Visual C++之间的一些差异，兼顾了以Turbo C为学习环境的读者。
+                    </p>
+                    <br/>
+                    <h5 class="bold">课程类型</h5>
+                    <ul class="nav nav-pills nav-stacked labels-info ">
+                        <li><i class=" fa fa-circle text-danger"></i> 公共选修课</p></li>
+                    </ul>
+
+                    <br/>
+                    <h5 class="bold">课程文件</h5>
+                    <ul class="list-unstyled p-files">
+                        <li><a href=""><i class="fa fa-file-text"></i> 课程介绍.docx</a></li>
+                        <li><a href=""><i class="fa fa-picture-o"></i> 课程大纲.jpg</a></li>
+                        <li><a href=""><i class="fa fa-mail-forward"></i> 教材.mln</a></li>
+                        <li><a href=""><i class="fa fa-file"></i> 文档.docx</a></li>
+                    </ul>
+                    <br/>
+
+                    <h5 class="bold">Project Tags</h5>
+                    <ul class="p-tag-list">
+                        <li><a href=""><i class="fa fa-tag"></i> Dlor</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Lorem ipsum</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Google</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Excellent</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Dlor</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Lorem ipsum</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Google</a></li>
+                        <li><a href=""><i class="fa fa-tag"></i> Excellent</a></li>
+                    </ul>
+
+                    <div class="text-center mtop20">
+                        <a href="#" class="btn btn-sm btn-primary">Add files</a>
+                        <a href="#" class="btn btn-sm btn-warning">Report contact</a>
+                    </div>
+                </div>
+
+            </section>
+        </div>
+    </div>
+    <!-- page end-->
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        {% LESSON_STATUS_JSON as lesson_status_json %}
+        lesson_status_json ={{ lesson_status_json|safe }};
+        {% LESSON_STATUS_STYLE_JSON as lesson_status_style_json %}
+        lesson_status_style_json ={{ lesson_status_style_json|safe }};
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "progressBar": false,
+            "positionClass": "toast-top-center",
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
+        $(".control-lessonstart").each(function () {
+            var lessonid = $(this).data('lessonid');
+            var $control = $(this);
+            $control.click(function () {
+                $.ajax({
+                    url: '{% url 'course:control.startlesson' %}',
+                    type: 'GET',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        lessonid: lessonid
+                    },
+                    success: function (data) {
+                        if (data.error != 0) {
+                            toastr['error'](data.message, "操作失败");
+                        } else {
+                            toastr['success'](data.message, "操作成功");
+                            $('.lesson-starttime[data-lessonid=' + lessonid + ']').text(data.starttime);
+                            $('.lesson-status[data-lessonid=' + lessonid + ']').text(lesson_status_json[data.newstatus]);
+                            $('.lesson-status[data-lessonid=' + lessonid + ']').attr('class', 'lesson-status label label-' + lesson_status_style_json[data.newstatus]);
+                            $control.remove();
+                            $(".control-lessonstop").each(function () {
+                                $(this).show();
+                            });
+
+                        }
+                    }, error: function (XMLHttpRequest, textStatus) {
+                        toastr['error'](textStatus, "与服务器连接失败");
+                    }
+                });
+            });
+        });
+        $(".control-lessonstop").each(function () {
+            var lessonid = $(this).data('lessonid');
+            var $control = $(this);
+            $control.click(function () {
+                $.ajax({
+                    url: '{% url 'course:control.stoplesson' %}',
+                    type: 'GET',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        lessonid: lessonid
+                    },
+                    success: function (data) {
+                        if (data.error != 0) {
+                            toastr['error'](data.message, "操作失败");
+                        } else {
+                            toastr['success'](data.message, "操作成功");
+                            $('.lesson-endtime[data-lessonid=' + lessonid + ']').text(data.endtime);
+                            $('.lesson-status[data-lessonid=' + lessonid + ']').text(lesson_status_json[data.newstatus]);
+                            $('.lesson-status[data-lessonid=' + lessonid + ']').attr('class', 'lesson-status label label-' + lesson_status_style_json[data.newstatus]);
+                            $control.remove();
+                            $(".control-lessonstart").each(function () {
+                                $(this).show();
+                            });
+                        }
+                    }, error: function (XMLHttpRequest, textStatus) {
+                        toastr['error'](textStatus, "与服务器连接失败");
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

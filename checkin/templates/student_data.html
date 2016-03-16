@@ -1,0 +1,109 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load checkin_extra %}
+{% block title %}学生考勤数据{% endblock %}
+{% block page_css %}
+    <link href="{% static 'assets/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+
+
+    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+    <style>
+        .bg-default {
+            background-color: lightcoral;
+        }
+    </style>
+
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'assets/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'assets/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+
+
+
+    <script src="{% static 'js/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'js/tableExport.min.js' %}"></script>
+
+    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    学生考勤数据 - {{ student.name }}({{ student.studentid }})
+             <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down"></a>
+                 <!--<a href="javascript:;" class="fa fa-times"></a>-->
+             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                        </div>
+                        <table id="table"
+
+                               data-search="false"
+                               data-show-toggle="true"
+                               data-show-columns="true"
+                               data-show-export="true"
+                               data-minimum-count-columns="2"
+                               data-pagination="true"
+                               data-page-size="5"
+                               data-page-list="[5,10, 25, 50, 100, ALL]"
+                               data-side-pagination="client"
+                               data-toolbar="#custom-toolbar"
+                               data-striped="true"
+                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
+                        >
+                        </table>
+
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+
+        {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
+        checkin_status_style_json ={{ checkin_status_style_json|safe }};
+        {% CHECKIN_STATUS_JSON as checkin_status_json %}
+        checkin_status_json ={{ checkin_status_json|safe }};
+        function identifierFormatter(value, row, index) {
+            return checkin_status_json[value];
+        }
+        function cellStyle(value, row, index) {
+            if (value == null) {
+                return {}
+            }
+            return {
+                classes: 'bg-' + checkin_status_style_json[value]
+            };
+        }
+        /*function clickrow(row, element){
+         var clickurl="{% url 'home' %}";
+         clickurl=clickurl.substring(0,clickurl.length-1);
+         window.location.href=clickurl+row.id;
+         }*/
+
+        $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.rows|safe}}});
+    </script>
+{% endblock %}

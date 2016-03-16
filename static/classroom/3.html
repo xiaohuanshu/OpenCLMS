@@ -1,0 +1,46 @@
+<!DOCTYPE HTML>
+<html>
+<head>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=0;" />
+    <title>HTML5测试</title>
+    <script src="http://ajax.googleapis.com/ajax/libs/jquery/1.9.1/jquery.min.js"></script>
+    <script type="text/javascript">
+        $(function() {
+            var startX, startY, endX, endY;
+            var showADID = 1;
+            document.getElementById("divADBox").addEventListener("touchstart", touchStart, false);
+            document.getElementById("divADBox").addEventListener("touchmove", touchMove, false);
+            document.getElementById("divADBox").addEventListener("touchend", touchEnd, false);
+            function touchStart(event) {
+                var touch = event.touches[0];
+                startY = touch.pageY;
+                startX = touch.pageX;
+            }
+            function touchMove(event) {
+                var touch = event.touches[0];
+                endX = touch.pageX;
+            }
+            function touchEnd(event) {
+                $("#img0" + showADID).hide();
+                showADID++;
+                if (showADID > 4) {
+                    showADID = 1;
+                }
+                    $("#img0" + showADID).show();
+                $("#spText").html("X轴移动大小：" + (startX - endX));
+            }
+        })
+    </script>
+</head>
+<body >
+    <form id="form1">
+    <span id="spText"></span>
+    <div style="border:solid 1px Red;" id="divADBox">
+        <img id="img01" height="450px" src="<%=basePath%>resources/tcode/t1.png"  />
+        <img id="img02" height="450px" src="<%=basePath%>resources/tcode/t2.png" style="display:none;" />
+        <img id="img03" height="450px" src="<%=basePath%>resources/tcode/t3.png" style="display:none;" />
+        <img id="img04" height="450px" src="<%=basePath%>resources/tcode/t4.png" style="display:none;" />
+    </div>
+    </form>
+</body>
+</html>

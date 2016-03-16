@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="zh">
+{% include 'head.html' %}
+{% block page_css %}
+
+{% endblock %}
+<script>document.title = '{% block title %}默认标题{% endblock %} - Checkin system'</script>
+{% block body %}
+    <!-- page start-->
+    Page content goes here
+    <!-- page end-->
+{% endblock %}
+{% include 'endscript.html' %}
+{% block page_js %}
+
+{% endblock %}
+{% block page_script %}
+
+{% endblock %}
+</html>

@@ -1,0 +1,291 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load center_extra %}
+{% load course_extra %}
+{% block title %}{{ lessondata.course.title }}{% endblock %}
+{% block page_js %}
+    <script src="{% static 'assets/chart-master/Chart.js' %}"></script>
+{% endblock %}
+{% block page_css %}
+{% endblock %}
+{% block content %}
+    <section class="panel">
+        <header class="panel-heading">
+            {{ lessondata.course.title }}
+                      <span class="pull-right">
+                          <button type="button" id="loading-btn" class="btn btn-warning btn-xs"><i
+                                  class="fa fa-refresh"></i> 刷新
+                          </button>
+                      </span>
+        </header>
+        <div class="panel-body">
+            {% if not lessondata.checkinnow and not lessondata.isend %}
+                {% if lessondata.isnow %}
+                    {% if checkincount == 0 %}
+                        <div class="row">
+                            <div class="col-sm-12">
+                                <button type="button" class="btn btn-success btn-lg btn-block"
+                                        onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}'">
+                                    开始签到
+                                </button>
+                            </div>
+                        </div>
+                    {% else %}
+                        <div class="row">
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-success btn-lg btn-block popovers"
+                                        onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}?mode=add'"
+                                        data-original-title="补签说明" data-content="当有同学迟到后,进入补签模式,所有新签入的同学会视为迟到"
+                                        data-placement="bottom" data-trigger="hover">
+                                    补签
+                                </button>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-success btn-lg btn-block popovers"
+                                        onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}?mode=again'"
+                                        data-original-title="再签说明" data-content="再次进行一次签到,所有没有签到的人会视为早退"
+                                        data-placement="bottom" data-trigger="hover">
+                                    再签
+                                </button>
+                            </div>
+                            <div class="col-sm-4">
+                                <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal" href="#LessonCloseModal">
+                                    结束课程
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
+                {% else %}
+                    <div class="row">
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-success btn-lg btn-block"
+                                    onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}'">
+                                开始上课
+                            </button>
+                        </div>
+                        <div class="col-sm-6">
+                            <button type="button" class="btn btn-success btn-lg btn-block"
+                                    onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}'">
+                                开始上课/签到
+                            </button>
+                        </div>
+                    </div>
+                {% endif %}
+            {% endif %}
+        </div>
+    </section>
+    <!--state overview start-->
+    <div class="row state-overview">
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol terques">
+                    <i class="fa fa-users"></i>
+                </div>
+                <div class="value">
+                    <h1 class="count">
+                        {{ lessondata.shouldnumber }}
+                    </h1>
+
+                    <p>应到人数</p>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol yellow">
+                    <i class="fa fa-thumbs-up"></i>
+                </div>
+                <div class="value">
+                    <h1 class=" count2">
+                        {{ lessondata.actuallynumber }}
+                    </h1>
+
+                    <p>实到人数</p>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol blue">
+                    <i class="fa fa-medkit"></i>
+                </div>
+                <div class="value">
+                    <h1 class=" count3">
+                        {{ lessondata.asknumber }}
+                    </h1>
+
+                    <p>请假人数</p>
+                </div>
+            </section>
+        </div>
+        <div class="col-lg-3 col-sm-6">
+            <section class="panel">
+                <div class="symbol red">
+                    <i class="fa fa-exclamation-circle"></i>
+                </div>
+                <div class="value">
+                    <h1 class=" count4">
+                        {{ lessondata.notreachnumber }}
+                    </h1>
+
+                    <p>未到人数</p>
+                </div>
+            </section>
+        </div>
+    </div>
+    <!--state overview end-->
+    {% if not checkincount == 0 %}
+        <div class="row">
+            <div class="col-lg-4">
+                <section class="panel">
+                    <div class="panel-body text-center">
+                        <canvas id="numberData" height="200"></canvas>
+                    </div>
+                </section>
+                {% comment %}
+            <!--revenue start-->
+            <section class="panel">
+                <div class="panel-body">
+                    <div class="row">
+
+                        <div class="col-lg-6 col-sm-6 text-center">
+                            <div class="easy-pie-chart">
+                                {% widthratio lessondata.actuallynumber lessondata.shouldnumber 100 as reachpercentage %}
+                                <div class="percentage" data-percent="{{ reachpercentage }}">
+                                    <span>{{ reachpercentage }}</span>%
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-lg-6 col-sm-6">
+                            <div class="chart-info chart-position">
+                                <span class="increase"></span>
+                                <span>到达</span>
+                            </div>
+                            <div class="chart-info">
+                                <span class="decrease"></span>
+                                <span>未到</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </section>
+            {% endcomment %}
+            </div>
+            <div class="col-lg-8">
+                <!--work progress start-->
+                <section class="panel">
+                    <div class="panel-body progress-panel">
+                        <div class="task-progress">
+                            <h1>签到日志</h1>
+                            <p>{{ lessondata.course.title }}</p>
+                        </div>
+                    </div>
+                    <table class="table table-hover personal-task">
+                        <thead>
+                        <tr>
+                            <th>次数</th>
+                            <th>开始时间</th>
+                            <th>结束时间</th>
+                            <th>到达比例</th>
+                            <th>应到人数</th>
+                            <th>实到人数</th>
+                            <th>新签入人数</th>
+                            <th>离开人数</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {% for cr in checkinrecord %}
+                            <tr>
+                                <td>{{ cr.time }}</td>
+                                <td>
+                                    {{ cr.starttime|date:'H:i:s' }}
+                                </td>
+                                <td>
+                                    {{ cr.endtime|date:'H:i:s'|default:'还未结束' }}
+                                </td>
+                                <td>
+                                    {% widthratio cr.actuallynumber cr.shouldnumber 100 %}%
+                                </td>
+                                <td>{{ cr.shouldnumber|default:'无数据' }}</td>
+                                <td>{{ cr.actuallynumber|default:'无数据' }}</td>
+                                <td>{{ cr.newnumber|default:'无数据' }}</td>
+                                <td>{{ cr.leavenumber|default:'无数据' }}</td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                </section>
+                <!--work progress end-->
+            </div>
+
+        </div>
+    {% endif %}
+
+
+
+    <div class="modal fade modal-dialog-center top-modal-with-space" id="LessonCloseModal" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">操作提示</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        确认结束课程?
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <a href="{% url 'course:control.stoplesson' %}?lessonid={{ lessondata.id }}">
+                            <button class="btn btn-warning" type="button"> 确认</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+{% endblock %}
+
+{% block page_script %}
+    <script>
+        var numberData = [
+            {
+                value: 8,
+                color: "#6CCAC9",
+                highlight: "#90CAC9",
+                label: "正常"
+            }, {
+                value: 2,
+                color: "#797979",
+                highlight: "#A09F9F",
+                label: "未到"
+            }, {
+                value: 3,
+                color: "#57C8F2",
+                highlight: "#79CDEC",
+                label: "请假"
+            }, {
+                value: 1,
+                color: "#FF6C60",
+                highlight: "#F38F86",
+                label: "迟到"
+            }, {
+                value: 0,
+                color: "#F38630",
+                highlight: "#F39A54",
+                label: "早退"
+            }, {
+                value: 0,
+                color: "#FFAD60",
+                highlight: "#F3BF8F",
+                label: "迟到早退"
+            }
+        ];
+        var chart = document.getElementById("numberData").getContext("2d");
+        new Chart(chart).Pie(numberData);
+    </script>
+{% endblock %}

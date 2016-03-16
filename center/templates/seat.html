@@ -1,0 +1,633 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="zh-cn" xmlns="http://www.w3.org/1999/html">
+<head>
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <meta name="viewport" content="width=device-width">
+    <title>Perspective Seat Preview</title>
+
+    <link href="{% static 'seat.css' %}" rel="stylesheet">
+
+    <style type="text/css">
+        * {
+            -webkit-box-sizing: border-box;
+            -moz-box-sizing: border-box;
+            box-sizing: border-box;
+        }
+
+        html {
+            -ms-touch-action: none;
+        }
+
+        body {
+            overflow: hidden; /* this is important to prevent the whole page to bounce */
+            font-family: 'Avenir Next', Avenir, 'Helvetica Neue', Helvetica, Arial, sans-serif;
+            color: #fff;
+            background: #272729;
+            height: 100vh;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
+        #bodywrapper {
+            position: absolute;
+            z-index: 1;
+            top: 0px;
+            bottom: 0px;
+            left: 0;
+            width: 100%;
+            0 overflow: hidden;
+        }
+    </style>
+</head>
+<body onload="loaded();">
+<div id="bodywrapper">
+    <div id="scroller">
+        <header class="header">
+            <h1 class="header__title">课程座位选择</h1>
+            <p class="note">B109</p>
+        </header>
+        <!-- /container -->
+        <div class="plan plan--shown">
+            <h3 class="plan__title">座位选择</h3>
+            <div id="wrapper">
+                <div id="scroller">
+                    <div class="rows rows--mini">
+                        <div class="row">
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__main">讲台</div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat__empty"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat__empty"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row__empty"></div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                        <div class="row">
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat__empty" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                            <div class="row__seat tooltip" data-tooltip="1"></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- /rows -->
+            <ul class="legend">
+                <li class="legend__item legend__item--free">空座</li>
+                <li class="legend__item legend__item--main">讲台</li>
+                <li class="legend__item legend__item--have">有人</li>
+                <li class="legend__item legend__item--selected">选中</li>
+            </ul>
+            <button class="action action--buy">选择</button>
+        </div><!-- /plan -->
+    </div>
+</div>
+</body>
+
+<script src="{% static 'iscroll-zoom.js' %}"></script>
+<script src="{% static 'js/jquery.js' %}"></script>
+<script type="text/javascript">
+
+    var myScroll, bodyScroll;
+
+    function loaded() {
+        myScroll = new IScroll('#wrapper', {
+            zoom: true,
+            scrollX: true,
+            scrollY: true,
+            click: true
+        });
+        myScroll.on('zoomEnd', function () {
+            if (this.scale == 1) {
+                $('.header').css({'visibility': 'visible'});
+                $('.plan__title').css({'visibility': 'visible'});
+                $('.legend').css({'visibility': 'visible'});
+                bodyScroll = new IScroll('#bodywrapper');
+            }
+        });
+        myScroll.on('zoomStart', function () {
+            $('.header').css({'visibility': 'hidden'});
+            $('.plan__title').css({'visibility': 'hidden'});
+            $('.legend').css({'visibility': 'hidden'});
+            bodyScroll.destroy();
+        });
+        bodyScroll = new IScroll('#bodywrapper');
+    }
+
+    document.addEventListener('touchmove', function (e) {
+        e.preventDefault();
+    }, false);
+
+    $(".row__seat").not('.row__seat--have').each(function(){
+        $(this).click(function(){
+            $('.row__seat--selected').removeClass('row__seat--selected');
+            $(this).addClass('row__seat--selected');
+        });
+    });
+</script>
+</html>

@@ -1,0 +1,181 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load center_extra %}
+{% load school_extra %}
+{% block title %}教师列表{% endblock %}
+{% block page_css %}
+    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'js/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'js/tableExport.min.js' %}"></script>
+    <script src="{% static 'assets/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
+    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <section class="panel">
+                <header class="panel-heading">
+                    教师列表
+             <span class="tools pull-right">
+                <a href="javascript:;" class="fa fa-chevron-down"></a>
+                 <!--<a href="javascript:;" class="fa fa-times"></a>-->
+             </span>
+                </header>
+                <div class="panel-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <select name="viewType2" id="department" data-placeholder="系所">
+                                        <option value selected></option>
+                                        {% getdepartment as departmentdata %}
+
+                                        {% for m in departmentdata %}
+                                            <option value="{{ m }}">{{ m }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                                <div class="form-group">
+                                    <select name="viewType2" id="administration" data-placeholder="行政机构">
+                                        <option value selected></option>
+                                        {% getadministration as administrationdata %}
+
+                                        {% for m in administrationdata %}
+                                            <option value="{{ m }}">{{ m }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        <table id="table"
+                               data-toggle="table"
+                               data-search="true"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true"
+                               data-show-export="true"
+                               data-minimum-count-columns="2"
+                               data-pagination="true"
+                               data-id-field="teacherid"
+                               data-page-size="10"
+                               data-page-list="[5,10, 25, 50, 100, ALL]"
+                               data-side-pagination="server"
+                               data-url="{% url 'school:getteacherdata' %}"
+                               data-toolbar="#custom-toolbar"
+                               data-striped="true"
+                               data-query-params="queryParams"
+                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
+                               data-search-text="{{ request.GET.search }}"
+                        >
+
+                        </table>
+
+                    </div>
+                </div>
+            </section>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+    <ul id="example2-context-menu" class="dropdown-menu">
+        <li data-item="edit"><a>Edit</a></li>
+        <li data-item="delete"><a>Delete</a></li>
+        <li data-item="action1"><a>Action Here</a></li>
+        <li data-item="action2"><a>And Action Here</a></li>
+    </ul>
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        {% if request.GET.major %}
+            $("#administration").find("option[value='{{ request.GET.administration }}']").attr('selected', true);
+        {% endif %}
+        {% if request.GET.department %}
+            $("#department").find("option[value='*{{ request.GET.department }}']").attr('selected', true);
+        {% endif %}
+
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+        $table.bootstrapTable({
+            columns: [{
+                field: 'name',
+                title: '姓名',
+                searchable: true
+            }, {
+                field: 'teacherid',
+                title: '教职工号',
+                sortable: true,
+                order: 'desc'
+            }, {
+                field: 'sex',
+                title: '性别'
+            }, {
+                field: 'idnumber',
+                title: '身份证',
+                visible: false
+            }, {
+                field: 'department',
+                title: '系所'
+            }, {
+                field: 'administration',
+                title: '行政机构'
+            }, {
+                field: 'username',
+                title: '用户名',
+                visible: false
+            }, {
+                field: 'operate',
+                title: '操作',
+                align: 'center',
+                formatter: operateFormatter
+            }],
+            contextMenu: '#example2-context-menu',
+            contextMenuButton: '.example2-button',
+            onContextMenuItem: function (row, $el) {
+                if ($el.data("item") == "edit") {
+                    alert("Edit: " + row.studentid + ' ' + row.name);
+                } else if ($el.data("item") == "delete") {
+                    alert("Delete: " + row.studentid + ' ' + row.name);
+                } else if ($el.data("item") == "action1") {
+                    alert("Action1: " + row.studentid + ' ' + row.name);
+                } else if ($el.data("item") == "action2") {
+                    alert("Action2: " + row.studentid + ' ' + row.name);
+                }
+            }
+        });
+        function queryParams(params) {
+            params['administration'] = $('#administration').val();
+            params['department'] = $('#department').val();
+            return params;
+        }
+
+        $('#administration').chosen({allow_single_deselect: true});
+        $('#department').chosen({allow_single_deselect: true});
+
+        $('#administration').on('change', function (evt, params) {
+            $table.bootstrapTable('refresh');
+        });
+        $('#department').on('change', function (evt, params) {
+            $table.bootstrapTable('refresh');
+        });
+
+        function operateFormatter(value, row, index) {
+            return [
+                '<div class="btn-group btn-group-xs">',
+                '    <button type="button" class="btn btn-default dropdown-toggle example2-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+                '        <span class="caret"></span>',
+                '        <span class="sr-only">操作</span>',
+                '    </button>',
+                '</div>'
+            ].join('');
+        }
+
+
+    </script>
+{% endblock %}

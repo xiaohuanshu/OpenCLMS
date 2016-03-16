@@ -1,0 +1,70 @@
+{% extends 'base-body.html' %}
+{% block page_js %}
+{% endblock %}
+{% block body %}
+    <body class="body-error">
+
+
+    <div class="container">
+
+        <section class="error-wrapper notifiy">
+            <i class="icon-error"></i>
+
+            <h1 style="font-size: 50px;">{{ message }}</h1>
+
+            <h2>{{ submessage }}</h2>
+
+            <p class="page-error">
+                {% if jumpurl %}
+                    页面自动 <a id="href" href="{{ jumpurl }}">跳转</a> 等待时间：<b id="wait">{{ waittime|default:3 }}</b>
+                {% endif %}
+                {% if wechatclose %}
+                    页面自动 关闭 等待时间：<b id="wait">{{ waittime|default:3 }}</b>
+                {% endif %}
+                <a href="{% url 'home' %}">返回主页</a>
+            </p>
+        </section>
+
+    </div>
+
+
+    </body>
+
+{% endblock %}
+{% block page_script %}
+    {% if jumpurl %}
+        <script type="text/javascript">
+            (function () {
+                var wait = document.getElementById('wait'), href = document.getElementById('href').href;
+                var interval = setInterval(function () {
+                    var time = --wait.innerHTML;
+                    if (time <= 0) {
+                        location.href = href;
+                        clearInterval(interval);
+                    }
+                    ;
+                }, 1000);
+            })();
+        </script>
+    {% endif %}
+    {% if wechatclose %}
+        <script language="JavaScript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+        {% load wechat_extra %}
+        {% wxconfig request.get_full_path 'closeWindow,hideOptionMenu' as wxc %}
+        {{ wxc | safe }}
+        <script type="text/javascript">
+            wx.ready(function () {
+                wx.hideOptionMenu();
+                var wait = document.getElementById('wait');
+                var interval = setInterval(function () {
+                    var time = --wait.innerHTML;
+                    if (time <= 0) {
+                        wx.closeWindow();
+                        clearInterval(interval);
+                    }
+                    ;
+                }, 1000);
+            });
+        </script>
+    {% endif %}
+{% endblock %}

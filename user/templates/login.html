@@ -1,0 +1,74 @@
+{% extends 'base-body.html' %}
+{% load staticfiles %}
+{% block body %}
+    <body class="login-body">
+
+    <div class="container">
+
+        <form class="form-signin" action="{% url 'user:loginProcess' %}" method="POST">
+            {% csrf_token %}
+            <h2 class="form-signin-heading">登录系统</h2>
+            <div class="login-wrap">
+                {% if request.GET.error %}
+                    <label class="error">{{ request.GET.error }}</label>
+                {% endif %}
+                <input name="username" type="text" class="form-control" placeholder="用户名/Email/学号/工号" autofocus>
+                <input type="password" class="form-control" name="password" placeholder="密码">
+                <label class="checkbox">
+                    <input type="checkbox" value="remember-me" name="remember"> 记住我
+                <span class="pull-right">
+                    <a data-toggle="modal" href="#myModal"> 忘记密码?</a>
+                </span>
+                </label>
+                <button class="btn btn-lg btn-login btn-block" type="submit">登录</button>
+                {% comment %}
+            <p>or you can sign in via social network</p>
+            <div class="login-social-link">
+                <a href="index.html" class="facebook">
+                    <i class="fa fa-facebook"></i>
+                    Facebook
+                </a>
+                <a href="index.html" class="twitter">
+                    <i class="fa fa-twitter"></i>
+                    Twitter
+                </a>
+            </div>
+            {% endcomment %}
+                <div class="registration">
+                    没有账户?
+                    <a class="" href="{% url 'user:register' %}">
+                        注册
+                    </a>
+                </div>
+
+            </div>
+
+            <!-- Modal -->
+            <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal"
+                 class="modal fade">
+                <div class="modal-dialog">
+                    <div class="modal-content">
+                        <div class="modal-header">
+                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                            <h4 class="modal-title">忘记密码 ?</h4>
+                        </div>
+                        <div class="modal-body">
+                            <p>输入你的E-mail地址,我们将为您发送密码重置连接</p>
+                            <input type="text" name="email" placeholder="Email" autocomplete="off"
+                                   class="form-control placeholder-no-fix">
+
+                        </div>
+                        <div class="modal-footer">
+                            <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                            <button class="btn btn-success" type="button">发送</button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <!-- modal -->
+
+        </form>
+
+    </div>
+    </body>
+{% endblock %}

@@ -57,7 +57,7 @@ class Course(models.Model):
                                                     week=ele['week'], day=ele['day'], length=ele['length'],
                                                     classroom=locationid.id).exists():
                 p = Lesson()
-                p.course = self.id
+                p.course = self
                 p.classroom = locationid
                 p.length = ele['length']
                 p.status = LESSON_STATUS_AWAIT

@@ -5,7 +5,6 @@ from course.models import Course
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        # Positional arguments
         parser.add_argument('courseid', type=int)
 
     def handle(self, *args, **options):

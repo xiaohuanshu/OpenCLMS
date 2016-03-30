@@ -21,7 +21,7 @@ def startLesson(request):
                                            reverse('course:information', args=[lessondata.course.id]))},
                                       context_instance=RequestContext(request))
         else:
-            if request.GET.get('jumptocheckin',default=0) == 1:
+            if request.GET.get('jumptocheckin',default=0) == '1':
                 return redirect(reverse('checkin:startcheckin', args=[lessondata.id]))
             else:
                 return redirect(reverse('checkin:lesson_data', args=[lessondata.id]))

@@ -44,10 +44,39 @@ def lesson_data(request, lessonid):
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
     checkinrecord = Checkinrecord.objects.filter(lesson=lesson)
     checkincount = checkinrecord.count()
+
+    shouldnumber=lesson.shouldnumber()
+    actuallynumber=lesson.actuallynumber()
+    asknumber=lesson.asknumber()
+    notreachnumber=lesson.notreachnumber()
+    t['shouldnumber']=shouldnumber
+    t['actuallynumber']=actuallynumber
+    t['asknumber']=asknumber
+    t['notreachnumber']=notreachnumber
+
+
+    checkin_success = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_SUCCESS).count()
+    checkin_early = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_EARLY).count()
+    checkin_late = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_LATE).count()
+    checkin_lateearly = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_LATEEARLY).count()
+    checkin_normal = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_NORMAL).count()
+    t['checkin_success']=checkin_success
+    t['checkin_early']=checkin_early
+    t['checkin_late']=checkin_late
+    t['checkin_lateearly']=checkin_lateearly
+    t['checkin_normal']=checkin_normal
+
+
     t['checkincount'] = checkincount
     if not checkincount == 0:
         checkinrecord = checkinrecord.order_by('time').all()
         t['checkinrecord'] = checkinrecord
+
+    checkindata=Checkin.objects.filter(lesson=lesson).exclude(status=CHECKIN_STATUS_ASK).select_related('student').select_related('student__classid').select_related('student__classid__department').select_related('student__classid__major').all()
+    t['checkindata']=checkindata
+
+    askdata=Checkin.objects.filter(lesson=lesson,status=CHECKIN_STATUS_ASK).select_related('student').select_related('student__classid').select_related('student__classid__department').select_related('student__classid__major').all()
+    t['askdata']=askdata
 
     return render_to_response('lesson_data.html', t, context_instance=RequestContext(request))
 

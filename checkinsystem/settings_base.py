@@ -35,6 +35,7 @@ INSTALLED_APPS = [
     'school',
     'course',
     'checkin',
+    'rbac',
 
 ]
 

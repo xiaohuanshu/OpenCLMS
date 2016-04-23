@@ -2,9 +2,10 @@ from django.shortcuts import render_to_response, RequestContext
 from school.function import getCurrentSchoolYearTerm, getnowlessontime
 from school.models import Student
 from course.models import Studentcourse, Lesson
-
+from rbac.auth import resourcejurisdiction_view_auth
 
 # Create your views here.
+#@resourcejurisdiction_view_auth(jurisdiction='school')
 def home(request):
     userid = request.session.get('userid')
     student = Student.objects.get(user=userid)

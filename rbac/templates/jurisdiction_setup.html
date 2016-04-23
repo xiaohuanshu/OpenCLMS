@@ -1,10 +1,102 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Title</title>
-</head>
-<body>
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}角色权限设置{% endblock %}
+{% block page_css %}
+    <link href="{% static 'assets/bootstrap-treeview/bootstrap-treeview.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+{% endblock %}
+{% block page_js %}
+    <script type="text/javascript" src="{% static 'assets/bootstrap-treeview/bootstrap-treeview.min.js' %}"></script>
+    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <!-- page start-->
+    <div class="row">
+        <div class="col-md-4">
+            <section class="panel">
+                <header class="panel-heading">
+                    角色选择
+                </header>
+                <div class="panel-body">
 
-</body>
-</html>
+                    <div class="row">
+                        <div class="col-md-12">
+                            <select name="role" id="role" data-placeholder="角色">
+                                <option value></option>
+                                {% for r in  roledata %}
+                                    {% if r.name == request.GET.role %}
+                                        <option value="{{ r.name }}" selected>{{ r.name }}</option>
+                                    {% else %}
+                                        <option value="{{ r.name }}">{{ r.name }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% if request.GET.role %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-primary btn-block" id="submit">提交修改</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+        <div class="col-md-8">
+            <section class="panel">
+                <header class="panel-heading">
+                    可选权限
+                </header>
+                <div class="panel-body">
+                    {% if request.GET.role %}
+                        <div id="tree"></div>
+                    {% endif %}
+                </div>
+            </section>
+        </div>
+    </div>
+    <!-- page end-->
+{% endblock %}
+{% block page_script %}
+    <script>
+        $('#role').chosen({width: '100%'});
+        $('#role').on('change', function (evt, params) {
+            window.location.href = "{% url 'rbac:jurisdiction_setup' %}?role=" + $(this).children('option:selected').val();
+        });
+        {% if request.GET.role %}
+            $('#tree').treeview({
+                showCheckbox: true,
+                data: {{ jurisdictiondata|safe }},
+                onNodeChecked: function (event, node) {
+                    console.log(node);
+                    parentid = node.parentId;
+                    while (typeof(parentid) != "undefined") {
+                        $('#tree').treeview('checkNode', [parentid, {silent: true}]);
+                        parentid = $('#tree').treeview('getNode', parentid).parentId;
+                    }
+                }
+            });
+            $('#tree').on('nodeUnchecked', uncheckchildtree);
+            function uncheckchildtree(event, node) {
+                if (typeof node['nodes'] != "undefined") {
+                    $.each(node.nodes, function () {
+                        if (this.state.checked) {
+                            $('#tree').treeview('uncheckNode', [this.nodeId, {silent: true}]);
+                            uncheckchildtree(null, this);
+                        }
+                    });
+                }
+            }
+            $('#submit').click(function () {
+                checked = [];
+                $.each($('#tree').treeview('getChecked'), function () {
+                    checked.push(this.id);
+                });
+                $.post("#", {checked: checked, csrfmiddlewaretoken:'{{ csrf_token }}'}, function (data) {
+                    alert('修改成功');
+                });
+            });
+        {% endif %}
+    </script>
+{% endblock %}

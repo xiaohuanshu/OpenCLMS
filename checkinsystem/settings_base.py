@@ -50,6 +50,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Own middleware
     'user.middleware.BlockedUserMiddleware',
+    'user.middleware.RequestUserMiddleware',
 ]
 
 ROOT_URLCONF = 'checkinsystem.urls'
@@ -69,6 +70,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 # Own processors
                 'course.context_processors.todaylesson',
+                'rbac.context_processors.auth',
             ],
         },
     },

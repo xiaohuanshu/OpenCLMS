@@ -1,10 +1,14 @@
 from django.db import models
 
+
 # Create your models here.
 
 
 class Role(models.Model):
     name = models.CharField(max_length=20, blank=True, null=True)
+    resourcejurisdiction = models.ManyToManyField('rbac.Resourcejurisdiction',
+                                                  through='rbac.Roletoresourcejurisdiction',
+                                                  through_fields=('role', 'resourcejurisdiction'))
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -24,6 +28,11 @@ class User(models.Model):
     lastlogintime = models.DateTimeField(blank=True, null=True)
     email = models.CharField(max_length=40, blank=True, null=True)
     verify = models.NullBooleanField()
+    role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
+
+    def hasresourcejurisdiction(self, jurisdiction):
+        from rbac.auth import is_user_has_resourcejurisdiction
+        return is_user_has_resourcejurisdiction(self, jurisdiction)
 
     def __unicode__(self):
         return u"%s" % (self.username)

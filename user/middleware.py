@@ -5,6 +5,7 @@ from django.core.urlresolvers import resolve
 from wechat.api import oauth_getuserinfo
 from django.contrib.auth.hashers import check_password
 from django.conf import settings
+from user.models import User
 
 
 class BlockedUserMiddleware(object):
@@ -17,7 +18,8 @@ class BlockedUserMiddleware(object):
         if request.session.get('username', '') == '':
             if request.COOKIES.has_key('username'):
                 remembercode = request.COOKIES['remembercode']
-                if check_password("%s%s%s"%(request.COOKIES['userid'],settings.SECRET_KEY,request.COOKIES['username']),
+                if check_password("%s%s%s" % (
+                request.COOKIES['userid'], settings.SECRET_KEY, request.COOKIES['username']),
                                   remembercode):
                     request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
@@ -34,3 +36,9 @@ class BlockedUserMiddleware(object):
                 request.session['origin'] = request.get_full_path()
                 return redirect(reverse('user:login'))
         return None
+
+
+class RequestUserMiddleware(object):
+    def process_request(self, request):
+        if not request.session.get('username', '') == '':
+            request.user = User.objects.get(id=request.session.get('userid'))

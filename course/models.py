@@ -6,7 +6,8 @@ from school.models import Classroom
 from constant import *
 from django.db.models import ObjectDoesNotExist, Q
 import time
-from function import getweek,gettime,getday,t,splitlesson
+from function import getweek, gettime, getday, t, splitlesson
+
 
 # Create your models here.
 
@@ -54,8 +55,8 @@ class Course(models.Model):
             except ObjectDoesNotExist:
                 return -1
             if not Lesson.objects.filter(course=self.id, time=ele['time'], term=term,
-                                                    week=ele['week'], day=ele['day'], length=ele['length'],
-                                                    classroom=locationid.id).exists():
+                                         week=ele['week'], day=ele['day'], length=ele['length'],
+                                         classroom=locationid.id).exists():
                 p = Lesson()
                 p.course = self
                 p.classroom = locationid
@@ -68,7 +69,6 @@ class Course(models.Model):
                 p.save()
                 count = count + 1
         return count
-
 
     def __unicode__(self):
         return u"%s" % (self.title)
@@ -122,8 +122,8 @@ class Lesson(models.Model):
             CHECKIN_STATUS_LATEEARLY
         checkindata = Checkin.objects.filter(lesson=self)
         realnumber = checkindata.filter(
-                Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_SUCCESS) | Q(status=CHECKIN_STATUS_LATE) | Q(
-                        status=CHECKIN_STATUS_LATEEARLY)).count()
+            Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_SUCCESS) | Q(status=CHECKIN_STATUS_LATE) | Q(
+                status=CHECKIN_STATUS_LATEEARLY)).count()
         return realnumber
 
     def asknumber(self):
@@ -210,7 +210,8 @@ class Lesson(models.Model):
 
 class Studentcourse(models.Model):
     student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
-    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True,
+                               related_name='courses')
 
     class Meta:
         managed = False

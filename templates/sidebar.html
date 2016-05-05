@@ -10,68 +10,101 @@
                     <span>首页</span>
                 </a>
             </li>
-
-            <li>
-                <a href="{% url 'course:list' %}" class="{% nav_menu_active request.path 'course' %}">
-                    <i class="fa fa-users"></i>
-                    <span>课程</span>
-                </a>
-            </li>
-
-            <li class="sub-menu">
-                <a href="javascript:;" class="{% nav_menu_active request.path 'checkin' %}">
-                    <i class="fa fa-book"></i>
-                    <span>考勤</span>
-                </a>
-                <ul class="sub">
-                    <li class="{% nav_active request.path 'whole' %}"><a
-                            href="{% url 'home' %}">全校总览</a></li>
-                    <li><a href="">课程状态</a></li>
-                    <li><a href="">个人数据</a></li>
-                </ul>
-            </li>
-
-            <li class="sub-menu">
-                <a href="javascript:;" class="{% nav_menu_active request.path 'wechat' %}">
-                    <i class="fa fa-tasks"></i>
-                    <span>微信平台</span>
-                </a>
-                <ul class="sub">
-                    <li><a href="">信息群发</a></li>
-                    <li><a href="">关键词回复</a></li>
-                    <li><a href="">关注者</a></li>
-                    <li><a href="">素材</a></li>
-                    <li><a href="">菜单</a></li>
-                </ul>
-            </li>
-            <li class="sub-menu">
-                <a href="javascript:;" class="{% nav_menu_active request.path 'school' %}">
-                    <i class="fa fa-gears"></i>
-                    <span>学校</span>
-                </a>
-                <ul class="sub">
-                    <li class="{% nav_active request.path 'studentlist' %}"><a href="{% url 'school:studentlist' %}">学生</a></li>
-                    <li class="{% nav_active request.path 'teacherlist' %}"><a href="{% url 'school:teacherlist' %}">教师</a></li>
-                    <li class="{% nav_active request.path 'classlist' %}"><a href="{% url 'school:classlist' %}">班级</a></li>
-                    <li class="{% nav_active request.path 'majorlist' %}"><a href="{% url 'school:majorlist' %}">专业</a></li>
-                    <li class="{% nav_active request.path 'departmentlist' %}"><a href="">系部</a></li>
-                    <li class="{% nav_active request.path 'administrationlist' %}"><a href="">行政处</a></li>
-                    <li class="{% nav_active request.path 'classroomlist' %}"><a href="">教室</a></li>
-                    <li class="{% nav_active request.path 'schoolterm' %}"><a href="{% url 'school:schoolterm' %}">学期</a></li>
-                    <li class="{% nav_active request.path 'classtime' %}"><a href="{% url 'school:classtime' %}">上课时间</a></li>
-                </ul>
-            </li>
-            <li class="sub-menu">
-                <a href="javascript:;" class="{% nav_menu_active request.path 'user' %}">
-                    <i class="fa fa-gears"></i>
-                    <span>用户</span>
-                </a>
-                <ul class="sub">
-                    <li class="{% nav_active request.path '' %}"><a href="">用户</a></li>
-                    <li class="{% nav_active request.path '' %}"><a href="">角色</a></li>
-                    <li class="{% nav_active request.path '' %}"><a href="">权限</a></li>
-                </ul>
-            </li>
+            {% if perms.app_course %}
+                <li>
+                    <a href="{% url 'course:list' %}" class="{% nav_menu_active request.path 'course' %}">
+                        <i class="fa fa-users"></i>
+                        <span>课程</span>
+                    </a>
+                </li>
+            {% endif %}
+            {% if perms.app_checkin %}
+                <li class="sub-menu">
+                    <a href="javascript:;" class="{% nav_menu_active request.path 'checkin' %}">
+                        <i class="fa fa-book"></i>
+                        <span>考勤</span>
+                    </a>
+                    <ul class="sub">
+                        <li class="{% nav_active request.path 'whole' %}"><a
+                                href="{% url 'home' %}">全校总览</a></li>
+                        <li><a href="">课程状态</a></li>
+                        <li><a href="">个人数据</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+            {% if perms.app_wechat %}
+                <li class="sub-menu">
+                    <a href="javascript:;" class="{% nav_menu_active request.path 'wechat' %}">
+                        <i class="fa fa-tasks"></i>
+                        <span>微信平台</span>
+                    </a>
+                    <ul class="sub">
+                        <li><a href="">信息群发</a></li>
+                        <li><a href="">关键词回复</a></li>
+                        <li><a href="">关注者</a></li>
+                        <li><a href="">素材</a></li>
+                        <li><a href="">菜单</a></li>
+                    </ul>
+                </li>
+            {% endif %}
+            {% if perms.app_school %}
+                <li class="sub-menu">
+                    <a href="javascript:;" class="{% nav_menu_active request.path 'school' %}">
+                        <i class="fa fa-gears"></i>
+                        <span>学校</span>
+                    </a>
+                    <ul class="sub">
+                        {% if perms.view_student %}
+                            <li class="{% nav_active request.path 'studentlist' %}"><a
+                                    href="{% url 'school:studentlist' %}">学生</a></li>
+                        {% endif %}
+                        {% if perms.view_teacher %}
+                            <li class="{% nav_active request.path 'teacherlist' %}"><a
+                                    href="{% url 'school:teacherlist' %}">教师</a></li>
+                        {% endif %}
+                        {% if perms.view_class %}
+                            <li class="{% nav_active request.path 'classlist' %}"><a
+                                    href="{% url 'school:classlist' %}">班级</a></li>
+                        {% endif %}
+                        {% if perms.view_major %}
+                            <li class="{% nav_active request.path 'majorlist' %}"><a
+                                    href="{% url 'school:majorlist' %}">专业</a></li>
+                        {% endif %}
+                        {% if perms.view_department %}
+                            <li class="{% nav_active request.path 'departmentlist' %}"><a href="">系部</a></li>
+                        {% endif %}
+                        {% if perms.view_administration %}
+                            <li class="{% nav_active request.path 'administrationlist' %}"><a href="">行政处</a></li>
+                        {% endif %}
+                        {% if perms.view_classroom %}
+                            <li class="{% nav_active request.path 'classroomlist' %}"><a href="">教室</a></li>
+                        {% endif %}
+                        {% if perms.view_schoolterm %}
+                            <li class="{% nav_active request.path 'schoolterm' %}"><a
+                                    href="{% url 'school:schoolterm' %}">学期</a>
+                            </li>
+                        {% endif %}
+                        {% if perms.view_classtime %}
+                            <li class="{% nav_active request.path 'classtime' %}"><a
+                                    href="{% url 'school:classtime' %}">上课时间</a>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </li>
+            {% endif %}
+            {% if perms.app_user %}
+                <li class="sub-menu">
+                    <a href="javascript:;" class="{% nav_menu_active request.path 'user' %}">
+                        <i class="fa fa-gears"></i>
+                        <span>用户</span>
+                    </a>
+                    <ul class="sub">
+                        <li class="{% nav_active request.path '' %}"><a href="">用户</a></li>
+                        <li class="{% nav_active request.path '' %}"><a href="">角色</a></li>
+                        <li class="{% nav_active request.path '' %}"><a href="">权限</a></li>
+                    </ul>
+                </li>
+            {% endif %}
 
 
         </ul>

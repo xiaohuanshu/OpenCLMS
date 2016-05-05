@@ -140,12 +140,12 @@
                         <tr>
                             <td>{{ forloop.counter }}</td>
                             <td>
-                                <a href="{% url 'course:information' course.course.id %}">{{ course.course.title }}</a>
+                                <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
                             </td>
-                            <td>{{ course.course.time }}</td>
-                            <td>{{ course.course.location }}</td>
+                            <td>{{ course.time }}</td>
+                            <td>{{ course.location }}</td>
                             <td>
-                                <span class="badge bg-{{ course.course.status|COURSE_STATUS_STYLE }}">{{ course.course.status|COURSE_STATUS }}</span>
+                                <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
                             </td>
                             <td>
                                 <div id="work-progress1"></div>

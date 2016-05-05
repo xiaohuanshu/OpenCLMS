@@ -4,7 +4,7 @@ import json, time
 from django.db.models import Q
 from django.http import HttpResponse
 from school.models import Student
-from models import Studentcourse, Lesson
+from models import Studentcourse, Lesson, Course
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from django.core.urlresolvers import reverse
@@ -36,7 +36,6 @@ def schedule(request):
 
 
 def schedule_data(request):
-    print request
     # tfrom = time.strftime('%Y-%m-%d',time.localtime(round(string.atoi(request.GET.get('from'))/1000.0)))
     # tto = time.strftime('%Y-%m-%d',time.localtime(round(string.atoi(request.GET.get('to'))/1000.0)))
     start = request.GET.get('start')
@@ -47,11 +46,13 @@ def schedule_data(request):
     except ObjectDoesNotExist:
         return HttpResponse(json.dumps([]), content_type="application/json")
     term = request.GET.get('term')
-    userid = request.session.get('userid')
-    student = Student.objects.get(user=userid)
-    studentcourse = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
+    if request.user.isteacher():
+        courses = Course.objects.filter(teacher=request.user.teacher_set.get().teacherid).all()
+    else:
+        student = Student.objects.get(user=request.user)
+        courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
     plessonlist = Lesson.objects.select_related('course').select_related('classroom') \
-        .filter(term=term, course__in=studentcourse)
+        .filter(term=term, course__in=courses)
     if startinf['week'] == endinf['week']:
         plessonlist = plessonlist.filter(week=startinf['week'],day__gte=startinf['day'],day__lte=endinf['day'])
     else:

@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.db import models
 
 
@@ -29,6 +30,12 @@ class User(models.Model):
     email = models.CharField(max_length=40, blank=True, null=True)
     verify = models.NullBooleanField()
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
+
+    def isteacher(self):
+        return self.role.filter(name='教师').exists()
+
+    def isstudent(self):
+        return self.role.filter(name='学生').exists()
 
     def hasresourcejurisdiction(self, jurisdiction):
         from rbac.auth import is_user_has_resourcejurisdiction

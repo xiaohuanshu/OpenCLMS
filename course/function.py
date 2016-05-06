@@ -15,10 +15,10 @@ def getweek(str):
 def gettime(str):
     week = re.findall(u"(?<=第).*?(?=节)", str, re.DOTALL)[0]
     week2 = week.split(',')
-    we = []
-    for i in range(int(week2[0]), int(week2[1]) + 1):
-        we.append(i)
-    return we
+    #we = []
+    #for i in range(int(week2[0]), int(week2[1]) + 1):
+    #    we.append(i)
+    return week2
 
 
 def getday(str):

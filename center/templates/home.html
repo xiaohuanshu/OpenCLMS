@@ -102,7 +102,7 @@
                             <td>
                                 <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
                             </td>
-                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length }}节</td>
+                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
                             <td>{{ lesson.classroom.location }}</td>
                             <td>
                                 <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
@@ -122,7 +122,7 @@
                             <td>
                                 <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
                             </td>
-                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length }}节</td>
+                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
                             <td>{{ lesson.classroom.location }}</td>
                             <td>
                                 <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>

@@ -110,7 +110,7 @@
                                 </td>
                                 <td class="hidden-xs">
                                     第{{ lesson.week }}周{{ lesson.day|weekdeal }}
-                                    ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length }}节
+                                    ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节
                                 </td>
                                 <td>
                                     {{ lesson.shouldnumber }}

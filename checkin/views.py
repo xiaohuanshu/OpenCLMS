@@ -189,3 +189,10 @@ def student_data(request, studentid):
     data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
     return render_to_response('student_data.html', {'student': student, 'data': data},
                               context_instance=RequestContext(request))
+
+
+def personaldata(request):
+    if request.user.isteacher():
+        pass
+    else:
+        student=Student.objects.get(user=request.user)

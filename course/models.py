@@ -7,6 +7,7 @@ from constant import *
 from django.db.models import ObjectDoesNotExist, Q
 import time
 from function import getweek, gettime, getday, t, splitlesson
+from center.functional import classmethod_cache
 
 
 # Create your models here.
@@ -24,6 +25,7 @@ class Course(models.Model):
     department = models.ForeignKey('school.Department', models.DO_NOTHING, db_column='departmentid', blank=True,
                                    null=True)
 
+    @classmethod_cache
     def lastlessontime(self):
         lessondata = Lesson.objects.filter(course=self).order_by('-starttime').all()[:1]
         if lessondata[0].starttime:
@@ -31,6 +33,7 @@ class Course(models.Model):
         else:
             return None
 
+    @classmethod_cache
     def status(self):
         try:
             lessondata = Lesson.objects.filter(course=self, status=LESSON_STATUS_NOW).get()
@@ -38,6 +41,7 @@ class Course(models.Model):
             return 0
         return 1
 
+    @classmethod_cache
     def progress(self):
         lessoncount = Lesson.objects.filter(course=self).count()
         lessonallreadycount = Lesson.objects.filter(course=self, status=LESSON_STATUS_END).count()
@@ -93,6 +97,7 @@ class Lesson(models.Model):
     checkincount = models.SmallIntegerField(blank=True, null=True)
     date = models.DateField(blank=True, null=True)
 
+    @classmethod_cache
     def getTime(self):
         # allowcheckinbeforetime = 10
         classtime = getClassTime()
@@ -109,6 +114,7 @@ class Lesson(models.Model):
         # allowstarttime = starttime - datetime.timedelta(minutes=allowcheckinbeforetime)
         return [starttime.timetuple(), endtime.timetuple()]
 
+    @classmethod_cache
     def shouldnumber(self):
         from checkin.models import Checkin
         from checkin.constant import CHECKIN_STATUS_ASK
@@ -116,6 +122,7 @@ class Lesson(models.Model):
         leavenumber = Checkin.objects.filter(lesson=self, status=CHECKIN_STATUS_ASK).count()
         return shouldnumber - leavenumber
 
+    @classmethod_cache
     def actuallynumber(self):
         from checkin.models import Checkin
         from checkin.constant import CHECKIN_STATUS_EARLY, CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_LATE, \
@@ -126,6 +133,7 @@ class Lesson(models.Model):
                 status=CHECKIN_STATUS_LATEEARLY)).count()
         return realnumber
 
+    @classmethod_cache
     def asknumber(self):
         from checkin.models import Checkin
         from checkin.constant import CHECKIN_STATUS_ASK
@@ -133,6 +141,7 @@ class Lesson(models.Model):
         asknumber = checkindata.filter(status=CHECKIN_STATUS_ASK).count()
         return asknumber
 
+    @classmethod_cache
     def notreachnumber(self):
         from checkin.models import Checkin
         from checkin.constant import CHECKIN_STATUS_NORMAL
@@ -182,6 +191,7 @@ class Lesson(models.Model):
         return {'error': 0, 'message': u'成功清除', 'newstatus': self.status,
                 'endtime': u'没有数据'}
 
+    @classmethod_cache
     def isnow(self):
         if self.status == LESSON_STATUS_NOW or self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
             return True
@@ -194,6 +204,7 @@ class Lesson(models.Model):
         else:
             return False
 
+    @classmethod_cache
     def ischeckinnow(self):
         if self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
             return True

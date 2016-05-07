@@ -1,5 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.db import models
+from center.functional import classmethod_cache
 
 
 # Create your models here.
@@ -31,9 +32,11 @@ class User(models.Model):
     verify = models.NullBooleanField()
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
 
+    @classmethod_cache
     def isteacher(self):
         return self.role.filter(name='教师').exists()
 
+    @classmethod_cache
     def isstudent(self):
         return self.role.filter(name='学生').exists()
 

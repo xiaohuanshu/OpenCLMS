@@ -15,7 +15,12 @@ class PermWrapper(object):
         self.user = user
 
     def __getitem__(self, jurisdiction):
-        return self.user.hasresourcejurisdiction(jurisdiction)
+        if hasattr(self, '%s_cacle' % jurisdiction):
+            return getattr(self, '%s_cacle' % jurisdiction)
+        else:
+            data = self.user.hasresourcejurisdiction(jurisdiction)
+            setattr(self, '%s_cacle' % jurisdiction, data)
+            return data
 
 
 class NonePermWrapper(object):

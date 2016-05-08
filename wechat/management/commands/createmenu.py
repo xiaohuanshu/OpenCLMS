@@ -17,7 +17,7 @@ class Command(BaseCommand):
                             'key': '1100'
                         },
                         {
-                            'type': 'click',
+                            'type': 'view',
                             'name': u'个人数据',
                             'url': '%s/checkin/personal_data'%settings.DOMAIN
                         }
@@ -42,7 +42,7 @@ class Command(BaseCommand):
                     'name': u'其他',
                     'sub_button': [
                         {
-                            'type': 'view',
+                            'type': 'click',
                             'name': u'设置',
                             'key': '1200'
                         },

@@ -26,9 +26,10 @@
                     </a>
                     <ul class="sub">
                         <li class="{% nav_active request.path 'whole' %}"><a
-                                href="{% url 'home' %}">全校总览</a></li>
+                                href="">全校总览</a></li>
                         <li><a href="">课程状态</a></li>
-                        <li><a href="">个人数据</a></li>
+                        <li class="{% nav_active request.path 'personal_data' %}"><a
+                                href="{% url 'checkin:personal_data' %}">个人数据</a></li>
                     </ul>
                 </li>
             {% endif %}

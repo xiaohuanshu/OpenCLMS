@@ -5,10 +5,10 @@ from school.models import Student
 from constant import *
 from django.shortcuts import render_to_response, RequestContext
 from django.core.urlresolvers import reverse
-from django.shortcuts import redirect
 from course.constant import *
 from checkin.function import clear_checkin, clear_last_checkin
 import json
+from django.shortcuts import redirect, HttpResponseRedirect
 
 
 def checkin(request, lessonid):
@@ -45,38 +45,40 @@ def lesson_data(request, lessonid):
     checkinrecord = Checkinrecord.objects.filter(lesson=lesson)
     checkincount = checkinrecord.count()
 
-    shouldnumber=lesson.shouldnumber()
-    actuallynumber=lesson.actuallynumber()
-    asknumber=lesson.asknumber()
-    notreachnumber=lesson.notreachnumber()
-    t['shouldnumber']=shouldnumber
-    t['actuallynumber']=actuallynumber
-    t['asknumber']=asknumber
-    t['notreachnumber']=notreachnumber
-
+    shouldnumber = lesson.shouldnumber()
+    actuallynumber = lesson.actuallynumber()
+    asknumber = lesson.asknumber()
+    notreachnumber = lesson.notreachnumber()
+    t['shouldnumber'] = shouldnumber
+    t['actuallynumber'] = actuallynumber
+    t['asknumber'] = asknumber
+    t['notreachnumber'] = notreachnumber
 
     checkin_success = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_SUCCESS).count()
     checkin_early = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_EARLY).count()
     checkin_late = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_LATE).count()
     checkin_lateearly = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_LATEEARLY).count()
     checkin_normal = Checkin.objects.filter(lesson=lesson).filter(status=CHECKIN_STATUS_NORMAL).count()
-    t['checkin_success']=checkin_success
-    t['checkin_early']=checkin_early
-    t['checkin_late']=checkin_late
-    t['checkin_lateearly']=checkin_lateearly
-    t['checkin_normal']=checkin_normal
-
+    t['checkin_success'] = checkin_success
+    t['checkin_early'] = checkin_early
+    t['checkin_late'] = checkin_late
+    t['checkin_lateearly'] = checkin_lateearly
+    t['checkin_normal'] = checkin_normal
 
     t['checkincount'] = checkincount
     if not checkincount == 0:
         checkinrecord = checkinrecord.order_by('time').all()
         t['checkinrecord'] = checkinrecord
 
-    checkindata=Checkin.objects.filter(lesson=lesson).exclude(status=CHECKIN_STATUS_ASK).select_related('student').select_related('student__classid').select_related('student__classid__department').select_related('student__classid__major').all()
-    t['checkindata']=checkindata
+    checkindata = Checkin.objects.filter(lesson=lesson).exclude(status=CHECKIN_STATUS_ASK).select_related(
+        'student').select_related('student__classid').select_related('student__classid__department').select_related(
+        'student__classid__major').all()
+    t['checkindata'] = checkindata
 
-    askdata=Checkin.objects.filter(lesson=lesson,status=CHECKIN_STATUS_ASK).select_related('student').select_related('student__classid').select_related('student__classid__department').select_related('student__classid__major').all()
-    t['askdata']=askdata
+    askdata = Checkin.objects.filter(lesson=lesson, status=CHECKIN_STATUS_ASK).select_related('student').select_related(
+        'student__classid').select_related('student__classid__department').select_related(
+        'student__classid__major').all()
+    t['askdata'] = askdata
 
     return render_to_response('lesson_data.html', t, context_instance=RequestContext(request))
 
@@ -195,4 +197,6 @@ def personaldata(request):
     if request.user.isteacher():
         pass
     else:
-        student=Student.objects.get(user=request.user)
+        student = Student.objects.get(user=request.user)
+        #return HttpResponseRedirect(reverse('checkin:student_data', args=[student.studentid]))
+        return student_data(request,student.studentid)

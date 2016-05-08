@@ -12,9 +12,9 @@ urlpatterns = [
     url(r'^control/startcheckin/(\d+)$', control.startCheckin, name='startcheckin'),
     url(r'^control/stopcheckin/(\d+)$', control.stopCheckin, name='stopcheckin'),
 
-
     url(r'^data/course_data/(\d+)$', views.course_data, name='course_data'),
     url(r'^data/student_data/(\d+)$', views.student_data, name='student_data'),
+    url(r'^data/personal_data$', views.personaldata, name='personal_data'),
     url(r'^data/lesson_data/(\d+)$', views.lesson_data, name='lesson_data'),
 
 ]

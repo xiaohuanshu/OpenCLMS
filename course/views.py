@@ -4,20 +4,25 @@ from django.shortcuts import render_to_response, RequestContext
 import json
 from django.http import HttpResponse
 from django.db.models import Q
+from rbac.auth import resourcejurisdiction_view_auth
+from course.auth import has_course_permission
 
 
 def information(request, courseid):
     coursedata = Course.objects.get(id=courseid)
     lessondata = Lesson.objects.filter(course=coursedata).order_by('week', 'day', 'time').all()
     return render_to_response('information.html',
-                              {'coursedata': coursedata, 'lessondata': lessondata},
+                              {'coursedata': coursedata, 'lessondata': lessondata,
+                               'courseperms': has_course_permission(request.user, coursedata)},
                               context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_courselist')
 def list(request):
     return render_to_response('list.html', {}, context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_courselist')
 def data(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -43,16 +48,16 @@ def data(request):
     search = request.GET.get('search', '')
     if not search == '':
         count = coursedata.filter(
-                (Q(title__icontains=search) | Q(teacher__name__icontains=search)) | Q(serialnumber=search)
+            (Q(title__icontains=search) | Q(teacher__name__icontains=search)) | Q(serialnumber=search)
         ).count()
         coursedata = coursedata.select_related('teacher').select_related('major').select_related(
-                'department').filter(
-                (Q(title__icontains=search) | Q(teacher__name__icontains=search)) | Q(serialnumber=search)
+            'department').filter(
+            (Q(title__icontains=search) | Q(teacher__name__icontains=search)) | Q(serialnumber=search)
         )[offset: (offset + limit)]
     else:
         count = coursedata.count()
         coursedata = coursedata.select_related('teacher').select_related('major').select_related(
-                'department').all()[offset: (offset + limit)]
+            'department').all()[offset: (offset + limit)]
 
     rows = []
     for p in coursedata:

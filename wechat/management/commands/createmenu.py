@@ -19,7 +19,7 @@ class Command(BaseCommand):
                         {
                             'type': 'view',
                             'name': u'个人数据',
-                            'url': '%s/checkin/personal_data'%settings.DOMAIN
+                            'url': '%s/checkin/data/personal_data'%settings.DOMAIN
                         }
                     ]
                 },

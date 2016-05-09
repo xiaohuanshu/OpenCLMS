@@ -94,12 +94,16 @@
                         <tr>
                             <th>节数</th>
                             <th class="hidden-xs">时间</th>
-                            <th>应到</th>
-                            <th>实到</th>
+                            {% if courseperms %}
+                                <th>应到</th>
+                                <th>实到</th>
+                            {% endif %}
                             <th class="hidden-xs">开始时间</th>
                             <th class="hidden-xs">结束时间</th>
                             <th>状态</th>
-                            <th>其他</th>
+                            {% if courseperms %}
+                                <th>其他</th>
+                            {% endif %}
                         </tr>
                         </thead>
                         <tbody>
@@ -112,12 +116,14 @@
                                     第{{ lesson.week }}周{{ lesson.day|weekdeal }}
                                     ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节
                                 </td>
-                                <td>
-                                    {{ lesson.shouldnumber }}
-                                </td>
-                                <td>
-                                    {{ lesson.actuallynumber|default:'没有数据' }}
-                                </td>
+                                {% if courseperms %}
+                                    <td>
+                                        {{ lesson.shouldnumber }}
+                                    </td>
+                                    <td>
+                                        {{ lesson.actuallynumber|default:'没有数据' }}
+                                    </td>
+                                {% endif %}
                                 <td class="hidden-xs lesson-starttime" data-lessonid="{{ lesson.id }}">
                                     {{ lesson.starttime|date:'Y-m-d H:i:s'|default:'还未开始' }}
                                 </td>
@@ -128,41 +134,45 @@
                                     <span class="label label-{{ lesson.status|LESSON_STATUS_STYLE }} lesson-status"
                                           data-lessonid="{{ lesson.id }}">{{ lesson.status|LESSON_STATUS }}</span>
                                 </td>
-                                <td>
-                                    <div class="btn-group">
-                                        <button data-toggle="dropdown" class="btn btn-primary dropdown-toggle btn-xs"
-                                                type="button" aria-expanded="false">操作 <span class="caret"></span>
-                                        </button>
-                                        <ul role="menu" class="dropdown-menu">
-                                            <li><a href="{% url 'checkin:startcheckin' lesson.id %}">开始签到</a></li>
-                                            <li><a href="{% url 'checkin:lesson_data' lesson.id %}">学生/签到数据</a></li>
-                                            {% if not lesson.isend %}
-                                                <li class="divider"></li>
-                                                {% if not lesson.isnow %}
+                                {% if courseperms %}
+                                    <td>
+                                        <div class="btn-group">
+                                            <button data-toggle="dropdown"
+                                                    class="btn btn-primary dropdown-toggle btn-xs"
+                                                    type="button" aria-expanded="false">操作 <span class="caret"></span>
+                                            </button>
+                                            <ul role="menu" class="dropdown-menu">
+                                                <li><a href="{% url 'checkin:startcheckin' lesson.id %}">开始签到</a></li>
+                                                <li><a href="{% url 'checkin:lesson_data' lesson.id %}">学生/签到数据</a></li>
+                                                {% if not lesson.isend %}
+                                                    <li class="divider"></li>
+                                                    {% if not lesson.isnow %}
+                                                        <li>
+                                                            {% if not coursedata.status %}
+                                                                <a href="#" class="control-lessonstart"
+                                                                   data-lessonid="{{ lesson.id }}">设为课程开始</a>
+                                                            {% else %}
+                                                                <a href="#" class="control-lessonstart"
+                                                                   style="display: none;"
+                                                                   data-lessonid="{{ lesson.id }}">设为课程开始</a>
+                                                            {% endif %}
+                                                        </li>
+                                                    {% endif %}
                                                     <li>
-                                                        {% if not coursedata.status %}
-                                                            <a href="#" class="control-lessonstart"
-                                                               data-lessonid="{{ lesson.id }}">设为课程开始</a>
+                                                        {% if lesson.isnow %}
+                                                            <a href="#" class="control-lessonstop"
+                                                               data-lessonid="{{ lesson.id }}">设为课程结束</a>
                                                         {% else %}
-                                                            <a href="#" class="control-lessonstart"
+                                                            <a href="#" class="control-lessonstop"
                                                                style="display: none;"
-                                                               data-lessonid="{{ lesson.id }}">设为课程开始</a>
+                                                               data-lessonid="{{ lesson.id }}">设为课程结束</a>
                                                         {% endif %}
                                                     </li>
                                                 {% endif %}
-                                                <li>
-                                                    {% if lesson.isnow %}
-                                                        <a href="#" class="control-lessonstop"
-                                                           data-lessonid="{{ lesson.id }}">设为课程结束</a>
-                                                    {% else %}
-                                                        <a href="#" class="control-lessonstop" style="display: none;"
-                                                           data-lessonid="{{ lesson.id }}">设为课程结束</a>
-                                                    {% endif %}
-                                                </li>
-                                            {% endif %}
-                                        </ul>
-                                    </div>
-                                </td>
+                                            </ul>
+                                        </div>
+                                    </td>
+                                {% endif %}
                             </tr>
                         {% endfor %}
                         </tbody>

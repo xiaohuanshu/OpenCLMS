@@ -4,11 +4,15 @@ from django.http import HttpResponse
 from models import Student
 from django.db.models import Q
 from django.shortcuts import render_to_response, RequestContext
+from rbac.auth import resourcejurisdiction_view_auth
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_student')
 def studentlist(request):
     return render_to_response('student_list.html', {}, context_instance=RequestContext(request))
 
+
+@resourcejurisdiction_view_auth(jurisdiction='view_student')
 def data(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -56,8 +60,10 @@ def data(request):
 
     rows = []
     for p in studentdata:
-        ld = {'studentid': p.studentid, 'name': p.name, 'sex': (p.sex-1 and [u'女'] or [u'男'])[0], 'idnumber': p.idnumber,
-              'schoolyear': p.classid.schoolyear, 'class': p.classid.name, 'username': (p.user and [p.user.username] or [None])[0],
+        ld = {'studentid': p.studentid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
+              'idnumber': p.idnumber,
+              'schoolyear': p.classid.schoolyear, 'class': p.classid.name,
+              'username': (p.user and [p.user.username] or [None])[0],
               'major': (p.major and [p.major.name] or [None])[0], 'department': p.department.name}
         rows.append(ld)
     data = {'total': count, 'rows': rows}

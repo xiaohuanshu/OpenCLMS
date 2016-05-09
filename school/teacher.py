@@ -4,12 +4,15 @@ from django.http import HttpResponse
 from models import Teacher, Teachertoadministration, Teachertodepartment
 from django.db.models import Q
 from django.shortcuts import render_to_response, RequestContext
+from rbac.auth import resourcejurisdiction_view_auth
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_teacher')
 def teacherlist(request):
     return render_to_response('teacher_list.html', {}, context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_teacher')
 def data(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -38,7 +41,8 @@ def data(request):
             teacherdata = teacherdata.filter(name__icontains=search)[offset: (offset + limit)]
     else:
         count = teacherdata.count()
-        teacherdata = teacherdata.prefetch_related('department').prefetch_related('administration').all()[offset: (offset + limit)]
+        teacherdata = teacherdata.prefetch_related('department').prefetch_related('administration').all()[
+                      offset: (offset + limit)]
 
     rows = []
     for p in teacherdata:

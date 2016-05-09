@@ -10,7 +10,7 @@
                     <span>首页</span>
                 </a>
             </li>
-            {% if perms.app_course %}
+            {% if perms.view_courselist %}
                 <li>
                     <a href="{% url 'course:list' %}" class="{% nav_menu_active request.path 'course' %}">
                         <i class="fa fa-users"></i>

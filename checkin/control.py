@@ -12,6 +12,7 @@ from models import Checkin
 from user.models import User
 from school.models import Student
 from django.db.models import ObjectDoesNotExist
+from course.auth import has_course_permission
 
 
 def getqrstr(request, lessonid):
@@ -97,6 +98,10 @@ def ck(request, qr_str):
 
 def startCheckin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
+    if not has_course_permission(request.user, lesson.course):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     mode = request.GET.get('mode', default='first')
     if lesson.status == LESSON_STATUS_AWAIT:
         return render_to_response('error.html',
@@ -123,6 +128,10 @@ def startCheckin(request, lessonid):
 
 def stopCheckin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
+    if not has_course_permission(request.user, lesson.course):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     if lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_ADD or lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         re = endcheckin(lessonid)
         if re['error'] != 0:

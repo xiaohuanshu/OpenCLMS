@@ -9,10 +9,14 @@ from course.constant import *
 from checkin.function import clear_checkin, clear_last_checkin
 import json
 from django.shortcuts import redirect, HttpResponseRedirect
-
+from course.auth import has_course_permission
 
 def checkin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
+    if not has_course_permission(request.user, lesson.course):
+        return render_to_response('error.html',
+                                      {'message': '没有权限'},
+                                      context_instance=RequestContext(request))
     if not (
                         lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_AGAIN or lesson.status == LESSON_STATUS_CHECKIN_ADD):
         return render_to_response('error.html',
@@ -39,6 +43,10 @@ def checkin(request, lessonid):
 
 def lesson_data(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
+    if not has_course_permission(request.user, lesson.course):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     t = {'lessondata': lesson}
     if lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_AGAIN or lesson.status == LESSON_STATUS_CHECKIN_ADD:
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
@@ -85,6 +93,10 @@ def lesson_data(request, lessonid):
 
 def course_data(request, courseid):
     course = Course.objects.get(id=courseid)
+    if not has_course_permission(request.user, course):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     alllesson = Lesson.objects.filter(course=course).exclude(status=LESSON_STATUS_AWAIT).order_by(
         'week',
         'day',

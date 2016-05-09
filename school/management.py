@@ -1,15 +1,20 @@
+# -*- coding: utf-8 -*-
 __author__ = 'xiaohuanshu'
 from django.shortcuts import render_to_response, RequestContext, redirect
 from models import Schoolterm, Classtime, Class, Major, Department
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 import json
+from rbac.auth import resourcejurisdiction_view_auth, is_user_has_resourcejurisdiction
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_schoolterm')
 def schoolterm(request):
     if request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('termname', default=False) and request.POST.get(
             'termyear', default=False) and request.POST.get('termstartdate', default=False) and request.POST.get(
         'termenddate', default=False):
+        if not is_user_has_resourcejurisdiction(request.user, 'modify_schoolterm'):
+            HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
         if request.POST.get('termid', default=False):
             oldterm = Schoolterm.objects.get(id=request.POST.get('termid'))
             oldterm.schoolyear = request.POST.get('termyear')
@@ -39,10 +44,13 @@ def schoolterm(request):
     return render_to_response('schoolterm.html', {'term': term}, context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_classtime')
 def classtime(request):
     if request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('pk', default=False) and request.POST.get('name',
                                                                                                                default=False) and request.POST.get(
         'value', default=False):
+        if not is_user_has_resourcejurisdiction(request.user, 'modify_classtime'):
+            HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
         data = Classtime.objects.get(id=request.POST.get('pk'))
         if request.POST.get('name') == 'starttime':
             data.starttime = request.POST.get('value')
@@ -56,10 +64,12 @@ def classtime(request):
                               context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_class')
 def classlist(request):
     return render_to_response('class.html', {}, context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_class')
 def classdata(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -100,10 +110,12 @@ def classdata(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_major')
 def majorlist(request):
     return render_to_response('major.html', {}, context_instance=RequestContext(request))
 
 
+@resourcejurisdiction_view_auth(jurisdiction='view_major')
 def majordata(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])

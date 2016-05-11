@@ -11,7 +11,8 @@ from user.models import User
 class UserMiddleware(object):
     def process_request(self, request):
         agent = request.META.get('HTTP_USER_AGENT', None)
-
+        urlname = resolve(request.path)
+        urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
         allow_url = ['user:login', 'user:loginProcess', 'user:register',
                      'user:check_username', 'user:check_email', 'user:registerProcess',
                      'wechat:api', 'wechat:oauth']
@@ -19,7 +20,7 @@ class UserMiddleware(object):
             if request.COOKIES.has_key('username'):
                 remembercode = request.COOKIES['remembercode']
                 if check_password("%s%s%s" % (
-                request.COOKIES['userid'], settings.SECRET_KEY, request.COOKIES['username']),
+                        request.COOKIES['userid'], settings.SECRET_KEY, request.COOKIES['username']),
                                   remembercode):
                     request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
@@ -27,8 +28,6 @@ class UserMiddleware(object):
                     if not request.user.verify:
                         return redirect(reverse('user:authentication'))
                     return None
-            urlname = resolve(request.path)
-            urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
             if "MicroMessenger" in agent:
                 if 'wechat:oauth' == urlname:
                     return None
@@ -40,6 +39,6 @@ class UserMiddleware(object):
                 return redirect(reverse('user:login'))
         else:
             request.user = User.objects.get(id=request.session.get('userid'))
-            if not request.user.verify:
+            if (not request.user.verify) and urlname != 'user:authentication':
                 return redirect(reverse('user:authentication'))
         return None

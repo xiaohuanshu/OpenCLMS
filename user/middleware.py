@@ -8,7 +8,7 @@ from django.conf import settings
 from user.models import User
 
 
-class BlockedUserMiddleware(object):
+class UserMiddleware(object):
     def process_request(self, request):
         agent = request.META.get('HTTP_USER_AGENT', None)
 
@@ -23,6 +23,9 @@ class BlockedUserMiddleware(object):
                                   remembercode):
                     request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
+                    request.user = User.objects.get(id=request.session.get('userid'))
+                    if not request.user.verify:
+                        return redirect(reverse('user:authentication'))
                     return None
             urlname = resolve(request.path)
             urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
@@ -35,10 +38,8 @@ class BlockedUserMiddleware(object):
             if urlname not in allow_url:
                 request.session['origin'] = request.get_full_path()
                 return redirect(reverse('user:login'))
-        return None
-
-
-class RequestUserMiddleware(object):
-    def process_request(self, request):
-        if not request.session.get('username', '') == '':
+        else:
             request.user = User.objects.get(id=request.session.get('userid'))
+            if not request.user.verify:
+                return redirect(reverse('user:authentication'))
+        return None

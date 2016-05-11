@@ -48,8 +48,7 @@ MIDDLEWARE_CLASSES = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Own middleware
-    'user.middleware.BlockedUserMiddleware',
-    'user.middleware.RequestUserMiddleware',
+    'user.middleware.UserMiddleware',
 ]
 
 ROOT_URLCONF = 'checkinsystem.urls'

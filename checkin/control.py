@@ -25,7 +25,8 @@ def getqrstr(request, lessonid):
 
 def getcheckinnowdata(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
-    checkindata = Checkin.objects.filter(lesson=lesson).select_related('student').all()
+    checkindata = Checkin.objects.filter(lesson=lesson).select_related('student').only('student__studentid',
+                                                                                       'status').all()
     checkinnowdata = []
     for cnd in checkindata:
         checkinnowdata.append({"studentid": cnd.student.studentid, "status": cnd.status})

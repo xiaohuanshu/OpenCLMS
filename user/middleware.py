@@ -25,7 +25,7 @@ class UserMiddleware(object):
                     request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
                     request.user = User.objects.get(id=request.session.get('userid'))
-                    if not request.user.verify:
+                    if (not request.user.verify) and urlname != 'user:authentication':
                         return redirect(reverse('user:authentication'))
                     return None
             if "MicroMessenger" in agent:

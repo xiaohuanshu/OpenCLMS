@@ -5,7 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from models import Checkin, Checkinrecord
 from constant import *
 from django.db.models import F, Q
-import time
+import time, uuid
+from django.core.cache import cache
 
 
 def startcheckin(lessonid, mode='first'):
@@ -174,3 +175,10 @@ def student_checkin(student, lesson):
             checkin.status = CHECKIN_STATUS_SUCCESS
     checkin.save()
     return {'error': 0, 'status': checkin.status}
+
+
+def generateqrstr(lessonid):
+    str = uuid.uuid1().hex
+    str = str[:8] + str[16:20]
+    cache.set("qr%s" % (str), lessonid, 20)
+    return str

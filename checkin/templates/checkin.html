@@ -207,11 +207,11 @@
                                         <input id="toastEnable" type="checkbox" checked/>新人签到提醒
                                     </div>
                                 </div>
-                                <div class="row m-bot15">
+                                <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <h5>学生操作</h5>
 
-                                        <div class="input-group m-bot15">
+                                        <div class="input-group">
                                             <input id='control-studentid' type="text" class="form-control"
                                                    placeholder="学号">
 
@@ -229,14 +229,14 @@
                                         </div>
                                     </div>
                                 </div>
-                                <div class="row m-bot15">
+                                <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <a href="?deletethis=1">
                                             <button type="button" class="btn btn-danger">删除本次签到数据</button>
                                         </a>
                                     </div>
                                 </div>
-                                <div class="row m-bot15">
+                                <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <a href="?deleteall=1">
                                             <button type="button" class="btn btn-danger">删除所有签到数据</button>
@@ -290,7 +290,9 @@
         student = new Array();
         time = 0;
         toastEnable = true;
-        qrstr = '';
+        {% DOMAIN as domain%}
+        domain = "{{ domain }}{% url 'checkin:ckurl' %}";
+        qrstr = domain + '{{ firstqrstr }}';
         loadingtimeid = null;
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         checkin_status_json ={{ checkin_status_json|safe }};
@@ -320,7 +322,6 @@
             });
         }
         function countdown(num) {
-            //$('#qrcode canvas').attr('id', 'imgqrcanvas');
             var can = $qrcode.children('canvas').get(0);
             var cans = can.getContext('2d');
             cans.fillStyle = 'black';
@@ -338,7 +339,7 @@
                 url: '{% url 'checkin:getqrstr' lessondata.id %}',
                 success: function (str) {
                     {% DOMAIN as domain%}
-                    qrstr = "{{ domain }}{% url 'checkin:ckurl' %}" + str.qr;
+                    qrstr = domain + str.qr;
                     //generateqr();
                 }
             });
@@ -353,7 +354,6 @@
                     radius = 30;
             ctx.fillStyle = "#FFF";
             ctx.fillRect(0, 0, w, h);
-
             var r = [3, 4, 4.5, 5, 6, 7];
             var angle = [10, 25, 45, 65, 90, 120];
             var alpha = [0.25, 0.35, 0.45, 0.65, 0.8, 1];
@@ -404,12 +404,42 @@
 
 
         function statushtml(status) {
-            //return "<span class='label label-" + checkin_status_style_json[status] + " label-mini'>" + checkin_status_json[status] + "</span>";
-
             return "    <button data-toggle='dropdown' class='btn btn-" + checkin_status_style_json[status] + " dropdown-toggle btn-xs' type='button'" +
                     "            aria-expanded='false'>" + checkin_status_json[status] +
                     "    </button>";
 
+        }
+        function changestudentstatus(studentid, status, toast) {
+            var $slstudent = $("#sl" + studentid);
+            $slstudent.find("td:eq(2) button").remove();
+            $slstudent.find("td:eq(2) .btn-group").prepend(statushtml(status));
+            if (checkin_status_json[status] == '请假') {
+                $slstudent.find("td:eq(2) button").attr('disabled', true);
+                $slstudent.find("td:eq(3) button").remove();
+            } else if (checkin_status_json[status] != '未到') {
+                $slstudent.find("td:eq(3) button").addClass("btn-danger");
+                $slstudent.find("td:eq(3) button").removeClass("btn-success");
+                $slstudent.find("td:eq(3) i").addClass("fa-trash-o");
+                $slstudent.find("td:eq(3) i").removeClass("fa-check");
+                $slstudent.data("status", status);
+            } else {
+                $slstudent.find("td:eq(3) button").removeClass("btn-danger");
+                $slstudent.find("td:eq(3) button").addClass("btn-success");
+                $slstudent.find("td:eq(3) i").removeClass("fa-trash-o");
+                $slstudent.find("td:eq(3) i").addClass("fa-check");
+                $slstudent.data("status", status);
+            }
+            if (typeof(toast) == "undefined" || toast == false) {
+                toast = false;
+            } else {
+                toast = true;
+            }
+            if (toastEnable && student[studentid] != status && toast && checkin_status_json[status] != '未到') {
+                toastr.success($slstudent.children("td:eq(0)").text());
+            }
+            student[studentid] = status;
+            $slstudent.find(".btn-group li").show();
+            $slstudent.find("td:eq(2) ul li:contains(" + checkin_status_json[status] + ")").hide();
         }
         function reflashdata(first) {
             $.ajax({
@@ -421,38 +451,9 @@
                         $('#actuallynumber').text(str.actually);
                         shake($("#actuallynumber"), "bg-warning", 3);
                         $.each(str.rows, function (n, value) {
-                            //$("#StudentList table tr td:contains('"+value.studentid+"')").parent("tr")("td:eq(3)").text("hello");
-                            $("#sl" + value.studentid + " td:eq(2) button").remove()
-                            $("#sl" + value.studentid + " td:eq(2) .btn-group").prepend(statushtml(value.status));
-                            if (checkin_status_json[value.status] == '请假') {
-                                $("#sl" + value.studentid + " td:eq(2) button").attr('disabled', true);
-                                $("#sl" + value.studentid + " td:eq(3) button").remove();
-                            } else if (checkin_status_json[value.status] != '未到') {
-                                $("#sl" + value.studentid + " td:eq(3) button").addClass("btn-danger");
-                                $("#sl" + value.studentid + " td:eq(3) button").removeClass("btn-success");
-                                $("#sl" + value.studentid + " td:eq(3) i").addClass("fa-trash-o");
-                                $("#sl" + value.studentid + " td:eq(3) i").removeClass("fa-check");
-                                $("#sl" + value.studentid).data("status", value.status);
-                                //$("#sl" + value.studentid + " td:eq(3)").html("<button class='btn btn-danger btn-xs changestatus' data-studentid='" + value.studentid + "' data-status='" + value.status + "'><i class='fa fa-trash-o'></i></button>");
-                            } else {
-                                $("#sl" + value.studentid + " td:eq(3) button").removeClass("btn-danger");
-                                $("#sl" + value.studentid + " td:eq(3) button").addClass("btn-success");
-                                $("#sl" + value.studentid + " td:eq(3) i").removeClass("fa-trash-o");
-                                $("#sl" + value.studentid + " td:eq(3) i").addClass("fa-check");
-                                $("#sl" + value.studentid).data("status", value.status);
-                                //$("#sl" + value.studentid + " td:eq(3)").html("<button class='btn btn-success btn-xs changestatus' data-studentid='" + value.studentid + "' data-status='" + value.status + "'><i class='fa fa-check'></i></button>");
-                            }
-                            if (toastEnable && student[value.studentid] != value.status && first != true && checkin_status_json[value.status] != '未到') {
-                                toastr.success($("#sl" + value.studentid + " td:eq(0)").text());
-                            }
-                            student[value.studentid] = value.status;
-                            $("#sl" + value.studentid + " .btn-group li").show()
-                            $("#sl" + value.studentid + " td:eq(2) ul li:contains(" + checkin_status_json[value.status] + ")").hide()
-
-
+                            changestudentstatus(value.studentid, value.status, !first);
                         });
                     }
-                    //console.log("hello");
                 }
             });
         }
@@ -465,13 +466,20 @@
                     'newstatus': status
                 },
                 success: function (value) {
+                    console.log(value);
                     if (value.error && value.error != 0) {
                         $("#control-studentid").attr('placeholder', value.message);
                         shake($("#control-studentid").parent("div"), "has-error", 3);
                     } else {
                         $("#control-studentid").attr('placeholder', '操作成功');
                         shake($("#control-studentid").parent("div"), "has-success", 3);
-                        reflashdata(true);
+                        //reflashdata(true);
+                        changestudentstatus(studentid, value.status, false);
+                        if (checkin_status_json[value.status] != '未到') {
+                            $('#actuallynumber').text(parseInt($('#actuallynumber').text()) + 1);
+                        } else {
+                            $('#actuallynumber').text(parseInt($('#actuallynumber').text()) - 1);
+                        }
                     }
                 },
                 error: function () {
@@ -500,7 +508,6 @@
             $("#control-studentid").val("");
         });
         $(document).ready(function () {
-            getqrstr();
             generateqr();
             setInterval(qraction, 1000);
             reflashdata(true);

@@ -4,45 +4,26 @@
 {% load school_extra %}
 {% block title %}学生列表{% endblock %}
 {% block page_css %}
-    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
-
-
-    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
-
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
-
-
-
-    <script src="{% static 'js/bootstrap-table-export.min.js' %}"></script>
-    <script src="{% static 'js/tableExport.min.js' %}"></script>
-    <script src="{% static 'assets/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
-
-    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
 {% endblock %}
 
-
-
-
 {% block content %}
-
-
-
-
-
     <div class="row">
         <div class="col-sm-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    学生列表
-             <span class="tools pull-right">
-                <a href="javascript:;" class="fa fa-chevron-down"></a>
-                 <!--<a href="javascript:;" class="fa fa-times"></a>-->
-             </span>
-                </header>
-                <div class="panel-body">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">学生列表</h3>
+                </div>
+                <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
                             <div class="form-inline" role="form">
@@ -105,7 +86,7 @@
 
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
 

@@ -1,74 +1,95 @@
 {% extends 'base-body.html' %}
 {% load staticfiles %}
+{% block title %}登录{% endblock %}
+{% block page_css %}
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
+{% endblock %}
 {% block body %}
-    <body class="login-body">
-
-    <div class="container">
-
-        <form class="form-signin" action="{% url 'user:loginProcess' %}" method="POST">
-            {% csrf_token %}
-            <h2 class="form-signin-heading">登录系统</h2>
-            <div class="login-wrap">
-                {% if request.GET.error %}
-                    <label class="error">{{ request.GET.error }}</label>
-                {% endif %}
-                <input name="username" type="text" class="form-control" placeholder="用户名/Email/学号/工号" autofocus>
-                <input type="password" class="form-control" name="password" placeholder="密码">
-                <label class="checkbox">
-                    <input type="checkbox" value="remember-me" name="remember"> 记住我
-                <span class="pull-right">
-                    <a data-toggle="modal" href="#myModal"> 忘记密码?</a>
-                </span>
-                </label>
-                <button class="btn btn-lg btn-login btn-block" type="submit">登录</button>
-                {% comment %}
-            <p>or you can sign in via social network</p>
-            <div class="login-social-link">
-                <a href="index.html" class="facebook">
-                    <i class="fa fa-facebook"></i>
-                    Facebook
-                </a>
-                <a href="index.html" class="twitter">
-                    <i class="fa fa-twitter"></i>
-                    Twitter
-                </a>
-            </div>
-            {% endcomment %}
-                <div class="registration">
-                    没有账户?
-                    <a class="" href="{% url 'user:register' %}">
-                        注册
-                    </a>
+    <body class="hold-transition login-page">
+    <div class="login-box">
+        <div class="login-logo">
+            <a href="{% url 'home' %}"><b>CHECKIN</b>SYSTEM</a>
+        </div>
+        <!-- /.login-logo -->
+        <div class="login-box-body">
+            <p class="login-box-msg">登录系统</p>
+            {% if request.GET.error %}
+                <label class="text-danger">{{ request.GET.error }}</label>
+            {% endif %}
+            <form action="{% url 'user:loginProcess' %}" method="post">
+                {% csrf_token %}
+                <div class="form-group has-feedback">
+                    <input type="text" class="form-control" placeholder="用户名" name="username">
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
-
-            </div>
-
-            <!-- Modal -->
-            <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal"
-                 class="modal fade">
-                <div class="modal-dialog">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title">忘记密码 ?</h4>
-                        </div>
-                        <div class="modal-body">
-                            <p>输入你的E-mail地址,我们将为您发送密码重置连接</p>
-                            <input type="text" name="email" placeholder="Email" autocomplete="off"
-                                   class="form-control placeholder-no-fix">
-
-                        </div>
-                        <div class="modal-footer">
-                            <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
-                            <button class="btn btn-success" type="button">发送</button>
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control" placeholder="密码" name="password">
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
+                </div>
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox icheck">
+                            <label>
+                                <input type="checkbox" value="remember-me" name="remember"> 记住我
+                            </label>
                         </div>
                     </div>
+                    <!-- /.col -->
+                    <div class="col-xs-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat">登录</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
+
+
+            <a data-toggle="modal" href="#myModal">忘记密码?</a><br>
+            <a href="{% url 'user:register' %}" class="text-center">注册一个新的帐号</a>
+
+        </div>
+        <!-- /.login-box-body -->
+    </div>
+    <!-- /.login-box -->
+
+    </body>
+    <!-- Modal -->
+    <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal"
+         class="modal fade">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                    <h4 class="modal-title">忘记密码 ?</h4>
+                </div>
+                <div class="modal-body">
+                    <p>输入你的E-mail地址,我们将为您发送密码重置连接</p>
+                    <input type="text" name="email" placeholder="Email" autocomplete="off"
+                           class="form-control placeholder-no-fix">
+
+                </div>
+                <div class="modal-footer">
+                    <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                    <button class="btn btn-success" type="button">发送</button>
                 </div>
             </div>
-            <!-- modal -->
-
-        </form>
-
+        </div>
     </div>
-    </body>
+    <!-- modal -->
+{% endblock %}
+
+{% block page_js %}
+    <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        $(function () {
+            $('input').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+        });
+    </script>
 {% endblock %}

@@ -3,22 +3,16 @@
 {% load school_extra %}
 {% block title %}班级{% endblock %}
 {% block page_css %}
-    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
-
-    <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
-          rel="stylesheet"/>
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/bootstrap-timepicker/compiled/timepicker.css' %}"/>
-    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
 
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
-    <script src="{% static 'bootstrap-editable.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-table-editable.min.js' %}"></script>
-    <script type="text/javascript" src="{% static 'assets/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
-    <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
-    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -29,15 +23,11 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    班级
-             <span class="tools pull-right">
-                <a href="javascript:;" class="fa fa-chevron-down"></a>
-                 <!--<a href="javascript:;" class="fa fa-times"></a>-->
-             </span>
-                </header>
-                <div class="panel-body">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">班级列表</h3>
+                </div>
+                <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
                             <div class="form-inline" role="form">
@@ -89,7 +79,7 @@
                         ></table>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
 

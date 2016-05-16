@@ -3,191 +3,194 @@
 {% load center_extra %}
 {% block title %}学期管理{% endblock %}
 {% block page_css %}
-    <link rel="stylesheet" type="text/css" href="{% static 'assets/bootstrap-datepicker/css/datepicker.css' %}"/>
-    <link href="{% static 'assets/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="{% static 'plugins/datepicker/datepicker3.css' %}"/>
+    <link href="{% static 'plugins/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
 {% endblock %}
 {% block page_js %}
-    <script type="text/javascript" src="{% static 'assets/bootstrap-datepicker/js/bootstrap-datepicker.js' %}"></script>
-    <script type="text/javascript" src="{% static 'assets/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'plugins/datepicker/bootstrap-datepicker.min.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'plugins/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
 {% endblock %}
 
 {% block content %}
     <div class="row">
         <div class="col-sm-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    学期列表
-                    {% if perms.modify_schoolterm %}
-                        <span class="pull-right">
-                          <a class=" btn btn-success btn-xs" id="creatnewterm"> 创建新的学期</a>
-                      </span>
-                    {% endif %}
-                </header>
-                <table class="table table-hover p-table">
-                    <thead>
-                    <tr>
-                        <th>学期</th>
-                        <th>学年</th>
-                        <th>开始日期</th>
-                        <th>结束日期</th>
-                        <th>状态</th>
-                        {% if perms.modify_schoolterm %}
-                            <th>操作</th>
-                        {% endif %}
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for t in term %}
-                        <tr id="term{{ t.id }}">
-                            <td class="p-name description">{{ t.description }}</td>
-                            <td class="p-team year">{{ t.schoolyear }}</td>
-                            <td class="p-team startdate">{{ t.startdate|date:"Y-m-d" }}</td>
-                            <td class="p-team enddate">{{ t.enddate|date:"Y-m-d" }}</td>
-                            <td>
-                                {% if t.now %}
-                                    <span class="label label-primary">当前</span>
-                                {% else %}
-                                    <span class="label label-default">无</span>
-                                {% endif %}
-                            </td>
+
+
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">学期列表</h3>
+                </div>
+                <div class="box-body">
+                    <table class="table">
+                        <thead>
+                        <tr>
+                            <th>学期</th>
+                            <th>学年</th>
+                            <th>开始日期</th>
+                            <th>结束日期</th>
+                            <th>状态</th>
                             {% if perms.modify_schoolterm %}
-                                <td>
-                                    {% if not t.now %}
-                                        <a href="#" class="btn btn-primary btn-xs changeterm" termid="{{ t.id }}"><i
-                                                class="fa fa-cog"></i> 设为当前</a>
-                                    {% endif %}
-                                    <a href="#" class="btn btn-info btn-xs termedit" termid="{{ t.id }}"><i
-                                            class="fa fa-pencil"></i> 编辑 </a>
-                                    {% if not t.now %}
-                                        <a href="#" class="btn btn-danger btn-xs deleteterm" termid="{{ t.id }}"><i
-                                                class="fa fa-trash-o"></i> 删除 </a>
-                                    {% endif %}
-                                </td>
+                                <th>操作<a class=" btn btn-success btn-xs" id="creatnewterm"> 创建新的学期</a></th>
                             {% endif %}
                         </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                {% if perms.modify_schoolterm %}
-                    <!-- Modal -->
-                    <form method="post" class="form-horizontal tasi-form" id="termform">
-                        {% csrf_token %}
-                        <div class="modal fade" id="schooltermModal" tabindex="-1" role="dialog" aria-hidden="true">
-                            <input type="hidden" name="termid" value="">
+                        </thead>
+                        <tbody>
+                        {% for t in term %}
+                            <tr id="term{{ t.id }}">
+                                <td class="description">{{ t.description }}</td>
+                                <td class="year">{{ t.schoolyear }}</td>
+                                <td class="startdate">{{ t.startdate|date:"Y-m-d" }}</td>
+                                <td class="enddate">{{ t.enddate|date:"Y-m-d" }}</td>
+                                <td>
+                                    {% if t.now %}
+                                        <span class="label label-primary">当前</span>
+                                    {% else %}
+                                        <span class="label label-default">无</span>
+                                    {% endif %}
+                                </td>
+                                {% if perms.modify_schoolterm %}
+                                    <td>
+                                        {% if not t.now %}
+                                            <a href="#" class="btn btn-primary btn-xs changeterm" termid="{{ t.id }}"><i
+                                                    class="fa fa-cog"></i> 设为当前</a>
+                                        {% endif %}
+                                        <a href="#" class="btn btn-info btn-xs termedit" termid="{{ t.id }}"><i
+                                                class="fa fa-pencil"></i> 编辑 </a>
+                                        {% if not t.now %}
+                                            <a href="#" class="btn btn-danger btn-xs deleteterm" termid="{{ t.id }}"><i
+                                                    class="fa fa-trash-o"></i> 删除 </a>
+                                        {% endif %}
+                                    </td>
+                                {% endif %}
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                    </table>
+                    {% if perms.modify_schoolterm %}
+                        <!-- Modal -->
 
+
+                        <form method="post" class="form-horizontal" id="termform">
+                            {% csrf_token %}
+                            <input type="hidden" name="termid" value="">
+                            <div class="modal fade" id="schooltermModal" tabindex="-1" role="dialog" aria-hidden="true">
+                                <div class="modal-dialog">
+                                    <div class="modal-content">
+                                        <div class="modal-header">
+                                            <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                                <span aria-hidden="true">×</span></button>
+                                            <h4 class="modal-title">创建新学期</h4>
+                                        </div>
+                                        <div class="modal-body">
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4">学期名称</label>
+
+                                                <div class="col-md-6 col-xs-11">
+                                                    <input size="11" type="text" value=""
+                                                           class="form-control form-control-inline input-medium"
+                                                           name="termname" data-bv-notempty
+                                                           data-bv-notempty-message="请输入学期名称">
+                                                    <span class="help-block">如:2014-2015-1</span>
+                                                </div>
+                                            </div>
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4">学年</label>
+
+                                                <div class="col-md-6 col-xs-11">
+                                                    <input size="4" type="text" value=""
+                                                           class="form-control" name="termyear" data-bv-notempty
+                                                           data-bv-notempty-message="请输入学年">
+                                                </div>
+                                            </div>
+
+                                            <div class="form-group">
+                                                <label class="control-label col-md-4">时间</label>
+
+                                                <div class="col-md-6">
+                                                    <div class="input-group input-daterange"
+                                                         data-date-format="yyyy-mm-dd">
+                                                        <input type="text" class="form-control dpd1"
+                                                               name="termstartdate"
+                                                               data-date-format="yyyy-mm-dd" data-bv-notempty
+                                                               data-bv-notempty-message="请选择开始日期">
+                                                        <span class="input-group-addon">到</span>
+                                                        <input type="text" class="form-control dpd2" name="termenddate"
+                                                               data-date-format="yyyy-mm-dd" data-bv-notempty
+                                                               data-bv-notempty-message="请选择结束日期">
+                                                    </div>
+                                                    <span class="help-block">选择一个时间范围,学期的开始必须为周日</span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="modal-footer">
+                                            <button type="button" class="btn btn-default pull-left"
+                                                    data-dismiss="modal">
+                                                取消
+                                            </button>
+                                            <button type="submit" class="btn btn-success">提交</button>
+                                        </div>
+                                    </div>
+                                    <!-- /.modal-content -->
+                                </div>
+                                <!-- /.modal-dialog -->
+                            </div>
+                        </form>
+                        <!-- modal -->
+                        <!-- change Modal -->
+                        <div class="modal modal-primary fade" id="changeconfirm" tabindex="-1" role="dialog"
+                             aria-hidden="true">
                             <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal"
-                                                aria-hidden="true">&times;</button>
-                                        <h4 class="modal-title">创建新学期</h4>
-                                    </div>
-
-                                    <div class="modal-body">
-
-                                        <div class="form-group">
-                                            <label class="control-label col-md-4">学期名称</label>
-
-                                            <div class="col-md-6 col-xs-11">
-                                                <input size="11" type="text" value=""
-                                                       class="form-control form-control-inline input-medium"
-                                                       name="termname" data-bv-notempty
-                                                       data-bv-notempty-message="请输入学期名称">
-                                                <span class="help-block">如:2014-2015-1</span>
-                                            </div>
-                                        </div>
-                                        <div class="form-group">
-                                            <label class="control-label col-md-4">学年</label>
-
-                                            <div class="col-md-6 col-xs-11">
-                                                <input size="4" type="text" value=""
-                                                       class="form-control" name="termyear" data-bv-notempty
-                                                       data-bv-notempty-message="请输入学年">
-                                            </div>
-                                        </div>
-
-                                        <div class="form-group">
-                                            <label class="control-label col-md-4">时间</label>
-
-                                            <div class="col-md-6">
-                                                <div class="input-group input-daterange" data-date-format="yyyy-mm-dd">
-                                                    <input type="text" class="form-control dpd1" name="termstartdate"
-                                                           data-date-format="yyyy-mm-dd" data-bv-notempty
-                                                           data-bv-notempty-message="请选择开始日期">
-                                                    <span class="input-group-addon">到</span>
-                                                    <input type="text" class="form-control dpd2" name="termenddate"
-                                                           data-date-format="yyyy-mm-dd" data-bv-notempty
-                                                           data-bv-notempty-message="请选择结束日期">
-                                                </div>
-                                                <span class="help-block">选择一个时间范围,学期的开始必须为周日</span>
-                                            </div>
-                                        </div>
-
-                                    </div>
-
-                                    <div class="modal-footer">
-                                        <button class="btn btn-success" type="submit" disabled>提交</button>
-                                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
-                                    </div>
-
-                                </div>
-                            </div>
-                        </div>
-
-                    </form>
-                    <!-- modal -->
-                    <!-- change Modal -->
-                    <div class="modal fade modal-dialog-center top-modal-with-space" id="changeconfirm" tabindex="-1"
-                         role="dialog" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal"
-                                                aria-hidden="true">&times;</button>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">×</span></button>
                                         <h4 class="modal-title">确认更改?</h4>
                                     </div>
                                     <div class="modal-body">
-
-                                        请在上一个学期结束后再更改学期,否则将出现不可预计的后果
-
+                                        <p>请在上一个学期结束后再更改学期,否则将出现不可预计的后果</p>
                                     </div>
                                     <div class="modal-footer">
-                                        <button data-dismiss="modal" class="btn btn-default" type="button">关闭</button>
-                                        <button class="btn btn-warning" type="button"> 确认</button>
+                                        <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">
+                                            取消
+                                        </button>
+                                        <button type="button" class="btn btn-outline btn-change">确认</button>
                                     </div>
                                 </div>
+                                <!-- /.modal-content -->
                             </div>
+                            <!-- /.modal-dialog -->
                         </div>
-                    </div>
-                    <!-- change Modal  -->
-                    <!-- delete Modal -->
-                    <div class="modal fade modal-dialog-center top-modal-with-space" id="deleteconfirm" tabindex="-1"
-                         role="dialog" aria-hidden="true">
-                        <div class="modal-dialog">
-                            <div class="">
+                        <!-- change Modal  -->
+                        <!-- delete Modal -->
+                        <div class="modal modal-danger fade" id="deleteconfirm" tabindex="-1" role="dialog"
+                             aria-hidden="true">
+                            <div class="modal-dialog">
                                 <div class="modal-content">
                                     <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal"
-                                                aria-hidden="true">&times;</button>
-                                        <h4 class="modal-title">确认删除?</h4>
+                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                                            <span aria-hidden="true">&times;</span></button>
+                                        <h4 class="modal-title">Danger Modal</h4>
                                     </div>
                                     <div class="modal-body">
-
-                                        请不要随意删除已经结束的学期
-
+                                        <p>请不要随意删除已经结束的学期</p>
                                     </div>
                                     <div class="modal-footer">
-                                        <button data-dismiss="modal" class="btn btn-default" type="button">关闭</button>
-                                        <button class="btn btn-warning" type="button"> 确认</button>
+                                        <button type="button" class="btn btn-outline pull-left"
+                                                data-dismiss="modal">关闭
+                                        </button>
+                                        <button type="button" class="btn btn-outline btn-delete">删除</button>
                                     </div>
                                 </div>
+                                <!-- /.modal-content -->
                             </div>
+                            <!-- /.modal-dialog -->
                         </div>
-                    </div>
-                    <!-- delete Modal  -->
-                {% endif %}
-            </section>
+                        <!-- delete Modal -->
+                    {% endif %}
+                </div>
+            </div>
         </div>
     </div>
 
@@ -251,7 +254,7 @@
                 $(this).click(function () {
                     var termid = $(this).attr("termid");
                     $('#changeconfirm .modal-title').text('确认修改当前学期为' + $('#term' + termid + ' .description').text() + "?");
-                    $('#changeconfirm .btn-warning').click(function () {
+                    $('#changeconfirm .btn-change').click(function () {
                         location.href = '?changeterm=' + termid;
                     })
                     $('#changeconfirm').modal('show');
@@ -260,8 +263,8 @@
             $(".deleteterm").each(function () {
                 $(this).click(function () {
                     var termid = $(this).attr("termid");
-                    $('#deleteconfirm .modal-title').text('确认修改当前学期为' + $('#term' + termid + ' .description').text() + "?");
-                    $('#deleteconfirm .btn-warning').click(function () {
+                    $('#deleteconfirm .modal-title').text('删除' + $('#term' + termid + ' .description').text() + "学期?");
+                    $('#deleteconfirm .btn-delete').click(function () {
                         location.href = '?deleteterm=' + termid;
                     })
                     $('#deleteconfirm').modal('show');

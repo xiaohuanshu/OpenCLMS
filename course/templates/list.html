@@ -3,28 +3,24 @@
 {% load school_extra %}
 {% block title %}课程列表{% endblock %}
 {% block page_css %}
-    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
-    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-table-export.min.js' %}"></script>
-    <script src="{% static 'js/tableExport.min.js' %}"></script>
-    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="row">
         <div class="col-sm-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    课程列表
-             <span class="tools pull-right">
-                <a href="javascript:;" class="fa fa-chevron-down"></a>
-                <!--<a href="javascript:;" class="fa fa-times"></a>-->
-             </span>
-                </header>
-                <div class="panel-body">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">课程列表</h3>
+                </div>
+                <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
                             <div class="form-inline" role="form">
@@ -81,16 +77,15 @@
                                data-query-params="queryParams"
                                data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf', 'json']"
                                data-search-text="{{ request.GET.search }}"
-                                >
+                        >
 
                         </table>
 
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
-
     <!-- page end-->
 
 
@@ -161,17 +156,17 @@
                 events: operateEvents,
                 formatter: operateFormatter
             }],
-            onClickRow:clickrow
+            onClickRow: clickrow
         });
         function queryParams(params) {
             params['schoolterm'] = $('#schoolterm').val();
             params['major'] = $('#major').val();
             return params;
         }
-        function clickrow(row, element){
-            var clickurl="{% url 'course:information' 0 %}";
-            clickurl=clickurl.substring(0,clickurl.length-1);
-            window.location.href=clickurl+row.id;
+        function clickrow(row, element) {
+            var clickurl = "{% url 'course:information' 0 %}";
+            clickurl = clickurl.substring(0, clickurl.length - 1);
+            window.location.href = clickurl + row.id;
         }
 
         $('#major').chosen({allow_single_deselect: true, include_group_label_in_selected: true});

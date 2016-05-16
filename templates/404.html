@@ -1,23 +1,62 @@
 {% extends 'base-body.html' %}
+{% load static %}
+{% block page_css %}
+    <style>
+        /*404 page*/
+
+        .body-404 {
+            background: #18d4cb;
+            color: #fff;
+        }
+
+        .error-wrapper {
+            text-align: center;
+            margin-top: 10%;
+        }
+
+        .error-wrapper .icon-404 {
+            background: url("{% static 'img/404_icon.png' %}") no-repeat;
+            width: 289px;
+            height: 274px;
+            display: inline-block;
+            margin-left: 30px;
+        }
+
+        .error-wrapper h1 {
+            font-size: 90px;
+            font-weight: 300;
+            margin: -50px 0 0 0;
+        }
+
+        .error-wrapper h2 {
+            font-size: 20px;
+            font-weight: 300;
+            margin: 0 0 30px 0;
+        }
+
+        .error-wrapper p, .error-wrapper p a {
+            font-size: 18px;
+            font-weight: 300;
+        }
+
+        .error-wrapper p.page-404 {
+            color: #7dfff7;
+        }
+
+        .error-wrapper p.page-404 a, .error-wrapper p.page-500 a, .error-wrapper p.page-404 a:hover, .error-wrapper p.page-500 a:hover {
+            color: #fff;
+        }
+    </style>
+{% endblock %}
 {% block body %}
     <body class="body-404">
-
-
     <div class="container">
-
         <section class="error-wrapper">
             <i class="icon-404"></i>
-
             <h1>404</h1>
-
             <h2>页面没有找到</h2>
-
             <p class="page-404">一些错误发生了!我们没有找到你需要的页面. <a href="{% url 'home' %}">返回主页</a></p>
         </section>
-
     </div>
-
-
     </body>
-
 {% endblock %}

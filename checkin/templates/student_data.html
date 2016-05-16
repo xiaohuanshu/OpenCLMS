@@ -3,10 +3,10 @@
 {% load checkin_extra %}
 {% block title %}学生考勤数据{% endblock %}
 {% block page_css %}
-    <link href="{% static 'assets/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
 
 
-    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
     <style>
         .bg-default {
             background-color: lightcoral;
@@ -15,15 +15,12 @@
 
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'assets/bootstrap-table/bootstrap-table.js' %}"></script>
-    <script src="{% static 'assets/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
 
-
-
-    <script src="{% static 'js/bootstrap-table-export.min.js' %}"></script>
-    <script src="{% static 'js/tableExport.min.js' %}"></script>
-
-    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 
 
@@ -37,15 +34,13 @@
 
     <div class="row">
         <div class="col-sm-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    学生考勤数据 - {{ student.name }}({{ student.studentid }})
-             <span class="tools pull-right">
-                <a href="javascript:;" class="fa fa-chevron-down"></a>
-                 <!--<a href="javascript:;" class="fa fa-times"></a>-->
-             </span>
-                </header>
-                <div class="panel-body">
+
+
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">学生考勤数据 - {{ student.name }}({{ student.studentid }})</h3>
+                </div>
+                <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
                         </div>
@@ -69,7 +64,7 @@
 
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
 

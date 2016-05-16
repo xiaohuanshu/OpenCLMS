@@ -3,22 +3,21 @@
 {% load center_extra %}
 {% block title %}上课时间{% endblock %}
 {% block page_css %}
-    <link href="{% static 'css/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
     {% if perms.modify_classtime %}
-        <link href="//cdnjs.cloudflare.com/ajax/libs/x-editable/1.5.0/bootstrap3-editable/css/bootstrap-editable.css"
-              rel="stylesheet"/>
+        <link href="{% static 'plugins/x-editable/css/bootstrap-editable.css' %}"rel="stylesheet"/>
         <link rel="stylesheet" type="text/css"
-              href="{% static 'assets/bootstrap-timepicker/compiled/timepicker.css' %}"/>
+              href="{% static 'plugins/timepicker/old/compiled/timepicker.css' %}"/>
     {% endif %}
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'js/bootstrap-table.min.js' %}"></script>
-    <script src="{% static 'js/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
     {% if perms.modify_classtime %}
-        <script src="{% static 'bootstrap-editable.min.js' %}"></script>
-        <script src="{% static 'js/bootstrap-table-editable.min.js' %}"></script>
+        <script src="{% static 'plugins/x-editable/js/bootstrap-editable.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js' %}"></script>
         <script type="text/javascript"
-                src="{% static 'assets/bootstrap-timepicker/js/bootstrap-timepicker.js' %}"></script>
+                src="{% static 'plugins/timepicker/old/js/bootstrap-timepicker.js' %}"></script>
         <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
     {% endif %}
 {% endblock %}
@@ -139,17 +138,17 @@
         {% if perms.modify_classtime %}
             $('.editable').on('shown', function (e, editable) {
                 editable.input.$input.timepicker({
-                    autoclose: true,
+                    //autoclose: true,
                     minuteStep: 1,
+                    template: 'dropdown',
                     showSeconds: true,
                     showMeridian: false,
                     defaultTime: false
                 });
             });
             $('.editable').each(function () {
-                var data = $table.bootstrapTable('getData'),
-                        index = $(this).parents('tr').data('index');
-                console.log(data[index].id);
+                var data = $table.bootstrapTable('getData');
+                index = $(this).parents('tr').data('index');
                 $(this).editable('option', 'pk', data[index].id);
             })
         {% endif %}

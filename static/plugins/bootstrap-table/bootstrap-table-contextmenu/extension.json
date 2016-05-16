@@ -1,0 +1,17 @@
+{
+  "name": "Context Menu",
+  "version": "1.1.4",
+  "description": "Context menu support to wenzhixin bootstrap table",
+  "url": "https://github.com/prograhammer/bootstrap-table-contextmenu",
+  "example": "http://www.prograhammer.com/demos/bootstrap-table-contextmenu/",
+
+  "plugins": [{
+    "name": "bootstrap-table-contextmenu",
+    "url": "https://github.com/prograhammer/bootstrap-table-contextmenu"
+  }],
+
+  "author": {
+    "name": "prograhammer",
+    "image": "https://avatars1.githubusercontent.com/u/4474660"
+  }
+}

@@ -2,25 +2,35 @@
 {% load staticfiles %}
 {% block title %}用户信息验证{% endblock %}
 {% block page_css %}
-    <link href="{% static 'assets/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
 {% endblock %}
 {% block page_js %}
-    <script type="text/javascript" src="{% static 'assets/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'plugins/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <!-- page start-->
     <div class="row">
-        <div class="col-lg-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    用户信息验证
-                </header>
-                <div class="panel-body">
-                    <form role="form" class="form-horizontal" id="authform" method="post">
-                        {% csrf_token %}
-                        {% if request.GET.error %}
-                            <label class="login-wrap error">{{ request.GET.error }}</label>
-                        {% endif %}
+
+
+
+
+
+
+    <div class="col-md-12">
+        <div class="box box-primary">
+            <div class="box-header">
+                <i class="fa fa-edit"></i>
+
+                <h3 class="box-title">用户信息验证</h3>
+            </div>
+            <div class="box-body">
+                <form role="form" class="form-horizontal" id="authform" method="post">
+                    {% csrf_token %}
+                    {% if request.GET.error %}
+                        <label class="login-wrap error">{{ request.GET.error }}</label>
+                    {% endif %}
+                    <div class="box-body">
                         <div class="form-group">
                             <label class="col-sm-2 control-label col-lg-2">姓名</label>
 
@@ -62,21 +72,6 @@
                                        placeholder="请输入学号" data-bv-notempty data-bv-notempty-message="请输入学号">
                             </div>
                         </div>
-                        {% comment %}
-                        <div class="form-group" id="group-studenttype">
-                            <label class="col-sm-2 control-label col-lg-2">学生类型</label>
-
-                            <div class="col-lg-10">
-                                <select class="form-control m-bot15" name="studenttype" id="studenttype">
-                                    <option value="1" selected>正式生</option>
-                                    <option value="2">外籍生</option>
-                                    <option value="3">交流生</option>
-                                    <option value="4">研修生</option>
-                                </select>
-
-                            </div>
-                        </div>
-                        {% endcomment %}
                         <div class="form-group" id="group-teacherid">
                             <label class="col-sm-2 control-label col-lg-2">教职工号:</label>
 
@@ -93,20 +88,26 @@
                                        placeholder="请输入安全号码" data-bv-notempty data-bv-notempty-message="请输入安全号码">
                             </div>
                         </div>
-                        <div class="checkbox">
-                            <label>
-                                <input type="checkbox" name="check" id="check" data-bv-notempty
-                                       data-bv-notempty-message="请确认您的信息"> 我确认上述信息无误
-                            </label>
+                        <div class="form-group">
+                            <div class="col-sm-offset-2 col-sm-10">
+                                <div class="checkbox">
+                                    <label>
+                                        <input type="checkbox" name="check" id="check" data-bv-notempty
+                                               data-bv-notempty-message="请确认您的信息"> 我确认上述信息无误
+                                    </label>
+                                </div>
+                            </div>
                         </div>
-                        <button type="submit" class="btn btn-info" disabled>提交</button>
-                    </form>
+                    </div>
 
-                </div>
-            </section>
+                    <div class="box-footer">
+                        <button type="submit" class="btn btn-info pull-right">提交</button>
+                    </div>
+                </form>
+            </div>
+            <!-- /.box -->
         </div>
     </div>
-    <!-- page end-->
 {% endblock %}
 {% block page_script %}
     <script type="text/javascript">

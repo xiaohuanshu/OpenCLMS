@@ -1,24 +1,36 @@
 {% extends 'base-body.html' %}
+{% load static %}
+{% block page_css %}
+    <style>
+        /*500 page*/
+
+        .body-500 {
+            background: #8075c6;
+            color: #fff;
+        }
+
+        .error-wrapper p.page-500 {
+            color: #afa5f1;
+        }
+
+        .error-wrapper .icon-500 {
+            background: url("{% static 'img/500_icon.png' %}") no-repeat;
+            width: 289px;
+            height: 274px;
+            display: inline-block;
+            margin-left: 55px;
+        }
+    </style>
+{% endblock %}
 {% block body %}
     <body class="body-500">
-
-
     <div class="container">
-
         <section class="error-wrapper">
             <i class="icon-500"></i>
-
             <h1>哦不!</h1>
-
             <h2>500 服务器内部错误</h2>
-
             <p class="page-500">很抱歉我们的页面出了些问题. <a href="{% url 'home' %}">返回主页</a></p>
         </section>
-
     </div>
-
-
     </body>
-
-
 {% endblock %}

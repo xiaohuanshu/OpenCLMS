@@ -2,82 +2,97 @@
 {% load staticfiles %}
 {% block title %}注册{% endblock %}
 {% block body %}
-    <body class="login-body">
 
-    <div class="container">
+    <body class="hold-transition register-page">
+    <div class="register-box">
+        <div class="register-logo">
+            <a href="{% url 'home' %}"><b>CHECKIN</b>SYSTEM</a>
+        </div>
 
-        <form class="form-signin" id="signupForm" action="{% url 'user:registerProcess' %}" method="post">
-            {% csrf_token %}
-            <h2 class="form-signin-heading">注册</h2>
-
-            <div class="login-wrap">
-
-
-                <p> 请输入您的账户资料</p>
-
-                <div class="form-group ">
-                    <input type="text" class="form-control" for="username" name="username" placeholder="用户名"
-                           id="username" autofocus>
+        <div class="register-box-body">
+            <p class="login-box-msg">注册</p>
+            {% if request.GET.error %}
+                <label class="text-danger">{{ request.GET.error }}</label>
+            {% endif %}
+            <form action="{% url 'user:registerProcess' %}" method="post" id="signupForm">
+                {% csrf_token %}
+                <div class="form-group has-feedback">
+                    <input type="text" class="form-control" placeholder="用户名" name="username" id="username" autofocus>
+                    <span class="glyphicon glyphicon-user form-control-feedback"></span>
                 </div>
-                <div class="form-group ">
-                    <input type="text" class="form-control" for="email" name="email" placeholder="Email" id="email"
-                           autofocus>
+                <div class="form-group has-feedback">
+                    <input type="email" class="form-control" placeholder="Email" name="email" id="email">
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
-                <div class="form-group ">
-                    <input type="password" class="form-control" for="password" name="password" id="password"
-                           placeholder="密码">
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control" placeholder="密码" name="password" id="password">
+                    <span class="glyphicon glyphicon-lock form-control-feedback"></span>
                 </div>
-                <div class="form-group ">
-                    <input type="password" class="form-control" for="repassword" name="repassword" id="repassword"
-                           placeholder="重复密码">
+                <div class="form-group has-feedback">
+                    <input type="password" class="form-control" placeholder="重复密码" name="repassword" id="repassword">
+                    <span class="glyphicon glyphicon-log-in form-control-feedback"></span>
                 </div>
+                <div class="row">
+                    <div class="col-xs-8">
+                        <div class="checkbox icheck">
+                            <label>
+                                <input type="checkbox" value="agree this condition" for="agree" name="agree" id="agree">
+                                我同意 <a href="#">网站服务条款</a>
+                            </label>
+                        </div>
+                    </div>
+                    <!-- /.col -->
+                    <div class="col-xs-4">
+                        <button type="submit" class="btn btn-primary btn-block btn-flat" disabled>注册</button>
+                    </div>
+                    <!-- /.col -->
+                </div>
+            </form>
 
-                <div class="btn-group" data-toggle="buttons">
-                    <label class="btn btn-primary active">
-                        <input type="radio" name="sex" id="male" value="1" checked> 男
-                    </label>
-                    <label class="btn btn-primary ">
-                        <input type="radio" name="sex" id="female" value="2"> 女
-                    </label>
-                </div>
-                <div class="form-group checkbox">
-                    <label>
-                        <input type="checkbox" value="agree this condition" for="agree" name="agree" id="agree">
-                        我同意网站服务条款
-                    </label>
-                </div>
-                <button class="btn btn-lg btn-login btn-block" type="submit" disabled>注册</button>
 
-                <div class="registration">
-                    已经拥有账户?
-                    <a class="" href="{% url 'user:login' %}">
-                        登录
-                    </a>
-                </div>
-
-            </div>
-
-        </form>
-
+            <a href="{% url 'user:login' %}" class="text-center">已有帐号?点击登录</a>
+        </div>
+        <!-- /.form-box -->
     </div>
-
+    <!-- /.register-box -->
 
     </body>
 
+
 {% endblock %}
 {% block page_css %}
-    <link href="{% static 'assets/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
+    <!-- iCheck -->
+    <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
+    <script type="text/javascript"
+            src="{% static 'plugins/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
 {% endblock %}
 {% block page_script %}
-    <script type="text/javascript" src="{% static 'assets/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
+    <script>
+        $(function () {
+            $('#agree').iCheck({
+                checkboxClass: 'icheckbox_square-blue',
+                radioClass: 'iradio_square-blue',
+                increaseArea: '20%' // optional
+            });
+            $('#agree').on('ifChanged', function (event) {
+                $('#agree').iCheck('update');
+                $('#signupForm').bootstrapValidator('validateField','agree');
+            });/*
+            $('#agree').on('ifChecked', function (event) {
+                $('#agree').attr('checked',true);
+            });
+            $('#agree').on('ifUnchecked', function (event) {
+                $('#agree').attr('checked',false);
+            });*/
+        });
+    </script>
 
     <script>
         $('#signupForm').bootstrapValidator({
-            feedbackIcons: {
-                valid: 'glyphicon glyphicon-ok',
-                invalid: 'glyphicon glyphicon-remove',
-                validating: 'glyphicon glyphicon-refresh'
-            },
             fields: {
                 username: {
                     validators: {

@@ -3,22 +3,22 @@
 {% load school_extra %}
 {% block title %}课表{% endblock %}
 {% block page_css %}
-    <link href="{% static 'schedule/css/calendar.min.css' %}" rel="stylesheet"/>
-    <link rel="stylesheet" href="{% static 'chosen/chosen1.1.css' %}">
+    <link href="{% static 'ownplugins/schedule/css/calendar.min.css' %}" rel="stylesheet"/>
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'assets/underscore/underscore-min.js' %}"></script>
-    <script src="{% static 'schedule/js/language/zh-CN.js' %}"></script>
-    <script src="{% static 'schedule/js/calendar.min.js' %}"></script>
-    <script src="{% static 'chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'ownplugins/schedule/underscore/underscore-min.js' %}"></script>
+    <script src="{% static 'ownplugins/schedule/js/language/zh-CN.js' %}"></script>
+    <script src="{% static 'ownplugins/schedule/js/calendar.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="row">
         <div class="col-sm-12">
-            <section class="panel">
-                <header class="panel-heading">
-                    课程表
 
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">课程表</h3>
                     <select name="viewType2" id="schoolterm" data-placeholder="学年学期">
                         {% getterm as termdata %}
 
@@ -29,8 +29,8 @@
                                     {% if m == term %}selected{% endif %}>{{ m }}</option>
                         {% endfor %}
                     </select>
-                </header>
-                <div class="panel-body">
+                </div>
+                <div class="box-body">
                     <div class="row">
                         <div class="col-sm-4 col-xs-7">
                             <div class="btn-group pull-left">
@@ -60,7 +60,7 @@
                         </div>
                     </div>
                 </div>
-            </section>
+            </div>
         </div>
     </div>
     <!-- page end-->
@@ -89,7 +89,7 @@
                 if (end > enddate) {
                     end = enddate;
                 }
-                nend=new Date(end);
+                nend = new Date(end);
                 nend.setDate(nend.getDate() - 1);
                 nstart = start.getFullYear() + '-' + (start.getMonth() + 1) + '-' + start.getDate();
                 nend = nend.getFullYear() + '-' + (nend.getMonth() + 1) + '-' + nend.getDate();
@@ -115,7 +115,7 @@
                 return events_data;
             },
             view: '{{ view|default:"week" }}',
-            tmpl_path: '{% static 'schedule/tmpls' %}/',
+            tmpl_path: '{% static 'ownplugins/schedule/tmpls' %}/',
             tmpl_cache: false,
             onAfterViewLoad: function (view) {
                 $('.scheduletime').text(this.getTitle());
@@ -184,85 +184,3 @@
         });
     </script>
 {% endblock %}
-{% comment %}
-{% block page_script %}
-    <script>
-
-        $('#calendar').fullCalendar({
-            lang: 'zh-cn',
-            defaultView: 'agendaWeek',
-            allDaySlot: false,
-            minTime: "08:00:00",
-            maxTime: "21:00:00",
-            slotDuration: "00:30:00",
-            slotEventOverlap: false,
-            firstDay: 0,
-            header: {
-                left: 'prev,next today',
-                center: 'title',
-                right: 'month,agendaWeek,agendaDay'
-            },
-            editable: false,
-            droppable: false, // this allows things to be dropped onto the calendar !!!
-            events: function (start, end, timezone, callback) {
-                if (start < startdate) {
-                    start = startdate.getFullYear() + '-' + (startdate.getMonth() + 1) + '-' + startdate.getDate();
-                } else {
-                    start = start.format('YYYY-MM-DD');
-                }
-                if (end > enddate) {
-                    end = enddate.getFullYear() + '-' + (enddate.getMonth() + 1) + '-' + enddate.getDate();
-                } else {
-                    end = end.format('YYYY-MM-DD');
-                }
-                $.ajax({
-                    url: '{% url 'course:schedule_data' %}',
-                    type: 'GET',
-                    dataType: "json",
-                    contentType: "application/json; charset=utf-8",
-                    data: {
-                        start: start,
-                        end: end,
-                        term: term,
-                    },
-                    success: function (data) {
-                        $(data).each(function () {
-                            var clickurl = "";
-                            clickurl = clickurl.substring(0, clickurl.length - 1);
-                            $(this).attr('url', clickurl+$(this).attr('id'));
-                        });
-                        callback(data);
-                    }
-                });
-            },
-            viewRender: function (view, element) {
-                viewend = view.end.toDate();
-                viewend.setHours(23, 59, 59, 0);
-                viewstart = view.start.toDate();
-                viewstart.setHours(0, 0, 0, 0);
-                if (viewend >= enddate) {
-                    $("#calendar .fc-next-button").hide();
-                    return false;
-                }
-                else {
-                    $("#calendar .fc-next-button").show();
-                }
-                if (viewstart <= startdate) {
-                    $("#calendar .fc-prev-button").hide();
-                    return false;
-                }
-                else {
-                    $("#calendar .fc-prev-button").show();
-                }
-
-                if (now > enddate || now < startdate) {
-                    $('#calendar .fc-today-button').hide();
-                } else {
-                    $('#calendar .fc-today-button').show();
-                }
-            }
-        });
-    </script>
-
-{% endblock %}
-{% endcomment %}

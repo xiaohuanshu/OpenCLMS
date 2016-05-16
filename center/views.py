@@ -21,7 +21,7 @@ def home(request):
         termcourse = Course.objects.filter(id__in=termcourse)
 
     nowlessontime = getnowlessontime()
-    lesson = Lesson.objects.filter(course__in=termcourse, day=nowlessontime['day'], week=nowlessontime['week'])
+    lesson = Lesson.objects.filter(course__in=termcourse, week=nowlessontime['week'])
 
     return render_to_response('home.html',
                               {'term': getCurrentSchoolYearTerm(), 'alreadycount': 0,

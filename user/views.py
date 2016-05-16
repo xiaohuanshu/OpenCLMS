@@ -59,7 +59,7 @@ def registerProcess(request):
             "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
             email) or password == '' or sex == '' or User.objects.filter(
                     Q(email=email) | Q(username=username)).exists():
-        return redirect(reverse('user:register', args=[]))
+        return redirect(reverse('user:register', args=[])+ u"?error=用户名或邮箱错误")
     else:
         m = hashlib.md5()
         m.update(password)

@@ -1,20 +1,34 @@
 {% extends 'base-body.html' %}
-{% block page_js %}
+{% load static %}
+{% block page_css %}
+    <style>
+        /*success page*/
 
+        .body-success {
+            background: #2A3542;
+            color: #fff;
+        }
+
+        .error-wrapper .icon-success {
+            background: url("{% static 'img/success.png' %}") no-repeat;
+            width: 300px;
+            height: 300px;
+            display: inline-block;
+            margin-left: 50px;
+        }
+
+        .error-wrapper p.page-success {
+            color: #7dfff7;
+        }
+    </style>
 {% endblock %}
 {% block body %}
     <body class="body-success">
-
-
     <div class="container">
-
         <section class="error-wrapper notifiy">
             <i class="icon-success"></i>
-
             <h1 style="font-size: 50px;">{{ message }}</h1>
-
             <h2>{{ submessage }}</h2>
-
             <p class="page-success">
                 {% if jumpurl %}
                     页面自动 <a id="href" href="{{ jumpurl }}">跳转</a> 等待时间：<b id="wait">{{ waittime|default:3 }}</b>
@@ -25,12 +39,8 @@
                 <a href="{% url 'home' %}">返回主页</a>
             </p>
         </section>
-
     </div>
-
-
     </body>
-
 {% endblock %}
 {% block page_script %}
     {% if jumpurl %}

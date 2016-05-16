@@ -16,159 +16,153 @@
         </header>
 
     </section>
-    <!--state overview start-->
-    <div class="row state-overview">
-        <div class="col-lg-3 col-sm-6">
-            <section class="panel">
-                <div class="symbol terques">
-                    <i class="fa fa-tags"></i>
-                </div>
-                <div class="value">
-                    <h1 class="count">
-                        {{ alreadycount }}
-                    </h1>
 
-                    <p>已上课程</p>
-                </div>
-            </section>
-        </div>
-        <div class="col-lg-3 col-sm-6">
-            <section class="panel">
-                <div class="symbol red">
-                    <i class="fa fa-book"></i>
-                </div>
-                <div class="value">
-                    <h1 class=" count2">
-                        {{ todaylesson | length }}
-                    </h1>
 
-                    <p>今日课程</p>
-                </div>
-            </section>
-        </div>
-        <div class="col-lg-3 col-sm-6">
-            <section class="panel">
-                <div class="symbol yellow">
-                    <i class="fa fa-calendar-o"></i>
-                </div>
-                <div class="value">
-                    <h1 class=" count3">
-                        12
-                    </h1>
 
-                    <p>本周课程</p>
-                </div>
-            </section>
-        </div>
-        <div class="col-lg-3 col-sm-6">
-            <section class="panel">
-                <div class="symbol blue">
-                    <i class="fa fa-bar-chart-o"></i>
-                </div>
-                <div class="value">
-                    <h1 class=" count4">
-                        {{ termcourse|length }}
-                    </h1>
-
-                    <p>学期课程</p>
-                </div>
-            </section>
-        </div>
-    </div>
-    <!--state overview end-->
     <div class="row">
-        <div class="col-lg-12">
-            <!--work progress start-->
-            <section class="panel">
-                <div class="panel-body progress-panel">
-                    <div class="task-progress">
-                        <h1>课程信息</h1>
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="fa fa-tags"></i></span>
 
-                        <p>{{ request.session.username }}</p>
-                    </div>
-                    <div class="task-option">
-                        <select class="styled" id="lessontableselect">
-                            <option value="todaylessontable" selected>今日</option>
-                            <option value="weeklessontable">本周</option>
-                            <option value="termcoursetable">学期</option>
-                        </select>
-                    </div>
+                <div class="info-box-content">
+                    <span class="info-box-text">已上课程</span>
+                    <span class="info-box-number">{{ alreadycount }}</span>
                 </div>
-                <table class="table table-hover personal-task lessontable" id="todaylessontable">
-                    <tbody>
-                    {% for lesson in todaylesson %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                                <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
-                            </td>
-                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                            <td>{{ lesson.classroom.location }}</td>
-                            <td>
-                                <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
-                            </td>
-                            <td>
-                                <div id="work-progress1"></div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <table class="table table-hover personal-task lessontable" id="weeklessontable">
-                    <tbody>
-                    {% for lesson in weeklesson %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                                <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
-                            </td>
-                            <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                            <td>{{ lesson.classroom.location }}</td>
-                            <td>
-                                <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
-                            </td>
-                            <td>
-                                <div id="work-progress1"></div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-                <table class="table table-hover personal-task lessontable" id="termcoursetable">
-                    <tbody>
-                    {% for course in termcourse %}
-                        <tr>
-                            <td>{{ forloop.counter }}</td>
-                            <td>
-                                <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
-                            </td>
-                            <td>{{ course.time }}</td>
-                            <td>{{ course.location }}</td>
-                            <td>
-                                <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
-                            </td>
-                            <td>
-                                <div id="work-progress1"></div>
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </section>
-            <!--work progress end-->
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
         </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-book"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">今日课程</span>
+                    <span class="info-box-number">{{ todaylesson | length }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+
+        <!-- fix for small devices only -->
+        <div class="clearfix visible-sm-block"></div>
+
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-calendar-o"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">本周课程</span>
+                    <span class="info-box-number">{{ weeklesson|length }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-md-3 col-sm-6 col-xs-12">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-bar-chart-o"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">学期课程</span>
+                    <span class="info-box-number">{{ termcourse|length }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
     </div>
+
+
+    <div class="row">
+
+
+        <div class="col-md-12">
+            <!-- Custom Tabs (Pulled to the right) -->
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs pull-right">
+                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期</a></li>
+                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周</a></li>
+                    <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日</a></li>
+                    <li class="pull-left header"><i class="fa fa-th"></i> 课程信息</li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="tab_1-1">
+                        <table class="table">
+                            <tbody>
+                            {% for lesson in todaylesson %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                                    </td>
+                                    <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
+                                    <td>{{ lesson.classroom.location }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="tab_2-2">
+                        <table class="table">
+                            <tbody>
+                            {% for lesson in weeklesson %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                                    </td>
+                                    <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
+                                    <td>{{ lesson.classroom.location }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="tab_3-2">
+                        <table class="table">
+                        <tbody>
+                        {% for course in termcourse %}
+                            <tr>
+                                <td>{{ forloop.counter }}</td>
+                                <td>
+                                    <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
+                                </td>
+                                <td>{{ course.time }}</td>
+                                <td>{{ course.location }}</td>
+                                <td>
+                                    <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                        </tbody>
+                        </table>
+                    </div>
+                    <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+            </div>
+            <!-- nav-tabs-custom -->
+        </div>
+        <!-- /.col -->
+    </div>
+
 
 {% endblock %}
 
 {% block page_script %}
-    <script>
-        $(".lessontable").hide();
-        $("#todaylessontable").show();
-        $('#lessontableselect').change(function () {
-            var p1 = $(this).children('option:selected').val();//这就是selected的值
-            $(".lessontable").hide();
-            $("#" + p1).show();
-        })
-    </script>
+
 {% endblock %}

@@ -10,13 +10,15 @@ from checkin.function import clear_checkin, clear_last_checkin
 import json
 from django.shortcuts import redirect, HttpResponseRedirect
 from course.auth import has_course_permission
+from function import generateqrstr
+
 
 def checkin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
         return render_to_response('error.html',
-                                      {'message': '没有权限'},
-                                      context_instance=RequestContext(request))
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     if not (
                         lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_AGAIN or lesson.status == LESSON_STATUS_CHECKIN_ADD):
         return render_to_response('error.html',
@@ -37,6 +39,7 @@ def checkin(request, lessonid):
         data['checkintype'] = u'补签'
     elif lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         data['checkintype'] = u'再签'
+    data['firstqrstr'] = generateqrstr(lessonid)
     return render_to_response('checkin.html', data,
                               context_instance=RequestContext(request))
 
@@ -210,5 +213,5 @@ def personaldata(request):
         pass
     else:
         student = Student.objects.get(user=request.user)
-        #return HttpResponseRedirect(reverse('checkin:student_data', args=[student.studentid]))
-        return student_data(request,student.studentid)
+        # return HttpResponseRedirect(reverse('checkin:student_data', args=[student.studentid]))
+        return student_data(request, student.studentid)

@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-import uuid, json
+import json
 from django.core.cache import cache
 from django.http import HttpResponse
 from course.models import Lesson, Studentcourse
@@ -7,7 +7,7 @@ from course.constant import *
 from checkin.constant import *
 from django.shortcuts import redirect, HttpResponseRedirect, render, render_to_response, RequestContext
 from django.core.urlresolvers import reverse
-from function import startcheckin, endcheckin, student_checkin
+from function import startcheckin, endcheckin, student_checkin, generateqrstr
 from models import Checkin
 from user.models import User
 from school.models import Student
@@ -16,10 +16,8 @@ from course.auth import has_course_permission
 
 
 def getqrstr(request, lessonid):
-    str = uuid.uuid1().hex
-    str = str[:8] + str[16:20]
+    str = generateqrstr(lessonid)
     data = {'qr': str}
-    cache.set("qr%s" % (str), lessonid, 20)
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 

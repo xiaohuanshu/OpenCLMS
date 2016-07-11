@@ -1,0 +1,73 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load school_extra %}
+{% block title %}行政部门{% endblock %}
+{% block page_css %}
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+
+{% block content %}
+
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">行政部门</h3>
+                </div>
+                <div class="box-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                        </div>
+                        <table id="table"
+                               data-toggle="table"
+                               data-striped="true"
+                               data-search="true"
+                               data-show-refresh="true"
+                               data-show-toggle="true"
+                               data-show-columns="true"
+                               data-show-export="true"
+                               data-minimum-count-columns="2"
+                               data-pagination="true"
+                               data-id-field="id"
+                               data-page-size="10"
+                               data-page-list="[5,10, 25, 50, 100, ALL]"
+                               data-side-pagination="server"
+                               data-url="{% url 'school:getadministrationdata' %}"
+                               data-toolbar="#custom-toolbar"
+                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
+                               data-search-text="{{ request.GET.search }}"
+                        ></table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+        $table.bootstrapTable({
+            columns: [{
+                field: 'name',
+                title: '行政部门',
+                searchable: true
+            }, {
+                field: 'teachernumber',
+                title: '教师人数'
+            }]
+        });
+    </script>
+{% endblock %}

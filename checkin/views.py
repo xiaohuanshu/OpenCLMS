@@ -143,7 +143,6 @@ def course_data(request, courseid):
             ratio = ratio / count
         studentcheckindata['ratio'] = '%.1f%%' % (ratio * 100)
         lessoncheckindata.append(studentcheckindata)
-    print lessoncheckindata
     data = {'header': json.dumps(columns), 'newrows': json.dumps(lessoncheckindata)}
     return render_to_response('course_data.html', {'coursedata': course, 'data': data},
                               context_instance=RequestContext(request))

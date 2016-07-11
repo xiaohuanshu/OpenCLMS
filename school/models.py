@@ -12,6 +12,9 @@ class Administration(models.Model):
     def __unicode__(self):
         return u"%s" % (self.name)
 
+    def teachernumber(self):
+        return self.teacher_set.count()
+
     class Meta:
         managed = False
         db_table = 'Administration'
@@ -59,8 +62,11 @@ class Department(models.Model):
     def majoramount(self):
         return self.major_set.count()
 
-    def number(self):
+    def studentnumber(self):
         return self.student_set.count()
+
+    def teachernumber(self):
+        return self.teacher_set.count()
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -78,7 +84,7 @@ class Major(models.Model):
         return u"%s" % (self.name)
 
     @classmethod_cache
-    def number(self):
+    def studentnumber(self):
         return self.student_set.count()
 
     @classmethod_cache

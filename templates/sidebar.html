@@ -67,16 +67,16 @@
                         {% endif %}
                         {% if perms.view_department %}
                             <li class="{% nav_active request.path 'departmentlist' %}"><a
-                                    href=""><i class="fa fa-circle-o"></i>系部</a></li>
+                                    href="{% url 'school:departmentlist' %}"><i class="fa fa-circle-o"></i>系部</a></li>
                         {% endif %}
                         {% if perms.view_administration %}
                             <li class="{% nav_active request.path 'administrationlist' %}"><a
-                                    href=""><i class="fa fa-circle-o"></i>行政部</a>
+                                    href="{% url 'school:administrationlist' %}"><i class="fa fa-circle-o"></i>行政部</a>
                             </li>
                         {% endif %}
                         {% if perms.view_classroom %}
                             <li class="{% nav_active request.path 'classroomlist' %}"><a
-                                    href=""><i class="fa fa-circle-o"></i>教室</a></li>
+                                    href="{% url 'school:classroomlist' %}"><i class="fa fa-circle-o"></i>教室</a></li>
                         {% endif %}
                         {% if perms.view_schoolterm %}
                             <li class="{% nav_active request.path 'schoolterm' %}"><a
@@ -94,7 +94,7 @@
                     <a href="#"><i class="fa fa-users"></i> <span>用户</span> <i
                             class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>用户</a></li>
+                        <li class=""><a href="{% url 'user:userlist' %}"><i class="fa fa-circle-o"></i>用户</a></li>
                         <li class=""><a href="#"><i class="fa fa-circle-o"></i>角色</a></li>
                         <li class=""><a href="#"><i class="fa fa-circle-o"></i>权限</a></li>
                     </ul>

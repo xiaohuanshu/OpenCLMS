@@ -196,3 +196,5 @@ def authentication(request):
             return redirect(reverse('user:authentication', args=[]))
     else:
         return render_to_response('authentication.html', {}, context_instance=RequestContext(request))
+
+

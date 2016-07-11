@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'xiaohuanshu'
 from django.shortcuts import render_to_response, RequestContext, redirect
-from models import Schoolterm, Classtime, Class, Major, Department
+from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 import json
@@ -135,9 +135,90 @@ def majordata(request):
 
     rows = []
     for p in majordata:
-        ld = {'id': p.id, 'name': p.name, 'department': p.department.name, 'number': p.number(),
+        ld = {'id': p.id, 'name': p.name, 'department': p.department.name, 'number': p.studentnumber(),
               'classamount': p.classamount()}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
-    print data
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_department')
+def departmentlist(request):
+    return render_to_response('department.html', {}, context_instance=RequestContext(request))
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_department')
+def departmentdata(request):
+    limit = int(request.GET['limit'])
+    offset = int(request.GET['offset'])
+    departmentdata = Department.objects.order_by('id')
+    search = request.GET.get('search', '')
+    if not search == '':
+        count = departmentdata.filter(name__icontains=search).count()
+        departmentdata = departmentdata.filter(name__icontains=search)[
+                         offset: (offset + limit)]
+    else:
+        count = departmentdata.count()
+        departmentdata = departmentdata.all()[offset: (offset + limit)]
+
+    rows = []
+    for p in departmentdata:
+        ld = {'id': p.id, 'name': p.name, 'studentnumber': p.studentnumber(), 'teachernumber': p.teachernumber(),
+              'majoramount': p.majoramount()}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_administration')
+def administrationlist(request):
+    return render_to_response('administration.html', {}, context_instance=RequestContext(request))
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_administration')
+def administrationdata(request):
+    limit = int(request.GET['limit'])
+    offset = int(request.GET['offset'])
+    administrationdata = Administration.objects.order_by('id')
+    search = request.GET.get('search', '')
+    if not search == '':
+        count = administrationdata.filter(name__icontains=search).count()
+        administrationdata = administrationdata.filter(name__icontains=search)[
+                         offset: (offset + limit)]
+    else:
+        count = administrationdata.count()
+        administrationdata = administrationdata.all()[offset: (offset + limit)]
+
+    rows = []
+    for p in administrationdata:
+        ld = {'id': p.id, 'name': p.name, 'teachernumber': p.teachernumber()}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_classroom')
+def classroomlist(request):
+    return render_to_response('classroom.html', {}, context_instance=RequestContext(request))
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_classroom')
+def classroomdata(request):
+    limit = int(request.GET['limit'])
+    offset = int(request.GET['offset'])
+    classroomdata = Classroom.objects.order_by('id')
+    search = request.GET.get('search', '')
+    if not search == '':
+        count = classroomdata.filter(location__icontains=search).count()
+        classroomdata = classroomdata.filter(location__icontains=search)[
+                         offset: (offset + limit)]
+    else:
+        count = classroomdata.count()
+        classroomdata = classroomdata.all()[offset: (offset + limit)]
+
+    rows = []
+    for p in classroomdata:
+        ld = {'id': p.id, 'name': p.location}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

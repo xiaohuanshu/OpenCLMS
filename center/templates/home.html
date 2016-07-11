@@ -7,12 +7,6 @@
     <section class="panel">
         <header class="panel-heading">
             当前学期:{{ term.term }}
-
-                      <span class="pull-right">
-                          <button type="button" id="loading-btn" class="btn btn-warning btn-xs"><i
-                                  class="fa fa-refresh"></i> 刷新
-                          </button>
-                      </span>
         </header>
 
     </section>
@@ -134,21 +128,21 @@
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_3-2">
                         <table class="table">
-                        <tbody>
-                        {% for course in termcourse %}
-                            <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td>
-                                    <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
-                                </td>
-                                <td>{{ course.time }}</td>
-                                <td>{{ course.location }}</td>
-                                <td>
-                                    <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
-                                </td>
-                            </tr>
-                        {% endfor %}
-                        </tbody>
+                            <tbody>
+                            {% for course in termcourse %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td>
+                                        <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
+                                    </td>
+                                    <td>{{ course.time }}</td>
+                                    <td>{{ course.location }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
                         </table>
                     </div>
                     <!-- /.tab-pane -->

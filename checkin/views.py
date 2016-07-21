@@ -95,6 +95,12 @@ def lesson_data(request, lessonid):
 
 
 def course_data(request, courseid):
+    modify = False
+    if request.GET.get('mode', default=None) == 'modify':
+        constantdata = {CHECKIN_STATUS_NORMAL: u"未到", CHECKIN_STATUS_SUCCESS: u"正常", CHECKIN_STATUS_EARLY: u"早退",
+                        CHECKIN_STATUS_LATEEARLY: u"迟到早退",
+                        CHECKIN_STATUS_LATE: u"迟到", CHECKIN_STATUS_CANCEL: u"取消"}
+        modify = True
     course = Course.objects.get(id=courseid)
     if not has_course_permission(request.user, course):
         return render_to_response('error.html',
@@ -113,9 +119,14 @@ def course_data(request, courseid):
     # for i in range(0, count - 1):
     #    columns.append({'field': 'lesson%d' % i, 'title': i + 1, 'formatter': 'identifierFormatter'})
     for i, l in enumerate(alllesson):
-        columns[1].append(
-            {'field': 'lesson%d' % l.id, 'title': i + 1, 'formatter': 'identifierFormatter', 'align': 'center',
-             'cellStyle': 'cellStyle'})
+        if modify and l.status != LESSON_STATUS_AWAIT and l.status != LESSON_STATUS_CANCLE:
+            columns[1].append(
+                    {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center',
+                     'editable': {'url': reverse('checkin:changecheckinstatus', args=[l.id])}})
+        else:
+            columns[1].append(
+                {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center', 'formatter': 'identifierFormatter',
+                 'cellStyle': 'cellStyle'})
     studentdata = Studentcourse.objects.filter(course=course).order_by('student').all()
     lessoncheckindata = []
     '''for s in studentdata:
@@ -160,7 +171,6 @@ def student_data(request, studentid):
             maxlength = sc.course.lesson_set.count()
         for (offset, l) in enumerate(sc.course.lesson_set.order_by('week', 'day', 'time').all()):
             course[sc.course.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
-    print course
     checkindata = Checkin.objects.filter(student=student).select_related('lesson').all()
     for c in checkindata:
         course[c.lesson.course.id]['checkindata'][c.lesson.id]['status'] = c.status

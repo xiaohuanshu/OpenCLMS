@@ -147,7 +147,7 @@ def oauth(request):
                 request.session['userid'] = user.id
                 if not user.verify:
                     request.session['origin'] = request.GET.get('state')
-                    return redirect(reverse('center.user.authentication', args=[]))
+                    return redirect(reverse('user:authentication', args=[]))
             except ObjectDoesNotExist:
                 pass
         else:

@@ -5,7 +5,7 @@
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
     {% if perms.modify_classtime %}
-        <link href="{% static 'plugins/x-editable/css/bootstrap-editable.css' %}"rel="stylesheet"/>
+        <link href="{% static 'plugins/x-editable/css/bootstrap-editable.css' %}" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css"
               href="{% static 'plugins/timepicker/old/compiled/timepicker.css' %}"/>
     {% endif %}
@@ -105,7 +105,7 @@
                         } else {
                             return '修改时间失败';
                         }
-                    },
+                    }
                 }
             }, {
                 field: 'endtime',
@@ -131,7 +131,7 @@
                         } else {
                             return '修改时间失败';
                         }
-                    },
+                    }
                 }
             }]
         });

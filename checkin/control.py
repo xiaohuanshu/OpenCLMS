@@ -36,13 +36,16 @@ def getcheckinnowdata(request, lessonid):
 
 def changecheckinstatus(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
-    studentid = request.GET.get('studentid')
-    newstatus = request.GET.get('newstatus')
+    studentid = request.GET.get('studentid',default=False) or request.GET.get('pk')
+    newstatus = request.GET.get('newstatus',default=False) or request.GET.get('value')
     student = Student.objects.get(studentid=studentid)
     try:
         checkin = Checkin.objects.get(student=student, lesson=lesson)
     except ObjectDoesNotExist:
-        return HttpResponse(json.dumps({'error': 101, 'message': '学生没有此课'}), content_type="application/json")
+        if Studentcourse.objects.filter(course=lesson.course,student=student).exists():
+            checkin = Checkin(student=student,lesson=lesson)
+        else:
+            return HttpResponse(json.dumps({'error': 101, 'message': '学生没有此课'}), content_type="application/json")
     if checkin.status == CHECKIN_STATUS_ASK:
         return HttpResponse(json.dumps({'error': 101, 'message': '学生已经请假'}), content_type="application/json")
     if newstatus == 'newcheckin':
@@ -65,6 +68,10 @@ def changecheckinstatus(request, lessonid):
         data = {'studentid': studentid, 'status': checkin.status}
     elif newstatus == 'lateearly':
         checkin.status = CHECKIN_STATUS_LATEEARLY
+        checkin.save()
+        data = {'studentid': studentid, 'status': checkin.status}
+    elif newstatus.isdigit():
+        checkin.status = newstatus
         checkin.save()
         data = {'studentid': studentid, 'status': checkin.status}
     return HttpResponse(json.dumps(data), content_type="application/json")

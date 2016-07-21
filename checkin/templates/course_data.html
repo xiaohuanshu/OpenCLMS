@@ -6,9 +6,8 @@
 {% block title %}课程考勤数据{% endblock %}
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
-
-
     <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
+    <link href="{% static 'plugins/x-editable/css/bootstrap-editable.css' %}" rel="stylesheet"/>
     <style>
         .bg-default {
             background-color: lightcoral;
@@ -19,20 +18,13 @@
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
-    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
-
+    <script src="{% static 'plugins/tableExport/tableExport.js' %}"></script>
+    <script src="{% static 'plugins/x-editable/js/bootstrap-editable.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
+    <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
 {% endblock %}
-
-
-
-
 {% block content %}
-
-
-
-
-
     <div class="row">
         <div class="col-sm-12">
 
@@ -43,6 +35,11 @@
                 <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
+                            {% if request.GET.mode == 'modify' %}
+                            <a class="btn btn-default" href="?mode=view">退出编辑模式</a>
+                            {% else %}
+                            <a class="btn btn-success" href="?mode=modify">进入编辑模式</a>
+                            {% endif %}
                         </div>
                         <table id="table"
                                data-search="true"
@@ -59,8 +56,6 @@
                                data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
                         >
                         </table>
-
-
                     </div>
                 </div>
             </div>
@@ -91,6 +86,29 @@
                 classes: 'bg-' + checkin_status_style_json[value]
             };
         }
-        $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.newrows|safe}}});
+        $.fn.editable.defaults.mode = 'inline';
+        $.fn.editable.defaults.type = 'select';
+        $.fn.editable.defaults.emptytext = '无';
+        $.fn.editable.defaults.showbuttons = false;
+        $.fn.editable.defaults.ajaxOptions = {type:'get',dataType:'json'};
+        $.fn.editable.defaults.source = checkin_status_json;
+        $.fn.editable.defaults.success = function(response){
+            if (response.error){
+                return response.message;
+            }
+        };
+        $.fn.editable.defaults.validate = function(value){
+            if (checkin_status_json[value]=='请假'){
+                return '无权设定为请假';
+            }
+        };
+        $.fn.editable.defaults.display = function (value, sourceData) {
+            if (value == "undefined") {
+                $(this).text();
+            }else {
+                $(this).html("<button class='btn btn-xs btn-" + checkin_status_style_json[value] + "'>" + checkin_status_json[value] + "</button>");
+            }
+        };
+        $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.newrows|safe}}, idField: 'studentid'});
     </script>
 {% endblock %}

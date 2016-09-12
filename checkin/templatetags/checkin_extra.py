@@ -22,6 +22,18 @@ def CHECKIN_STATUS_STYLE_JSON():
     return json.dumps(data)
 
 
+@register.assignment_tag
+def ASK_STATUS_STYLE_JSON():
+    data = {ASK_STATUS_WAITING: "info", ASK_STATUS_APPROVE: "success", ASK_STATUS_CANCEL: "danger"}
+    return json.dumps(data)
+
+
+@register.assignment_tag
+def ASK_STATUS_JSON():
+    data = {ASK_STATUS_WAITING: u"等待批准", ASK_STATUS_APPROVE: u"批准", ASK_STATUS_CANCEL: u"取消"}
+    return json.dumps(data)
+
+
 @register.filter
 def CHECKIN_STATUS(status):
     if status == CHECKIN_STATUS_NORMAL:

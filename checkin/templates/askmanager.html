@@ -1,0 +1,336 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load checkin_extra %}
+{% block title %}请假管理{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/moment.min.js' %}"></script>
+    <script src="{% static 'plugins/daterangepicker/daterangepicker.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+{% endblock %}
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/daterangepicker/daterangepicker-bs3.css' %}">
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <style>
+        .select2-result-student {
+            padding-top: 4px;
+            padding-bottom: 3px;
+        }
+
+        .select2-result-student__name {
+            color: black;
+            font-weight: bold;
+            word-wrap: break-word;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .select2-result-student__major, .select2-result-student__department {
+            margin-right: 1em;
+        }
+
+        .select2-result-student__major, .select2-result-student__department, .select2-result-student__class {
+            display: inline-block;
+            color: #aaa;
+            font-size: 11px;
+        }
+
+        .select2-results__option--highlighted .select2-result-student__title {
+            color: white;
+        }
+
+        .select2-results__option--highlighted .select2-result-student__major, .select2-results__option--highlighted .select2-result-student__department, .select2-results__option--highlighted .select2-result-student__class {
+            color: #c6dcef;
+        }
+
+    </style>
+{% endblock %}
+{% block content %}
+    <div class="box box-primary">
+        <div class="box-header with-border">
+            <h3 class="box-title">添加请假信息</h3>
+        </div>
+        <!-- /.box-header -->
+        <div class="box-body">
+            <div class="row">
+                <div class="col-md-12">
+                    <div class="form-group">
+                        <label>学生</label>
+                        <select class="form-control" multiple="multiple" data-placeholder="选择请假学生" id="studentselecter"
+                                style="width: 100%;">
+                            <option></option>
+                        </select>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                        <label>请假时间</label>
+                        <div class="input-group">
+                            <div class="input-group-addon">
+                                <i class="fa fa-clock-o"></i>
+                            </div>
+                            <input type="text" class="form-control pull-right" id="reservationtime">
+                        </div>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
+                        <label>请假原因</label>
+                        <textarea class="form-control" rows="2" placeholder="请假原因 ..." maxlength="100"
+                                  id="reasontextarea"></textarea>
+                    </div>
+                    <!-- /.form-group -->
+                </div>
+                <!-- /.col -->
+            </div>
+            <!-- /.row -->
+        </div>
+        <!-- /.box-body -->
+        <div class="box-footer">
+            <button type="submit" class="btn btn-primary" id="submitbutton">提交</button> <label class="text-danger" id="errormessage"></label>
+        </div>
+    </div>
+    <!-- /.box -->
+
+    <div class="box box-primary">
+        <div class="box-header">
+            <h3 class="box-title">假单列表</h3>
+        </div>
+        <div class="box-body">
+            <div class="adv-table">
+                <div id="custom-toolbar">
+                </div>
+                <table id="table"
+                       data-toggle="table"
+                       data-search="true"
+                       data-show-refresh="true"
+                       data-show-toggle="true"
+                       data-show-columns="true"
+                       data-minimum-count-columns="2"
+                       data-pagination="true"
+                       data-id-field="studentid"
+                       data-page-size="10"
+                       data-page-list="[5,10, 25, 50, 100, ALL]"
+                       data-side-pagination="server"
+                       data-url="{% url 'checkin:getaskdata' %}"
+                       data-toolbar="#custom-toolbar"
+                       data-striped="true"
+                       data-search-text="{{ request.GET.search }}"
+                >
+
+                </table>
+
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block page_script %}
+    <script>
+        function formatRepo(repo) {
+            if (repo.loading) return repo.text;
+
+            var markup = "<div class='select2-result-student clearfix'>" +
+                    "<div class='select2-result-student__name'>" + repo.name + "(" + repo.id + ")</div>";
+
+            markup += "<div class='select2-result-student__statistics'>" +
+                    "<div class='select2-result-student__major'><i class='fa fa-comment'></i> " + repo.major + "</div>" +
+                    "<div class='select2-result-student__department'><i class='fa fa-building'></i> " + repo.department + "</div>" +
+                    "<div class='select2-result-student__class'><i class='fa fa-clone'></i> " + repo.class + "</div>" +
+                    "</div>" +
+                    "</div>";
+
+            return markup;
+        }
+
+        function formatRepoSelection(repo) {
+            return repo.name + "(" + repo.id + ")" || repo.text;
+        }
+        $studentselecter = $("#studentselecter");
+        $studentselecter.select2({
+            ajax: {
+                url: "{% url 'school:getstudentselectdata' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        wd: params.term
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.rows
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+        $('#reservationtime').daterangepicker({
+            timePicker: true,
+            timePickerIncrement: 5,
+            format: "YYYY-MM-DD h:mm A",
+            locale: {
+                format: "YYYY-MM-DD h:mm A",
+                separator: " - ",
+                applyLabel: "应用",
+                cancelLabel: "取消",
+                fromLabel: "从",
+                toLabel: "到",
+                customRangeLabel: "自定义",
+                weekLabel: "周",
+                daysOfWeek: [
+                    "日",
+                    "一",
+                    "二",
+                    "三",
+                    "四",
+                    "五",
+                    "六"
+                ],
+                monthNames: [
+                    "一月",
+                    "二月",
+                    "三月",
+                    "四月",
+                    "五月",
+                    "六月",
+                    "七月",
+                    "八月",
+                    "九月",
+                    "十月",
+                    "十一月",
+                    "十二月"
+                ],
+                firstDay: 1
+            },
+            opens: 'left'
+        });
+        {% ASK_STATUS_JSON as ask_status_json %}
+        var ask_status_json ={{ ask_status_json|safe }};
+        {% ASK_STATUS_STYLE_JSON as ask_status_style_json %}
+        var ask_status_style_json ={{ ask_status_style_json|safe }};
+        function identifierFormatter(value, row, index) {
+            return ask_status_json[value];
+        }
+        function cellStyle(value, row, index) {
+            if (value == null) {
+                return {}
+            }
+            return {
+                classes: 'bg-' + ask_status_style_json[value]
+            };
+        }
+        function operateFormatter(value, row, index) {
+            return [
+                '<a class="like" href="javascript:void(0)" title="Like">',
+                '<i class="glyphicon glyphicon-heart"></i>',
+                '</a>  ',
+                '<a class="remove" href="javascript:void(0)" title="Remove">',
+                '<i class="glyphicon glyphicon-remove"></i>',
+                '</a>'
+            ].join('');
+        }
+
+        window.operateEvents = {
+            'click .like': function (e, value, row, index) {
+                alert('You click like action, row: ' + JSON.stringify(row));
+            },
+            'click .remove': function (e, value, row, index) {
+                $table.bootstrapTable('remove', {
+                    field: 'id',
+                    values: [row.id]
+                });
+            }
+        };
+        var $table = $('#table');
+        $table.bootstrapTable({
+            columns: [{
+                field: 'student',
+                title: '学生',
+                searchable: true
+            }, {
+                field: 'starttime',
+                title: '开始时间',
+                sortable: true,
+                order: 'desc'
+            }, {
+                field: 'endtime',
+                title: '结束时间',
+                sortable: true,
+                order: 'desc'
+            }, {
+                field: 'reason',
+                title: '原因'
+            }, {
+                field: 'status',
+                title: '状态',
+                align: 'center',
+                cellStyle: cellStyle,
+                formatter: identifierFormatter
+            }, {
+                field: 'operate',
+                title: '操作',
+                align: 'center',
+                events: operateEvents,
+                formatter: operateFormatter
+            }]
+        });
+        $submitbutton = $('#submitbutton');
+        $submitbutton.click(function () {
+            var data = $studentselecter.select2("data");
+            var time = $('#reservationtime').val().split(" - ");
+            var starttime = time[0];
+            var endtime = time[1];
+            var reason = $('#reasontextarea').val();
+            var students = [];
+            var studentstring = "";
+            $.each(data, function () {
+                students.push(this.id);
+                if (studentstring == "") {
+                    studentstring = this.name + "(" + this.id + ")";
+                } else {
+                    studentstring += "," + this.name + "(" + this.id + ")";
+                }
+            });
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                url: '{% url 'checkin:addask' %}',
+                dataType: 'json',
+                data: {
+                    'students': students,
+                    'starttime': starttime,
+                    'endtime': endtime,
+                    'reason': reason
+                },
+                success: function (value) {
+                    if (value.error && value.error != 0) {
+                        $("#errormessage").text(value.message);
+                    } else {
+                        $table.bootstrapTable('insertRow', {
+                            index: 0, row: {
+                                student: studentstring,
+                                starttime: starttime,
+                                endtime: endtime,
+                                reason: reason,
+                                status: value.status
+                            }
+                        });
+                        $studentselecter.select2("val", "");
+                        $('#reservationtime').val("");
+                        $('#reasontextarea').val("");
+                        $("#errormessage").text("");
+                    }
+                },
+                error: function () {
+                    $("#errormessage").text(value.message);
+                }
+            });
+        });
+    </script>
+{% endblock %}

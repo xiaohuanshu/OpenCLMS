@@ -17,4 +17,9 @@ urlpatterns = [
     url(r'^data/personal_data$', views.personaldata, name='personal_data'),
     url(r'^data/lesson_data/(\d+)$', views.lesson_data, name='lesson_data'),
 
+
+    url(r'^askmanager$', views.askmanager, name='askmanager'),
+    url(r'^ajax/getaskdata$', views.askdata, name='getaskdata'),
+    url(r'^ajax/addask$', control.addask, name='addask'),
+
 ]

@@ -68,3 +68,27 @@ def data(request):
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@resourcejurisdiction_view_auth(jurisdiction='view_student')
+def selectdata(request):
+    wd = request.GET['wd']
+    limit = 5
+    offset = 0
+    # lessondata = Lesson.objects.all()[offset: (offset + limit)]
+    studentdata = Student.objects.order_by('studentid')
+    count = studentdata.filter(
+                (Q(name__icontains=wd) | Q(studentid__startswith=wd))
+            ).count()
+    studentdata = studentdata.select_related('classid').select_related('major').select_related(
+                'department').filter(
+                (Q(name__icontains=wd) | Q(studentid__startswith=wd))
+            )[offset: (offset + limit)]
+
+    rows = []
+    for p in studentdata:
+        ld = {'id': p.studentid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0], 'class': p.classid.name,
+              'major': (p.major and [p.major.name] or [None])[0], 'department': p.department.name}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")

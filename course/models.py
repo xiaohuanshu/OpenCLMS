@@ -160,8 +160,8 @@ class Lesson(models.Model):
         self.save()
 
         # for checkin
-        from checkin.models import Checkin
-        from checkin.constant import CHECKIN_STATUS_NORMAL
+        from checkin.models import Checkin, Ask
+        from checkin.constant import CHECKIN_STATUS_NORMAL, ASK_STATUS_APPROVE, CHECKIN_STATUS_ASK
         nowstudent = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
         studentcourse = Studentcourse.objects.filter(course=self.course).exclude(student__in=nowstudent)
         newstudent = []
@@ -169,7 +169,14 @@ class Lesson(models.Model):
             newstudent.append(
                 Checkin(lesson=self, status=CHECKIN_STATUS_NORMAL, student=s.student))
         Checkin.objects.bulk_create(newstudent)
-
+        students = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
+        starttime, endtime = self.getTime()
+        starttime = time.strftime('%Y-%m-%d %H:%M:%S', starttime)
+        endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
+        askstudents = Ask.objects.filter(student__in=students, starttime__range=(starttime, endtime),
+                                         endtime__range=(starttime, endtime), status=ASK_STATUS_APPROVE).values_list(
+            'student', flat=True)
+        Checkin.objects.filter(lesson=self,student__in=askstudents).update(status=CHECKIN_STATUS_ASK)
         return {'error': 0, 'message': u'课程成功开启', 'newstatus': self.status,
                 'starttime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 

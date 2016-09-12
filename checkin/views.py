@@ -1,16 +1,18 @@
 # coding:utf-8
 from course.models import Lesson, Studentcourse, Course
-from models import Checkin, Checkinrecord
+from models import Checkin, Checkinrecord, Ask
 from school.models import Student
+from school.function import getCurrentSchoolYearTerm
 from constant import *
 from django.shortcuts import render_to_response, RequestContext
 from django.core.urlresolvers import reverse
 from course.constant import *
 from checkin.function import clear_checkin, clear_last_checkin
 import json
-from django.shortcuts import redirect, HttpResponseRedirect
+from django.shortcuts import redirect, HttpResponse
 from course.auth import has_course_permission
 from function import generateqrstr
+import datetime
 
 
 def checkin(request, lessonid):
@@ -121,8 +123,8 @@ def course_data(request, courseid):
     for i, l in enumerate(alllesson):
         if modify and l.status != LESSON_STATUS_AWAIT and l.status != LESSON_STATUS_CANCLE:
             columns[1].append(
-                    {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center',
-                     'editable': {'url': reverse('checkin:changecheckinstatus', args=[l.id])}})
+                {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center',
+                 'editable': {'url': reverse('checkin:changecheckinstatus', args=[l.id])}})
         else:
             columns[1].append(
                 {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center', 'formatter': 'identifierFormatter',
@@ -224,3 +226,49 @@ def personaldata(request):
         student = Student.objects.get(user=request.user)
         # return HttpResponseRedirect(reverse('checkin:student_data', args=[student.studentid]))
         return student_data(request, student.studentid)
+
+
+def askmanager(request):
+    return render_to_response('askmanager.html',
+                              context_instance=RequestContext(request))
+
+
+def askdata(request):
+    order = request.GET['order']
+    limit = int(request.GET['limit'])
+    offset = int(request.GET['offset'])
+    sort = request.GET.get('sort', '')
+    if not sort == '':
+        if order == "asc":
+            ask = Ask.objects.order_by(sort)
+        else:
+            ask = Ask.objects.order_by("-%s" % sort)
+    else:
+        ask = Ask.objects.order_by('-id')
+    schoolterm = getCurrentSchoolYearTerm()['term']
+    ask = ask.filter(schoolterm=schoolterm, operater=request.user)
+    search = request.GET.get('search', '')
+    if not search == '':
+        if search.isdigit():
+            count = ask.filter(student=search).count()
+            ask = ask.filter(
+                studentid=search
+            )[offset: (offset + limit)]
+        else:
+            count = ask.filter(student__name=search).count()
+            ask = ask.filter(
+                student__name=search
+            )[offset: (offset + limit)]
+    else:
+        count = ask.count()
+        ask = ask.all()[offset: (offset + limit)]
+
+    rows = []
+    for p in ask:
+        ld = {'id': p.id, 'student': ", ".join("%s(%d)" % (s.name, s.studentid) for s in p.student.all()),
+              'starttime': datetime.datetime.strftime(p.starttime, '%Y-%m-%d %I:%M %p'),
+              'endtime': datetime.datetime.strftime(p.endtime, '%Y-%m-%d %I:%M %p'),
+              'reason': p.reason, 'status': p.status}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")

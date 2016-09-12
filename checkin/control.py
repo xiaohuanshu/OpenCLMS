@@ -8,11 +8,13 @@ from checkin.constant import *
 from django.shortcuts import redirect, HttpResponseRedirect, render, render_to_response, RequestContext
 from django.core.urlresolvers import reverse
 from function import startcheckin, endcheckin, student_checkin, generateqrstr
-from models import Checkin
+from models import Checkin, Ask, Asktostudent
 from user.models import User
 from school.models import Student
-from django.db.models import ObjectDoesNotExist
+from django.db.models import ObjectDoesNotExist, Q
 from course.auth import has_course_permission
+import datetime
+from school.function import getCurrentSchoolYearTerm
 
 
 def getqrstr(request, lessonid):
@@ -36,14 +38,14 @@ def getcheckinnowdata(request, lessonid):
 
 def changecheckinstatus(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
-    studentid = request.GET.get('studentid',default=False) or request.GET.get('pk')
-    newstatus = request.GET.get('newstatus',default=False) or request.GET.get('value')
+    studentid = request.GET.get('studentid', default=False) or request.GET.get('pk')
+    newstatus = request.GET.get('newstatus', default=False) or request.GET.get('value')
     student = Student.objects.get(studentid=studentid)
     try:
         checkin = Checkin.objects.get(student=student, lesson=lesson)
     except ObjectDoesNotExist:
-        if Studentcourse.objects.filter(course=lesson.course,student=student).exists():
-            checkin = Checkin(student=student,lesson=lesson)
+        if Studentcourse.objects.filter(course=lesson.course, student=student).exists():
+            checkin = Checkin(student=student, lesson=lesson)
         else:
             return HttpResponse(json.dumps({'error': 101, 'message': '学生没有此课'}), content_type="application/json")
     if checkin.status == CHECKIN_STATUS_ASK:
@@ -149,3 +151,31 @@ def stopCheckin(request, lessonid):
                                       context_instance=RequestContext(request))
     # checkin_start(lessonruntimeid)
     return redirect(reverse('checkin:lesson_data', args=[lesson.id]))
+
+
+def addask(request):
+    student = request.GET.getlist('students[]', default=False)
+    starttime = datetime.datetime.strptime(request.GET.get('starttime', default=False), "%Y-%m-%d %I:%M %p")
+    endtime = datetime.datetime.strptime(request.GET.get('endtime', default=False), "%Y-%m-%d %I:%M %p")
+    reason = request.GET.get('reason', default='')
+    schoolterm = getCurrentSchoolYearTerm()['term']
+    students = Student.objects.in_bulk(student)
+
+    if (Ask.objects.filter(student__in=students, schoolterm=schoolterm).filter(
+                Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).exists()):
+        return HttpResponse(json.dumps({'error': 101, 'message': "时间冲突"}), content_type="application/json")
+    ask = Ask()
+    ask.starttime = starttime
+    ask.endtime = endtime
+    ask.reason = reason
+    ask.status = ASK_STATUS_APPROVE
+    ask.schoolterm = schoolterm
+    ask.operater = request.user
+    ask.save()
+    querysetlist = []
+    for i in students:
+        s = students[i]
+        querysetlist.append(Asktostudent(ask=ask, student=s))
+    Asktostudent.objects.bulk_create(querysetlist)
+    data = {'error': 0, 'message': '添加成功', 'status': ask.status}
+    return HttpResponse(json.dumps(data), content_type="application/json")

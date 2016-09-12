@@ -5,6 +5,7 @@ urlpatterns = [
 
     url(r'^studentlist$', student.studentlist, name='studentlist'),
     url(r'^ajax/studentdata$', student.data, name='getstudentdata'),
+    url(r'^ajax/studentselectdata$', student.selectdata, name='getstudentselectdata'),
     url(r'^teacherlist', teacher.teacherlist, name='teacherlist'),
     url(r'^ajax/teacherdata$', teacher.data, name='getteacherdata'),
     url(r'^classlist', management.classlist, name='classlist'),

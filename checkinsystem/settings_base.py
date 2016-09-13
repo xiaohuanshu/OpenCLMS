@@ -99,3 +99,30 @@ STATICFILES_DIRS = (
 
 SESSION_ENGINE = 'django.contrib.sessions.backends.cache'
 SESSION_EXPIRE_AT_BROWSER_CLOSE = True
+
+LOGGING = {
+    'version': 1,
+    'disable_existing_loggers': True,
+    'formatters': {
+        'request': {
+            'format': '%(asctime)s [%(levelname)s] [status_code:%(status_code)s]- %(message)s'
+        },
+    },
+    'handlers': {
+        'request': {
+            'level': 'DEBUG',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'request.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'request',
+        }
+    },
+    'loggers': {
+        'django.request': {
+            'handlers': ['request'],
+            'propagate': True,
+            'level': 'WARNING',
+        },
+    }
+}

@@ -173,10 +173,10 @@ class Lesson(models.Model):
         starttime, endtime = self.getTime()
         starttime = time.strftime('%Y-%m-%d %H:%M:%S', starttime)
         endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
-        askstudents = Ask.objects.filter(student__in=students, starttime__range=(starttime, endtime),
-                                         endtime__range=(starttime, endtime), status=ASK_STATUS_APPROVE).values_list(
+        askstudents = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE).filter(
+            Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).values_list(
             'student', flat=True)
-        Checkin.objects.filter(lesson=self,student__in=askstudents).update(status=CHECKIN_STATUS_ASK)
+        Checkin.objects.filter(lesson=self, student__in=askstudents).update(status=CHECKIN_STATUS_ASK)
         return {'error': 0, 'message': u'课程成功开启', 'newstatus': self.status,
                 'starttime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 

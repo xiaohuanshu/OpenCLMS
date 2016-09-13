@@ -26,6 +26,11 @@
                         </li>
                         <li class="{% nav_active request.path 'personal_data' %}"><a
                                 href="{% url 'checkin:personal_data' %}"><i class="fa fa-circle-o"></i>个人数据</a></li>
+                        {% if perms.control_askmanager %}
+                            <li class="{% nav_active request.path 'askmanager' %}"><a
+                                    href="{% url 'checkin:askmanager' %}"><i class="fa fa-circle-o"></i>请假管理</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </li>
             {% endif %}
@@ -96,7 +101,10 @@
                     <ul class="treeview-menu">
                         <li class=""><a href="{% url 'user:userlist' %}"><i class="fa fa-circle-o"></i>用户</a></li>
                         <li class=""><a href="#"><i class="fa fa-circle-o"></i>角色</a></li>
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>权限</a></li>
+                        {% if perms.view_jurisdiction %}
+                            <li class=""><a href="{% url "rbac:jurisdiction_setup" %}"><i class="fa fa-circle-o"></i>权限</a>
+                            </li>
+                        {% endif %}
                     </ul>
                 </li>
             {% endif %}

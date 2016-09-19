@@ -8,7 +8,6 @@ class Wechatkeyword(models.Model):
     data = models.CharField(max_length=255, blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'WechatKeyword'
 
 
@@ -28,5 +27,4 @@ class Wechatuser(models.Model):
     accuracy = models.FloatField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'WechatUser'

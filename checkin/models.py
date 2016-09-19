@@ -22,7 +22,6 @@ class Checkin(models.Model):
         return "%d %d" % (self.id, self.lesson.id)
 
     class Meta:
-        managed = False
         db_table = 'Checkin'
 
 
@@ -41,7 +40,6 @@ class Checkinrecord(models.Model):
         return "%d %d" % (self.id, self.lesson.id)
 
     class Meta:
-        managed = False
         db_table = 'CheckinRecord'
 
 
@@ -57,7 +55,6 @@ class Ask(models.Model):
     student = models.ManyToManyField('school.Student', through='Asktostudent',
                                             through_fields=('ask', 'student'))
     class Meta:
-        managed = False
         db_table = 'Ask'
 
 
@@ -66,5 +63,4 @@ class Asktostudent(models.Model):
     ask = models.ForeignKey(Ask, models.DO_NOTHING, db_column='askid', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'AsktoStudent'

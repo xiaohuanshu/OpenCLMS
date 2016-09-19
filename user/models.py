@@ -16,7 +16,6 @@ class Role(models.Model):
         return u"%s" % (self.name)
 
     class Meta:
-        managed = False
         db_table = 'Role'
 
 
@@ -25,7 +24,7 @@ class User(models.Model):
     openid = models.CharField(max_length=28, blank=True, null=True)
     password = models.CharField(max_length=32, blank=True, null=True)
     sex = models.IntegerField(blank=True, null=True)
-    ip = models.TextField(blank=True, null=True)  # This field type is a guess.
+    ip = models.GenericIPAddressField(protocol='IPv4', blank=True, null=True)
     registertime = models.DateTimeField(blank=True, null=True)
     lastlogintime = models.DateTimeField(blank=True, null=True)
     email = models.CharField(max_length=40, blank=True, null=True)
@@ -48,7 +47,6 @@ class User(models.Model):
         return u"%s" % (self.username)
 
     class Meta:
-        managed = False
         db_table = 'User'
 
 
@@ -57,5 +55,4 @@ class Usertorole(models.Model):
     role = models.ForeignKey(Role, models.DO_NOTHING, db_column='roleid', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'UsertoRole'

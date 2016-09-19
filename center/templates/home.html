@@ -87,63 +87,75 @@
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane active" id="tab_1-1">
-                        <table class="table">
-                            <tbody>
-                            {% for lesson in todaylesson %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>
-                                        <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
-                                    </td>
-                                    <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                                    <td>{{ lesson.classroom.location }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                        {% if todaylesson %}
+                            <table class="table">
+                                <tbody>
+                                {% for lesson in todaylesson %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                                        </td>
+                                        <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
+                                        <td>{{ lesson.classroom.location }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="text-center">今日没有课程</div>
+                        {% endif %}
                     </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_2-2">
-                        <table class="table">
-                            <tbody>
-                            {% for lesson in weeklesson %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>
-                                        <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
-                                    </td>
-                                    <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                                    <td>{{ lesson.classroom.location }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                        {% if weeklesson %}
+                            <table class="table">
+                                <tbody>
+                                {% for lesson in weeklesson %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                                        </td>
+                                        <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
+                                        <td>{{ lesson.classroom.location }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="text-center">本周没有课程</div>
+                        {% endif %}
                     </div>
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_3-2">
-                        <table class="table">
-                            <tbody>
-                            {% for course in termcourse %}
-                                <tr>
-                                    <td>{{ forloop.counter }}</td>
-                                    <td>
-                                        <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
-                                    </td>
-                                    <td>{{ course.time }}</td>
-                                    <td>{{ course.location }}</td>
-                                    <td>
-                                        <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
-                                    </td>
-                                </tr>
-                            {% endfor %}
-                            </tbody>
-                        </table>
+                        {% if termcourse %}
+                            <table class="table">
+                                <tbody>
+                                {% for course in termcourse %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
+                                        </td>
+                                        <td>{{ course.time }}</td>
+                                        <td>{{ course.location }}</td>
+                                        <td>
+                                            <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="text-center">本学期没有课程</div>
+                        {% endif %}
                     </div>
                     <!-- /.tab-pane -->
                 </div>

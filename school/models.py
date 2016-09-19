@@ -16,7 +16,6 @@ class Administration(models.Model):
         return self.teacher_set.count()
 
     class Meta:
-        managed = False
         db_table = 'Administration'
 
 
@@ -30,7 +29,6 @@ class Class(models.Model):
         return u"%s" % (self.name)
 
     class Meta:
-        managed = False
         db_table = 'Class'
 
 
@@ -40,7 +38,6 @@ class Classtime(models.Model):
     endtime = models.TimeField(blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'ClassTime'
 
 
@@ -52,7 +49,6 @@ class Classroom(models.Model):
         return u"%s" % (self.location)
 
     class Meta:
-        managed = False
         db_table = 'Classroom'
 
 
@@ -72,7 +68,6 @@ class Department(models.Model):
         return u"%s" % (self.name)
 
     class Meta:
-        managed = False
         db_table = 'Department'
 
 
@@ -92,7 +87,6 @@ class Major(models.Model):
         return self.class_set.count()
 
     class Meta:
-        managed = False
         db_table = 'Major'
 
 
@@ -107,7 +101,6 @@ class Schoolterm(models.Model):
         return u"%s" % (self.description)
 
     class Meta:
-        managed = False
         db_table = 'SchoolTerm'
 
 
@@ -120,7 +113,6 @@ class Seat(models.Model):
         return "%d" % (self.seattype)
 
     class Meta:
-        managed = False
         db_table = 'Seat'
 
 
@@ -141,7 +133,6 @@ class Student(models.Model):
         return u"%s" % (self.name)
 
     class Meta:
-        managed = False
         db_table = 'Student'
 
 
@@ -160,7 +151,6 @@ class Teacher(models.Model):
         return u"%s" % (self.name)
 
     class Meta:
-        managed = False
         db_table = 'Teacher'
 
 
@@ -170,7 +160,6 @@ class Teachertoadministration(models.Model):
                                        null=True)
 
     class Meta:
-        managed = False
         db_table = 'TeachertoAdministration'
 
 
@@ -179,7 +168,6 @@ class Teachertodepartment(models.Model):
     department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'TeachertoDepartment'
 
 

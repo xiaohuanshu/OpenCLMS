@@ -78,7 +78,6 @@ class Course(models.Model):
         return u"%s" % (self.title)
 
     class Meta:
-        managed = False
         db_table = 'Course'
 
 
@@ -222,7 +221,6 @@ class Lesson(models.Model):
         return "%d %s-%d-%d-%d-%d" % (self.id, self.term, self.year, self.week, self.day, self.time)
 
     class Meta:
-        managed = False
         db_table = 'Lesson'
 
 
@@ -232,5 +230,4 @@ class Studentcourse(models.Model):
                                related_name='courses')
 
     class Meta:
-        managed = False
         db_table = 'StudentCourse'

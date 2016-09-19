@@ -10,7 +10,6 @@ class Resourcejurisdiction(models.Model):
                                related_name="children")
 
     class Meta:
-        managed = False
         db_table = 'ResourceJurisdiction'
 
 
@@ -20,5 +19,4 @@ class Roletoresourcejurisdiction(models.Model):
                                                db_column='resourcejurisdictionid', blank=True, null=True)
 
     class Meta:
-        managed = False
         db_table = 'RoletoResourceJurisdiction'

@@ -30,6 +30,7 @@ class User(models.Model):
     email = models.CharField(max_length=40, blank=True, null=True)
     verify = models.NullBooleanField()
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
+    avatar = models.ImageField(upload_to='avatar', default='avatar/default.png')
 
     @classmethod_cache
     def isteacher(self):
@@ -42,6 +43,19 @@ class User(models.Model):
     def hasresourcejurisdiction(self, jurisdiction):
         from rbac.auth import is_user_has_resourcejurisdiction
         return is_user_has_resourcejurisdiction(self, jurisdiction)
+
+    def updateavatarfromwechat(self):
+        if self.openid is not None:
+            from wechat.api import wechat
+            userinfo = wechat.get_user_info(self.openid, lang='zh_CN')
+            avatar_url = userinfo['headimgurl']
+            from django.core.files import File
+            from django.core.files.temp import NamedTemporaryFile
+            import urllib2
+            img_temp = NamedTemporaryFile(delete=True)
+            img_temp.write(urllib2.urlopen(avatar_url).read())
+            img_temp.flush()
+            self.avatar.save('%s.jpeg' % self.openid, File(img_temp))
 
     def __unicode__(self):
         return u"%s" % (self.username)

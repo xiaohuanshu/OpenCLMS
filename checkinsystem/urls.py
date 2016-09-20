@@ -13,7 +13,8 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url,include
+from django.conf.urls import url, include, patterns
+from django.conf import settings
 
 urlpatterns = [
     url(r'^$', 'center.views.home', name='home'),
@@ -26,3 +27,9 @@ urlpatterns = [
     url(r'^rbac/', include('rbac.urls', namespace="rbac")),
     url(r'^seat$', 'center.views.seat', name='seat'),
 ]
+
+if settings.DEBUG:
+    urlpatterns += patterns('',
+                            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
+                                {'document_root': settings.MEDIA_ROOT}),
+                            )

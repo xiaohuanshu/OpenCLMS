@@ -15,9 +15,9 @@ Including another URLconf
 """
 from django.conf.urls import url, include, patterns
 from django.conf import settings
-
+from center.views import home
 urlpatterns = [
-    url(r'^$', 'center.views.home', name='home'),
+    url(r'^$', home, name='home'),
 
     url(r'^wechat/', include('wechat.urls', namespace="wechat")),
     url(r'^user/', include('user.urls', namespace="user")),
@@ -25,7 +25,7 @@ urlpatterns = [
     url(r'^course/', include('course.urls', namespace="course")),
     url(r'^checkin/', include('checkin.urls', namespace="checkin")),
     url(r'^rbac/', include('rbac.urls', namespace="rbac")),
-    url(r'^seat$', 'center.views.seat', name='seat'),
+    #url(r'^seat$', 'center.views.seat', name='seat'),
 ]
 
 if settings.DEBUG:

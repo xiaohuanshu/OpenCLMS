@@ -15,7 +15,7 @@
 {% block content %}
     <!-- page start-->
     <div class="row">
-        <div class="col-md-8">
+        <div class="col-md-12">
             <div class="box box-primary">
                 <div class="box-header text-center">
                     <h3 class="box-title">[{{ coursedata.title }}]</h3>
@@ -74,7 +74,22 @@
                             </dl>
                         </div>
                     </div>
-
+                    {% if courseperms %}
+                        <div class="row">
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-info btn-block"
+                                        onclick="window.location.href = '{% url 'checkin:course_data' coursedata.id %}'">
+                                    签到数据
+                                </button>
+                            </div>
+                            <div class="col-sm-3">
+                                <button type="button" class="btn btn-primary btn-block"
+                                        onclick="window.location.href = ''">
+                                    学生列表
+                                </button>
+                            </div>
+                        </div>
+                    {% endif %}
                 </div>
 
             </div>
@@ -102,7 +117,8 @@
                         </thead>
                         <tbody>
                         {% for lesson in lessondata %}
-                            <tr>
+                            <tr class="lessontr" data-lessonid="{{ lesson.id }}"
+                                data-lessonstatus="{{ lesson.status }}">
                                 <td>
                                     {{ forloop.counter }}
                                 </td>
@@ -118,51 +134,37 @@
                                         {{ lesson.actuallynumber|default:'没有数据' }}
                                     </td>
                                 {% endif %}
-                                <td class="hidden-xs lesson-starttime" data-lessonid="{{ lesson.id }}">
+                                <td class="hidden-xs lesson-starttime">
                                     {{ lesson.starttime|date:'Y-m-d H:i:s'|default:'还未开始' }}
                                 </td>
-                                <td class="hidden-xs lesson-endtime" data-lessonid="{{ lesson.id }}">
+                                <td class="hidden-xs lesson-endtime">
                                     {{ lesson.endtime|date:'Y-m-d H:i:s'|default:'还未结束' }}
                                 </td>
                                 <td>
-                                    <span class="label label-{{ lesson.status|LESSON_STATUS_STYLE }} lesson-status"
-                                          data-lessonid="{{ lesson.id }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                    <span class="label label-{{ lesson.status|LESSON_STATUS_STYLE }} lesson-status">{{ lesson.status|LESSON_STATUS }}</span>
                                 </td>
                                 {% if courseperms %}
                                     <td>
+                                        <button type="button" class="control-lessonenter btn btn-xs btn-success"
+                                                onclick="window.location.href = '{% url 'checkin:lesson_data' lesson.id %}'">
+                                            进入课程
+                                        </button>
                                         <div class="btn-group">
                                             <button data-toggle="dropdown"
-                                                    class="btn btn-primary dropdown-toggle btn-xs"
+                                                    class="btn btn-primary dropdown-toggle btn-xs control-panel"
                                                     type="button" aria-expanded="false">操作 <span class="caret"></span>
                                             </button>
                                             <ul role="menu" class="dropdown-menu">
-                                                <li><a href="{% url 'checkin:startcheckin' lesson.id %}">开始签到</a></li>
-                                                <li><a href="{% url 'checkin:lesson_data' lesson.id %}">学生/签到数据</a></li>
-                                                {% if not lesson.isend %}
-                                                    <li class="divider"></li>
-                                                    {% if not lesson.isnow %}
-                                                        <li>
-                                                            {% if not coursedata.status %}
-                                                                <a href="#" class="control-lessonstart"
-                                                                   data-lessonid="{{ lesson.id }}">设为课程开始</a>
-                                                            {% else %}
-                                                                <a href="#" class="control-lessonstart"
-                                                                   style="display: none;"
-                                                                   data-lessonid="{{ lesson.id }}">设为课程开始</a>
-                                                            {% endif %}
-                                                        </li>
-                                                    {% endif %}
-                                                    <li>
-                                                        {% if lesson.isnow %}
-                                                            <a href="#" class="control-lessonstop"
-                                                               data-lessonid="{{ lesson.id }}">设为课程结束</a>
-                                                        {% else %}
-                                                            <a href="#" class="control-lessonstop"
-                                                               style="display: none;"
-                                                               data-lessonid="{{ lesson.id }}">设为课程结束</a>
-                                                        {% endif %}
-                                                    </li>
-                                                {% endif %}
+                                                <li><a class="control-checkinstart"
+                                                       href="{% url 'checkin:startcheckin' lesson.id %}">开始签到</a></li>
+                                                <li class="divider"></li>
+                                                <li>
+                                                    <a href="#" class="control-lessonstart">设为课程开始</a>
+                                                </li>
+                                                <li>
+                                                    <a href="#" class="control-lessonstop"
+                                                       data-lessonid="{{ lesson.id }}">设为课程结束</a>
+                                                </li>
                                             </ul>
                                         </div>
                                     </td>
@@ -175,6 +177,7 @@
             </div>
 
         </div>
+        {% comment %}
         <div class="col-md-4">
             <div class="box">
                 <div class="box-header">
@@ -193,7 +196,7 @@
                     <br/>
                     <h5 class="bold">课程类型</h5>
                     <ul class="nav nav-pills nav-stacked labels-info ">
-                        <li><i class=" fa fa-circle text-danger"></i> 公共选修课</p></li>
+                        <li><i class=" fa fa-circle text-danger"></i> 公共选修课</li>
                     </ul>
 
                     <br/>
@@ -226,6 +229,7 @@
 
             </div>
         </div>
+        {% endcomment %}
     </div>
     <!-- page end-->
 
@@ -252,10 +256,77 @@
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
-        $(".control-lessonstart").each(function () {
+        /*function hidepanelforunopenedlesson() {
+            $(".lessontr").each(function () {
+                status = $(this).data('lessonstatus');
+                var statustext = lesson_status_json[status];
+                var controlpanel = $(this).find('.control-panel');
+                if (statustext == '正在上课') {
+                    controlpanel.show()
+                } else {
+                    controlpanel.hide()
+                }
+            });
+        }
+        function showpanelforunclosedlesson() {
+            $(".lessontr").each(function () {
+                status = $(this).data('lessonstatus');
+                var statustext = lesson_status_json[status];
+                var controlpanel = $(this).find('.control-panel');
+                if (statustext == '课程结束') {
+                    controlpanel.hide()
+                } else {
+                    controlpanel.show()
+                }
+            });
+        }*/
+        function changelessonstatus(lessonid, status) {
+            var lessontr = $('.lessontr[data-lessonid=' + lessonid + ']');
+            if (typeof(status) == "undefined") {
+                status = lessontr.data('lessonstatus');
+            } else {
+                lessontr.data('lessonstatus', status);
+            }
+            statustext = lesson_status_json[status];
+            starttimetd = lessontr.find('.lesson-starttime');
+            endtimetd = lessontr.find('.lesson-endtime');
+            statusspan = lessontr.find('.lesson-status');
+            enterlesson = lessontr.find('.control-lessonenter');
+            startcheckin = lessontr.find('.control-checkinstart');
+            startlesson = lessontr.find('.control-lessonstart');
+            stoplesson = lessontr.find('.control-lessonstop');
+            controlpanel = lessontr.find('.control-panel');
+            statusspan.text(statustext);
+            statusspan.attr('class', 'lesson-status label label-' + lesson_status_style_json[status]);
+            if (statustext == '正在上课') {
+                startcheckin.show();
+                stoplesson.show();
+                startlesson.hide();
+                enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-success');
+            } else if (statustext == '未开始') {
+                if (lesson_status_json[lessontr.prev().data('lessonstatus')] == "课程结束") {
+                    enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-success');
+                } else {
+                    enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-default');
+                }
+                startcheckin.hide();
+                stoplesson.hide();
+                startlesson.show();
+            } else if (statustext == '正在签到') {
+                startcheckin.show();
+                stoplesson.hide();
+                startlesson.hide();
+                enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-success');
+            } else {
+                controlpanel.hide();
+                enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-danger');
+            }
+        }
+        $(".lessontr").each(function () {
             var lessonid = $(this).data('lessonid');
-            var $control = $(this);
-            $control.click(function () {
+            changelessonstatus(lessonid);
+            var $controlstart = $(this).find('.control-lessonstart');
+            $controlstart.click(function () {
                 $.ajax({
                     url: '{% url 'course:control.startlesson' %}',
                     type: 'GET',
@@ -269,25 +340,16 @@
                             toastr['error'](data.message, "操作失败");
                         } else {
                             toastr['success'](data.message, "操作成功");
-                            $('.lesson-starttime[data-lessonid=' + lessonid + ']').text(data.starttime);
-                            $('.lesson-status[data-lessonid=' + lessonid + ']').text(lesson_status_json[data.newstatus]);
-                            $('.lesson-status[data-lessonid=' + lessonid + ']').attr('class', 'lesson-status label label-' + lesson_status_style_json[data.newstatus]);
-                            $control.remove();
-                            $(".control-lessonstop").each(function () {
-                                $(this).show();
-                            });
-
+                            changelessonstatus(lessonid, data.newstatus);
+                            //hidepanelforunopenedlesson();
                         }
                     }, error: function (XMLHttpRequest, textStatus) {
                         toastr['error'](textStatus, "与服务器连接失败");
                     }
                 });
             });
-        });
-        $(".control-lessonstop").each(function () {
-            var lessonid = $(this).data('lessonid');
-            var $control = $(this);
-            $control.click(function () {
+            var $controlstop = $(this).find('.control-lessonstop');
+            $controlstop.click(function () {
                 $.ajax({
                     url: '{% url 'course:control.stoplesson' %}',
                     type: 'GET',
@@ -301,13 +363,8 @@
                             toastr['error'](data.message, "操作失败");
                         } else {
                             toastr['success'](data.message, "操作成功");
-                            $('.lesson-endtime[data-lessonid=' + lessonid + ']').text(data.endtime);
-                            $('.lesson-status[data-lessonid=' + lessonid + ']').text(lesson_status_json[data.newstatus]);
-                            $('.lesson-status[data-lessonid=' + lessonid + ']').attr('class', 'lesson-status label label-' + lesson_status_style_json[data.newstatus]);
-                            $control.remove();
-                            $(".control-lessonstart").each(function () {
-                                $(this).show();
-                            });
+                            changelessonstatus(lessonid, data.newstatus);
+                            //showpanelforunclosedlesson();
                         }
                     }, error: function (XMLHttpRequest, textStatus) {
                         toastr['error'](textStatus, "与服务器连接失败");
@@ -315,5 +372,7 @@
                 });
             });
         });
+        //hidepanelforunopenedlesson();
+        //showpanelforunclosedlesson();
     </script>
 {% endblock %}

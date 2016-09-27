@@ -1,7 +1,8 @@
 # coding:utf-8
+from __future__ import division
 from course.models import Lesson, Studentcourse, Course
 from models import Checkin, Checkinrecord, Ask
-from school.models import Student
+from school.models import Student, Teacher
 from school.function import getCurrentSchoolYearTerm
 from constant import *
 from django.shortcuts import render_to_response, RequestContext
@@ -13,6 +14,7 @@ from django.shortcuts import redirect, HttpResponse
 from course.auth import has_course_permission
 from function import generateqrstr
 import datetime
+from django.db.models import Count, Case, When, Q
 
 
 def checkin(request, lessonid):
@@ -219,9 +221,58 @@ def student_data(request, studentid):
                               context_instance=RequestContext(request))
 
 
+def teacher_data(request, teacherid):
+    teacher = Teacher.objects.get(teacherid=teacherid)
+    teachercourse = Course.objects.filter(teacher=teacher).all()
+    coursecount = teachercourse.count()
+    course = {}
+    maxlength = 0
+    for tc in teachercourse:
+        course[tc.id] = {'name': tc.title, 'schoolterm': tc.schoolterm, 'courseid': tc.id, 'checkindata': {}}
+        if tc.lesson_set.count() > maxlength:
+            maxlength = tc.lesson_set.count()
+        for (offset, l) in enumerate(tc.lesson_set.order_by('week', 'day', 'time').all()):
+            course[tc.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
+    checkindata = Checkin.objects.filter(lesson__course__in=teachercourse).annotate(
+        should=Count(Case(When(~Q(status=CHECKIN_STATUS_ASK), then=1))), actually=Count(Case(
+            When(Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_SUCCESS) | Q(status=CHECKIN_STATUS_LATE) | Q(
+                status=CHECKIN_STATUS_LATEEARLY), then=2)))).values('lesson__course',
+                                                                    'lesson', 'should', 'actually')
+    checkindata.query.group_by = ['lesson']
+
+    for c in checkindata:
+        if c['should'] == 0:
+            course[c['lesson__course']]['checkindata'][c['lesson']]['status'] = None
+        else:
+            course[c['lesson__course']]['checkindata'][c['lesson']]['status'] = "%.1f" % (
+                c['actually'] / c['should'] * 100)
+
+    rows = []
+    for (k, v) in course.items():
+        ld = {'courseid': v['courseid'], 'name': v['name'], 'schoolterm': v['schoolterm']}
+        # ld['data'] = []
+        for (key, item) in v['checkindata'].items():
+            ld.update({'lesson%d' % item['offset']: item['status']})
+        rows.append(ld)
+
+    columns = [
+        [{'field': 'name', 'title': u'课程名称', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True,
+          'formatter': 'identifierFormatter'},
+         {'field': 'schoolterm', 'title': u'学期', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+         {'title': u'课程学生到达率', 'colspan': maxlength, 'align': 'center'}], []]
+
+    for i in range(0, maxlength):
+        columns[1].append(
+            {'field': 'lesson%d' % i, 'title': i + 1, 'align': 'center'})
+    data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
+    return render_to_response('teacher_data.html', {'teacher': teacher, 'data': data},
+                              context_instance=RequestContext(request))
+
+
 def personaldata(request):
     if request.user.isteacher():
-        pass
+        teacher = Teacher.objects.get(user=request.user)
+        return teacher_data(request, teacher.teacherid)
     else:
         student = Student.objects.get(user=request.user)
         # return HttpResponseRedirect(reverse('checkin:student_data', args=[student.studentid]))

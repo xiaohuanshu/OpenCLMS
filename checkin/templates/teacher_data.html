@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load checkin_extra %}
+{% block title %}学生考勤数据{% endblock %}
+{% block page_css %}
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
+{% endblock %}
+
+
+
+
+{% block content %}
+
+
+
+
+
+    <div class="row">
+        <div class="col-sm-12">
+
+
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">教师课程考勤数据 - {{ teacher.name }}({{ teacher.teacherid }})</h3>
+                </div>
+                <div class="box-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                        </div>
+                        <table id="table"
+
+                               data-search="false"
+                               data-show-toggle="true"
+                               data-show-columns="true"
+                               data-show-export="true"
+                               data-minimum-count-columns="2"
+                               data-pagination="true"
+                               data-page-size="5"
+                               data-page-list="[5,10, 25, 50, 100, ALL]"
+                               data-side-pagination="client"
+                               data-toolbar="#custom-toolbar"
+                               data-striped="true"
+                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
+                        >
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+        function identifierFormatter(value, row, index) {
+            var clickurl = "{% url 'checkin:course_data' 0 %}";
+            clickurl = clickurl.substring(0, clickurl.length - 1);
+            return "<a href='" + clickurl + row.courseid + "'>" + value + "</a>";
+        }
+        $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.rows|safe}}});
+    </script>
+{% endblock %}

@@ -145,7 +145,7 @@
 
 
 
-    {% if lessondata.isnow %}
+    {% if lessondata.isnow or lessondata.isend %}
         {% if checkincount != 0 %}
             <div class="row">
                 <div class="col-lg-4">
@@ -378,8 +378,6 @@
             //Boolean - whether to make the chart responsive to window resizing
             responsive: true,
         };
-        var chart = document.getElementById("numberData").getContext("2d");
-        new Chart(chart).Pie(numberData, pieOptions);
 
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         var checkin_status_json ={{ checkin_status_json|safe }};
@@ -420,5 +418,8 @@
         $(".set-early").bind('click', function () {
             changestatus($(this).parents('tr').data("studentid"), 'early');
         });
+
+        var chart = document.getElementById("numberData").getContext("2d");
+        new Chart(chart).Pie(numberData, pieOptions);
     </script>
 {% endblock %}

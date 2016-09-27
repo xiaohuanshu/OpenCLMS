@@ -110,7 +110,8 @@
             columns: [{
                 field: 'title',
                 title: '课程名称',
-                searchable: true
+                searchable: true,
+                formatter: identifierFormatter
             }, {
                 field: 'serialnumber',
                 title: '课程编号'
@@ -139,18 +140,17 @@
                 field: 'schoolterm',
                 title: '学年学期',
                 visible: false
-            }],
-            onClickRow: clickrow
+            }]
         });
         function queryParams(params) {
             params['schoolterm'] = $('#schoolterm').val();
             params['major'] = $('#major').val();
             return params;
         }
-        function clickrow(row, element) {
+        function identifierFormatter(value, row, index) {
             var clickurl = "{% url 'course:information' 0 %}";
             clickurl = clickurl.substring(0, clickurl.length - 1);
-            window.location.href = clickurl + row.id;
+            return "<a href='" + clickurl + row.id + "'>" + value + "</a>";
         }
 
         $('#major').chosen({allow_single_deselect: true, include_group_label_in_selected: true});
@@ -162,8 +162,6 @@
         $('#major').on('change', function (evt, params) {
             $table.bootstrapTable('refresh');
         });
-
-
 
 
     </script>

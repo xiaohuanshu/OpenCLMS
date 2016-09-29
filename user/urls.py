@@ -4,7 +4,8 @@ except ImportError:  # django < 1.4
     from django.conf.urls.defaults import *
 
 # place app url patterns here
-import views,management
+import views, management
+
 urlpatterns = [
     url(r'^login$', views.login, name='login'),
     url(r'^loginProcess$', views.loginProcess, name='loginProcess'),
@@ -17,4 +18,5 @@ urlpatterns = [
     url(r'^userlist', management.userlist, name='userlist'),
     url(r'^ajax/userdata', management.userdata, name='getuserdata'),
 
+    url(r'^addpermission$', views.add_permission, name='addpermission'),
 ]

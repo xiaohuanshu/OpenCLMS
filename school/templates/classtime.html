@@ -4,7 +4,7 @@
 {% block title %}上课时间{% endblock %}
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
-    {% if perms.modify_classtime %}
+    {% if perms.school_classtime_modify %}
         <link href="{% static 'plugins/x-editable/css/bootstrap-editable.css' %}" rel="stylesheet"/>
         <link rel="stylesheet" type="text/css"
               href="{% static 'plugins/timepicker/old/compiled/timepicker.css' %}"/>
@@ -13,7 +13,7 @@
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
-    {% if perms.modify_classtime %}
+    {% if perms.school_classtime_modify %}
         <script src="{% static 'plugins/x-editable/js/bootstrap-editable.min.js' %}"></script>
         <script src="{% static 'plugins/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js' %}"></script>
         <script type="text/javascript"
@@ -135,7 +135,7 @@
                 }
             }]
         });
-        {% if perms.modify_classtime %}
+        {% if perms.school_classtime_modify %}
             $('.editable').on('shown', function (e, editable) {
                 editable.input.$input.timepicker({
                     //autoclose: true,
@@ -150,7 +150,7 @@
                 var data = $table.bootstrapTable('getData');
                 index = $(this).parents('tr').data('index');
                 $(this).editable('option', 'pk', data[index].id);
-            })
+            });
         {% endif %}
     </script>
 {% endblock %}

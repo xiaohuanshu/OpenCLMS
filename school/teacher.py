@@ -1,18 +1,19 @@
 # -*- coding: utf-8 -*-
 import json
+
 from django.http import HttpResponse
-from models import Teacher, Teachertoadministration, Teachertodepartment
-from django.db.models import Q
 from django.shortcuts import render_to_response, RequestContext
-from rbac.auth import resourcejurisdiction_view_auth
+
+from models import Teacher
+from user.auth import permission_required
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_teacher')
+@permission_required(permission='school_teacher_view')
 def teacherlist(request):
     return render_to_response('teacher_list.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_teacher')
+@permission_required(permission='school_teacher_view')
 def data(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])

@@ -1,11 +1,13 @@
 # Create your views here.
-from models import Course, Lesson
-from django.shortcuts import render_to_response, RequestContext
 import json
-from django.http import HttpResponse
+
 from django.db.models import Q
-from rbac.auth import resourcejurisdiction_view_auth
+from django.http import HttpResponse
+from django.shortcuts import render_to_response, RequestContext
+
 from course.auth import has_course_permission
+from models import Course, Lesson
+from user.auth import permission_required
 
 
 def information(request, courseid):
@@ -17,12 +19,12 @@ def information(request, courseid):
                               context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_courselist')
+@permission_required(permission='course_viewlist')
 def list(request):
     return render_to_response('list.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_courselist')
+@permission_required(permission='course_viewlist')
 def data(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])

@@ -16,6 +16,7 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
+from permission import permission_data
 
 
 def login(request):
@@ -58,8 +59,8 @@ def registerProcess(request):
     if username == '' or not re.search('^\w*[a-zA-Z]+\w*$', username) or email == '' or not re.search(
             "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
             email) or password == '' or sex == '' or User.objects.filter(
-                    Q(email=email) | Q(username=username)).exists():
-        return redirect(reverse('user:register', args=[])+ u"?error=用户名或邮箱错误")
+                Q(email=email) | Q(username=username)).exists():
+        return redirect(reverse('user:register', args=[]) + u"?error=用户名或邮箱错误")
     else:
         m = hashlib.md5()
         m.update(password)
@@ -110,7 +111,7 @@ def loginProcess(request):
                 else:
                     response = redirect(reverse('home', args=[]))
             if request.POST.get('remember', default=False) == "remember-me":
-                remembercode = make_password("%d%s%s"%(user.id,settings.SECRET_KEY,username), None, 'pbkdf2_sha256')
+                remembercode = make_password("%d%s%s" % (user.id, settings.SECRET_KEY, username), None, 'pbkdf2_sha256')
                 response.set_cookie('remembercode', remembercode, None, datetime.now() + timedelta(days=365))
                 response.set_cookie('userid', user.id, None, datetime.now() + timedelta(days=365))
                 response.set_cookie('username', username, None, datetime.now() + timedelta(days=365))
@@ -133,7 +134,7 @@ def logout(request):
 
 
 def authentication(request):
-    user = User.objects.get(id=request.session.get('userid'))
+    user = request.user
     if user.verify:
         return redirect(reverse('home', args=[]))
     student = None
@@ -152,6 +153,7 @@ def authentication(request):
                 if student.user:
                     return redirect(reverse('user:authentication', args=[]) + u'?error=此学生已经绑定了帐号')
                 student.user = user
+                user.sex = student.sex
                 flag = True
             except ObjectDoesNotExist:
                 return redirect(reverse('user:authentication', args=[]) + u'?error=认证信息有误,没有找到您的学生信息')
@@ -164,6 +166,7 @@ def authentication(request):
                 if teacher.user:
                     return redirect(reverse('user:authentication', args=[]) + u'?error=此教师已经绑定了帐号')
                 teacher.user = user
+                user.sex = teacher.sex
                 flag = True
             except ObjectDoesNotExist:
                 return redirect(reverse('user:authentication', args=[]) + u'?error=认证信息有误,没有找到您的教师信息')
@@ -198,3 +201,45 @@ def authentication(request):
         return render_to_response('authentication.html', {}, context_instance=RequestContext(request))
 
 
+def add_permission(request):
+    if request.META['REQUEST_METHOD'] == 'POST':
+        rolename = request.GET.get('role', default=None)
+        role = Role.objects.get(name=rolename)
+        newpermission = request.POST.getlist('checked[]')
+        role.permission = newpermission
+        role.save()
+        return HttpResponse('{error:0}', content_type="application/json")
+    else:
+        roledata = Role.objects.all()
+        mdata = {}
+        mdata['roledata'] = roledata
+        rolename = request.GET.get('role', default=None)
+
+        if rolename:
+            role = Role.objects.get(name=rolename)
+            alreadypermission = role.permission
+
+            def treedata(roots, lastname=''):
+                treelist = []
+                for root in roots:
+                    data = {'text': root['direction'], 'selectable': False, 'name': root['name'], 'permtype': 'res',
+                            'nodes': []}
+                    if lastname + root['name'] in alreadypermission:
+                        data['state'] = {'checked': True}
+                    children = root['children']
+                    if children is not None:
+                        data['nodes'] = treedata(children, lastname + root['name'] + '_')
+                    operator = root['operator']
+                    if operator is not None:
+                        for (offset, op) in enumerate(operator):
+                            operatordata = {'text': root['operatordirection'][offset], 'selectable': False, 'name': op,
+                                            'permtype': 'operator'}
+                            if lastname + root['name'] + '_' + op in alreadypermission:
+                                operatordata['state'] = {'checked': True}
+                            data['nodes'].append(operatordata)
+                    treelist.append(data)
+                return treelist
+
+            tree = json.dumps(treedata(permission_data))
+            mdata['jurisdictiondata'] = tree
+        return render_to_response('addpermission.html', mdata, context_instance=RequestContext(request))

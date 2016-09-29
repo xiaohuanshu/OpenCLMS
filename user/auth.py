@@ -1,17 +1,17 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
 from django.shortcuts import render_to_response, RequestContext
-from rbac.models import Resourcejurisdiction, Roletoresourcejurisdiction
+from models import Role
 from django.http import HttpResponse
 import json
 
 
-def resourcejurisdiction_view_auth(func=None, jurisdiction=None):
+def permission_required(func=None, permission=None):
     def decorator(func):
         @wraps(func)
         def returned_wrapper(request, *args, **kwargs):
             user = request.user
-            if is_user_has_resourcejurisdiction(user, jurisdiction):
+            if user.has_perm(permission):
                 return func(request, *args, **kwargs)
             else:
                 if request.is_ajax():
@@ -31,9 +31,3 @@ def resourcejurisdiction_view_auth(func=None, jurisdiction=None):
 
     else:
         return decorator(func)
-
-
-def is_user_has_resourcejurisdiction(user, jurisdiction):
-    role = user.role.values_list('id', flat=True)
-    jurisdictionid = Resourcejurisdiction.objects.get(name=jurisdiction)
-    return Roletoresourcejurisdiction.objects.filter(role__in=role, resourcejurisdiction=jurisdictionid).exists()

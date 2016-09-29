@@ -13,7 +13,7 @@ class UserMiddleware(object):
         agent = request.META.get('HTTP_USER_AGENT', None)
         urlname = resolve(request.path)
         urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
-        allow_url = ['user:login', 'user:loginProcess', 'user:register',
+        allow_url = ['user:login', 'user:loginProcess', 'user:register', 'user:logout',
                      'user:check_username', 'user:check_email', 'user:registerProcess',
                      'wechat:api', 'wechat:oauth']
         if request.session.get('username', '') == '':

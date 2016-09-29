@@ -14,12 +14,12 @@ class PermWrapper(object):
     def __init__(self, user):
         self.user = user
 
-    def __getitem__(self, jurisdiction):
-        if hasattr(self, '%s_cacle' % jurisdiction):
-            return getattr(self, '%s_cacle' % jurisdiction)
+    def __getitem__(self, permission):
+        if hasattr(self, '%s_cache' % permission):
+            return getattr(self, '%s_cache' % permission)
         else:
-            data = self.user.hasresourcejurisdiction(jurisdiction)
-            setattr(self, '%s_cacle' % jurisdiction, data)
+            data = self.user.has_perm(permission)
+            setattr(self, '%s_cache' % permission, data)
             return data
 
 

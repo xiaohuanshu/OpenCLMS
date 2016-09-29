@@ -1,19 +1,21 @@
 # -*- coding: utf-8 -*-
 __author__ = 'xiaohuanshu'
-from django.shortcuts import render_to_response, RequestContext, redirect
-from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
+import json
+
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-import json
-from rbac.auth import resourcejurisdiction_view_auth, is_user_has_resourcejurisdiction
+from django.shortcuts import render_to_response, RequestContext, redirect
+
+from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
+from user.auth import permission_required
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_schoolterm')
+@permission_required(permission='school_schoolterm_view')
 def schoolterm(request):
     if request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('termname', default=False) and request.POST.get(
             'termyear', default=False) and request.POST.get('termstartdate', default=False) and request.POST.get(
         'termenddate', default=False):
-        if not is_user_has_resourcejurisdiction(request.user, 'modify_schoolterm'):
+        if not request.user.has_perm('school_schoolterm_modify'):
             HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
         if request.POST.get('termid', default=False):
             oldterm = Schoolterm.objects.get(id=request.POST.get('termid'))
@@ -44,12 +46,12 @@ def schoolterm(request):
     return render_to_response('schoolterm.html', {'term': term}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_classtime')
+@permission_required(permission='school_classtime_view')
 def classtime(request):
     if request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('pk', default=False) and request.POST.get('name',
                                                                                                                default=False) and request.POST.get(
         'value', default=False):
-        if not is_user_has_resourcejurisdiction(request.user, 'modify_classtime'):
+        if not request.user.has_perm('school_classtime_modify'):
             HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
         data = Classtime.objects.get(id=request.POST.get('pk'))
         if request.POST.get('name') == 'starttime':
@@ -64,12 +66,12 @@ def classtime(request):
                               context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_class')
+@permission_required(permission='school_class_view')
 def classlist(request):
     return render_to_response('class.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_class')
+@permission_required(permission='school_class_view')
 def classdata(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -110,12 +112,12 @@ def classdata(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_major')
+@permission_required(permission='school_major_view')
 def majorlist(request):
     return render_to_response('major.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_major')
+@permission_required(permission='school_major_view')
 def majordata(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -142,12 +144,12 @@ def majordata(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_department')
+@permission_required(permission='school_department_view')
 def departmentlist(request):
     return render_to_response('department.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_department')
+@permission_required(permission='school_department_view')
 def departmentdata(request):
     limit = int(request.GET['limit'])
     offset = int(request.GET['offset'])
@@ -170,12 +172,12 @@ def departmentdata(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_administration')
+@permission_required(permission='school_administration_view')
 def administrationlist(request):
     return render_to_response('administration.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_administration')
+@permission_required(permission='school_administration_view')
 def administrationdata(request):
     limit = int(request.GET['limit'])
     offset = int(request.GET['offset'])
@@ -184,7 +186,7 @@ def administrationdata(request):
     if not search == '':
         count = administrationdata.filter(name__icontains=search).count()
         administrationdata = administrationdata.filter(name__icontains=search)[
-                         offset: (offset + limit)]
+                             offset: (offset + limit)]
     else:
         count = administrationdata.count()
         administrationdata = administrationdata.all()[offset: (offset + limit)]
@@ -197,12 +199,12 @@ def administrationdata(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_classroom')
+@permission_required(permission='school_classroom_view')
 def classroomlist(request):
     return render_to_response('classroom.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_classroom')
+@permission_required(permission='school_classroom_view')
 def classroomdata(request):
     limit = int(request.GET['limit'])
     offset = int(request.GET['offset'])
@@ -211,7 +213,7 @@ def classroomdata(request):
     if not search == '':
         count = classroomdata.filter(location__icontains=search).count()
         classroomdata = classroomdata.filter(location__icontains=search)[
-                         offset: (offset + limit)]
+                        offset: (offset + limit)]
     else:
         count = classroomdata.count()
         classroomdata = classroomdata.all()[offset: (offset + limit)]

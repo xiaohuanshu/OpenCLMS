@@ -24,7 +24,6 @@ urlpatterns = [
     url(r'^school/', include('school.urls', namespace="school")),
     url(r'^course/', include('course.urls', namespace="course")),
     url(r'^checkin/', include('checkin.urls', namespace="checkin")),
-    url(r'^rbac/', include('rbac.urls', namespace="rbac")),
     #url(r'^seat$', 'center.views.seat', name='seat'),
 ]
 

@@ -1,8 +1,8 @@
 from django.shortcuts import render_to_response, RequestContext
+
+from course.models import Studentcourse, Lesson, Course
 from school.function import getCurrentSchoolYearTerm, getnowlessontime
 from school.models import Student, Teacher
-from course.models import Studentcourse, Lesson, Course
-from rbac.auth import resourcejurisdiction_view_auth
 
 
 # Create your views here.

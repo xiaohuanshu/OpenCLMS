@@ -1,18 +1,20 @@
 # -*- coding: utf-8 -*-
 import json
-from django.http import HttpResponse
-from models import Student
+
 from django.db.models import Q
+from django.http import HttpResponse
 from django.shortcuts import render_to_response, RequestContext
-from rbac.auth import resourcejurisdiction_view_auth
+
+from models import Student
+from user.auth import permission_required
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_student')
+@permission_required(permission='school_student_view')
 def studentlist(request):
     return render_to_response('student_list.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_student')
+@permission_required(permission='school_student_view')
 def data(request):
     order = request.GET['order']
     limit = int(request.GET['limit'])
@@ -70,7 +72,7 @@ def data(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_student')
+@permission_required(permission='school_student_view')
 def selectdata(request):
     wd = request.GET['wd']
     limit = 5

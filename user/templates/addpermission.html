@@ -63,7 +63,7 @@
     <script>
         $('#role').chosen({width: '100%'});
         $('#role').on('change', function (evt, params) {
-            window.location.href = "{% url 'rbac:jurisdiction_setup' %}?role=" + $(this).children('option:selected').val();
+            window.location.href = "{% url 'user:addpermission' %}?role=" + $(this).children('option:selected').val();
         });
         {% if request.GET.role %}
             $('#tree').treeview({
@@ -92,7 +92,14 @@
             $('#submit').click(function () {
                 checked = [];
                 $.each($('#tree').treeview('getChecked'), function () {
-                    checked.push(this.id);
+                    var fullname=this.name;
+                    var parentid = this.parentId;
+                    while (typeof(parentid) != "undefined") {
+                        var parenttree = $('#tree').treeview('getNode', parentid);
+                        fullname = parenttree.name + "_" + fullname;
+                        parentid = parenttree.parentId;
+                    }
+                    checked.push(fullname);
                 });
                 $.post("#", {checked: checked, csrfmiddlewaretoken: '{{ csrf_token }}'}, function (data) {
                     alert('修改成功');

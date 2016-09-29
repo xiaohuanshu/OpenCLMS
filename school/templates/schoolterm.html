@@ -30,7 +30,7 @@
                             <th>开始日期</th>
                             <th>结束日期</th>
                             <th>状态</th>
-                            {% if perms.modify_schoolterm %}
+                            {% if perms.school_schoolterm_modify %}
                                 <th>操作<a class=" btn btn-success btn-xs" id="creatnewterm"> 创建新的学期</a></th>
                             {% endif %}
                         </tr>
@@ -49,7 +49,7 @@
                                         <span class="label label-default">无</span>
                                     {% endif %}
                                 </td>
-                                {% if perms.modify_schoolterm %}
+                                {% if perms.school_schoolterm_modify %}
                                     <td>
                                         {% if not t.now %}
                                             <a href="#" class="btn btn-primary btn-xs changeterm" termid="{{ t.id }}"><i
@@ -67,7 +67,7 @@
                         {% endfor %}
                         </tbody>
                     </table>
-                    {% if perms.modify_schoolterm %}
+                    {% if perms.school_schoolterm_modify %}
                         <!-- Modal -->
 
 
@@ -199,7 +199,7 @@
 
 {% endblock %}
 {% block page_script %}
-    {% if perms.modify_schoolterm %}
+    {% if perms.school_schoolterm_modify %}
         <script>
             $.fn.datepicker.dates['cn'] = {
                 days: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],

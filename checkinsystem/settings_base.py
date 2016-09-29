@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'school',
     'course',
     'checkin',
-    'rbac',
+    #'rbac'
 
 ]
 
@@ -68,7 +68,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 # Own processors
                 'course.context_processors.todaylesson',
-                'rbac.context_processors.auth',
+                'user.context_processors.auth',
             ],
         },
     },

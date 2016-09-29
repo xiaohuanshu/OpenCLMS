@@ -1,10 +1,10 @@
-from rbac.auth import is_user_has_resourcejurisdiction
-from school.models import Teacher
 from django.db.models import ObjectDoesNotExist
+
+from school.models import Teacher
 
 
 def has_course_permission(user, course):
-    if is_user_has_resourcejurisdiction(user, 'control_course'):
+    if user.has_perm('course_control'):
         return True
     try:
         teacher = Teacher.objects.get(user=user)

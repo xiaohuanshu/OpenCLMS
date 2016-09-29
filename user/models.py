@@ -1,6 +1,10 @@
 # -*- coding: utf-8 -*-
+from django.contrib.postgres.fields import ArrayField
 from django.db import models
+from django.core.cache import cache
 from center.functional import classmethod_cache
+from django.dispatch import receiver
+from django.db.models.signals import post_save
 
 
 # Create your models here.
@@ -8,9 +12,7 @@ from center.functional import classmethod_cache
 
 class Role(models.Model):
     name = models.CharField(max_length=20, blank=True, null=True)
-    resourcejurisdiction = models.ManyToManyField('rbac.Resourcejurisdiction',
-                                                  through='rbac.Roletoresourcejurisdiction',
-                                                  through_fields=('role', 'resourcejurisdiction'))
+    permission = ArrayField(models.CharField(max_length=50), blank=True, default=[])
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -23,7 +25,7 @@ class User(models.Model):
     username = models.CharField(max_length=20, blank=True, null=True)
     openid = models.CharField(max_length=28, blank=True, null=True)
     password = models.CharField(max_length=32, blank=True, null=True)
-    sex = models.IntegerField(blank=True, null=True)
+    sex = models.IntegerField(blank=True, null=True, default=1)
     ip = models.GenericIPAddressField(protocol='IPv4', blank=True, null=True)
     registertime = models.DateTimeField(blank=True, null=True)
     lastlogintime = models.DateTimeField(blank=True, null=True)
@@ -40,9 +42,19 @@ class User(models.Model):
     def isstudent(self):
         return self.role.filter(name='学生').exists()
 
-    def hasresourcejurisdiction(self, jurisdiction):
-        from rbac.auth import is_user_has_resourcejurisdiction
-        return is_user_has_resourcejurisdiction(self, jurisdiction)
+    def has_perm(self, permission):
+        # permbool = Role.objects.filter(user=self,permission__contains=[permission]).exists()
+        perm_cache = cache.get('perm_%d_cache' % self.id)
+        if not perm_cache:
+            perms_cache = []
+            perms = list(Role.objects.filter(user=self).values_list('permission', flat=True))
+            for p in perms:
+                perms_cache = list(set(perms_cache).union(set(p)))
+            cache.set('perm_%d_cache' % self.id, perms_cache, 86400)
+        if permission in perm_cache:
+            return True
+        else:
+            return False
 
     def updateavatarfromwechat(self):
         if self.openid is not None:
@@ -70,3 +82,14 @@ class Usertorole(models.Model):
 
     class Meta:
         db_table = 'UsertoRole'
+
+
+@receiver(post_save, sender=Role)
+def role_pre_save(sender, **kwargs):
+    for user in kwargs['instance'].usertorole_set.values('user'):
+        cache.delete('perm_%d_cache' % user['user'])
+
+
+@receiver(post_save, sender=Usertorole)
+def usertorole_pre_save(sender, **kwargs):
+    cache.delete('perm_%d_cache' % kwargs['instance'].user.id)

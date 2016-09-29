@@ -1,16 +1,19 @@
 # -*- coding: utf-8 -*-
-from django.shortcuts import render_to_response, RequestContext, redirect
-from rbac.auth import resourcejurisdiction_view_auth, is_user_has_resourcejurisdiction
-from user.models import User
-from django.http import HttpResponse
 import json
 
-@resourcejurisdiction_view_auth(jurisdiction='view_userlist')
+from django.http import HttpResponse
+from django.shortcuts import render_to_response, RequestContext
+
+from user.auth import permission_required
+from user.models import User
+
+
+@permission_required(permission='user_viewlist')
 def userlist(request):
     return render_to_response('user.html', {}, context_instance=RequestContext(request))
 
 
-@resourcejurisdiction_view_auth(jurisdiction='view_userlist')
+@permission_required(permission='user_viewlist')
 def userdata(request):
     limit = int(request.GET['limit'])
     offset = int(request.GET['offset'])

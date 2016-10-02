@@ -123,7 +123,7 @@
                                         <td>{{ lesson.day|weekdeal }} 第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
                                         <td>{{ lesson.classroom.location }}</td>
                                         <td>
-                                            <span class="badge bg-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</span>
+                                            <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
                                     </tr>
                                 {% endfor %}
@@ -147,7 +147,7 @@
                                         <td>{{ course.time }}</td>
                                         <td>{{ course.location }}</td>
                                         <td>
-                                            <span class="badge bg-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</span>
+                                            <small class="label label-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</small>
                                         </td>
                                     </tr>
                                 {% endfor %}

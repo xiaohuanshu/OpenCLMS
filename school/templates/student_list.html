@@ -10,8 +10,6 @@
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
-    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
-    <script src="{% static 'plugins/bootstrap-table/extensions/export/tableExport.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
 {% endblock %}
@@ -78,7 +76,6 @@
                                data-toolbar="#custom-toolbar"
                                data-striped="true"
                                data-query-params="queryParams"
-                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
                                data-search-text="{{ request.GET.search }}"
                         >
 

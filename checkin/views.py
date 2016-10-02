@@ -50,7 +50,7 @@ def checkin(request, lessonid):
 
 def lesson_data(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
-    if not has_course_permission(request.user, lesson.course):
+    if not (has_course_permission(request.user, lesson.course) or request.user.has_perm('checkin_view')):
         return render_to_response('error.html',
                                   {'message': '没有权限'},
                                   context_instance=RequestContext(request))
@@ -106,7 +106,7 @@ def course_data(request, courseid):
                         CHECKIN_STATUS_LATE: u"迟到", CHECKIN_STATUS_CANCEL: u"取消"}
         modify = True
     course = Course.objects.get(id=courseid)
-    if not has_course_permission(request.user, course):
+    if not (has_course_permission(request.user, course) or request.user.has_perm('checkin_view')):
         return render_to_response('error.html',
                                   {'message': '没有权限'},
                                   context_instance=RequestContext(request))
@@ -165,6 +165,10 @@ def course_data(request, courseid):
 
 def student_data(request, studentid):
     student = Student.objects.get(studentid=studentid)
+    if not (student.user == request.user or request.user.has_perm('checkin_view')):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     studentcourse = Studentcourse.objects.filter(student=student).all()
     coursecount = studentcourse.count()
     course = {}
@@ -223,6 +227,10 @@ def student_data(request, studentid):
 
 def teacher_data(request, teacherid):
     teacher = Teacher.objects.get(teacherid=teacherid)
+    if not (teacher.user == request.user or request.user.has_perm('checkin_view')):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
     teachercourse = Course.objects.filter(teacher=teacher).all()
     coursecount = teachercourse.count()
     course = {}

@@ -41,6 +41,8 @@ def changecheckinstatus(request, lessonid):
     studentid = request.GET.get('studentid', default=False) or request.GET.get('pk')
     newstatus = request.GET.get('newstatus', default=False) or request.GET.get('value')
     student = Student.objects.get(studentid=studentid)
+    if not (has_course_permission(request.user, lesson.course) or request.user.has_perm('checkin_modify')):
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
     try:
         checkin = Checkin.objects.get(student=student, lesson=lesson)
     except ObjectDoesNotExist:

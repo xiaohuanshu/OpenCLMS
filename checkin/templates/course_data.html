@@ -17,8 +17,6 @@
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
-    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
-    <script src="{% static 'plugins/tableExport/tableExport.js' %}"></script>
     <script src="{% static 'plugins/x-editable/js/bootstrap-editable.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
@@ -53,7 +51,6 @@
                                data-side-pagination="client"
                                data-toolbar="#custom-toolbar"
                                data-striped="true"
-                               data-export-types="['png', 'doc', 'csv', 'txt', 'excel', 'powerpoint', 'pdf']"
                         >
                         </table>
                     </div>

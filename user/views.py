@@ -17,6 +17,7 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from permission import permission_data
+from auth import permission_required
 
 
 def login(request):
@@ -200,7 +201,7 @@ def authentication(request):
     else:
         return render_to_response('authentication.html', {}, context_instance=RequestContext(request))
 
-
+@permission_required(permission='user_addpermission')
 def add_permission(request):
     if request.META['REQUEST_METHOD'] == 'POST':
         rolename = request.GET.get('role', default=None)

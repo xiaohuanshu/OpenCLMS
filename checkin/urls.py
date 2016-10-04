@@ -5,7 +5,6 @@ urlpatterns = [
 
     url(r'^qrcheckin/(\d+)$', views.checkin, name='qrcheckin'),
     url(r'^ck/([^/]+)$', control.ck, name='qrck'),
-    url(r'^ck/$', control.ck, name='ckurl'),
     url(r'^ajax/getqrstr/(\d+)$', control.getqrstr, name='getqrstr'),
     url(r'^ajax/getcheckinnowdata/(\d+)$', control.getcheckinnowdata, name='getcheckinnowdata'),
     url(r'^ajax/changecheckinstatus/(\d+)$', control.changecheckinstatus, name='changecheckinstatus'),

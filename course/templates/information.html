@@ -74,7 +74,7 @@
                             </dl>
                         </div>
                     </div>
-                    {% if courseperms %}
+                    {% if courseperms or perms.checkin_view %}
                         <div class="row">
                             <div class="col-sm-3">
                                 <button type="button" class="btn btn-info btn-block"
@@ -84,7 +84,7 @@
                             </div>
                             <div class="col-sm-3">
                                 <button type="button" class="btn btn-primary btn-block"
-                                        onclick="window.location.href = ''">
+                                        onclick="window.location.href = '{% url 'course:studentcourse' coursedata.id %}'">
                                     学生列表
                                 </button>
                             </div>

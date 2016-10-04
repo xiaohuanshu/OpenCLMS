@@ -18,6 +18,9 @@ from school.function import getCurrentSchoolYearTerm
 
 
 def getqrstr(request, lessonid):
+    lesson=Lesson.objects.get(id=lessonid)
+    if not (has_course_permission(request.user, lesson.course) or request.user.has_perm('course_control')):
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
     str = generateqrstr(lessonid)
     data = {'qr': str}
     return HttpResponse(json.dumps(data), content_type="application/json")

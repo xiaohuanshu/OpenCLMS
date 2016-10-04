@@ -6,7 +6,8 @@ from django.http import HttpResponse
 from django.shortcuts import render_to_response, RequestContext
 
 from course.auth import has_course_permission
-from models import Course, Lesson
+from models import Course, Lesson, Studentcourse
+from school.models import Student
 from user.auth import permission_required
 
 
@@ -69,3 +70,13 @@ def data(request):
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def studentcourse(request, courseid):
+    coursedata = Course.objects.get(id=courseid)
+    students = Studentcourse.objects.filter(course=coursedata).select_related('student', 'student__classid',
+                                                                              'student__classid__major',
+                                                                              'student__classid__department').all()
+    return render_to_response('studentcourse.html',
+                              {'coursedata': coursedata, 'students': students},
+                              context_instance=RequestContext(request))

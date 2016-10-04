@@ -234,7 +234,7 @@
                                         <td>
                                             <div class="btn-group">
                                                 <button data-toggle="dropdown"
-                                                        class="btn btn-{{ s.status | CHECKIN_STATUS_STYLE }} dropdown-toggle btn-xs"
+                                                        class="btn bg-{{ s.status | CHECKIN_STATUS_STYLE }} dropdown-toggle btn-xs"
                                                         type="button"
                                                         aria-expanded="false">{{ s.status | CHECKIN_STATUS }}
                                                 </button>
@@ -328,33 +328,33 @@
         var numberData = [
             {
                 value: {{ checkin_success }},
-                color: "#6CCAC9",
-                highlight: "#90CAC9",
+                color: "#00a65a",
+                highlight: "#008d4c",
                 label: "正常"
             }, {
                 value: {{ checkin_normal }},
-                color: "#797979",
-                highlight: "#A09F9F",
+                color: "#d2d6de",
+                highlight: "#b5bbc8",
                 label: "未到"
             }, {
                 value: {{ asknumber }},
-                color: "#57C8F2",
-                highlight: "#79CDEC",
+                color: "#0073b7",
+                highlight: "#357ca5",
                 label: "请假"
             }, {
                 value: {{ checkin_late }},
-                color: "#FF6C60",
-                highlight: "#F38F86",
+                color: "#d81b60",
+                highlight: "#ca195a",
                 label: "迟到"
             }, {
                 value: {{ checkin_early }},
-                color: "#F38630",
-                highlight: "#F39A54",
+                color: "#f012be",
+                highlight: "#db0ead",
                 label: "早退"
             }, {
                 value: {{ checkin_lateearly }},
-                color: "#FFAD60",
-                highlight: "#F3BF8F",
+                color: "#605ca8",
+                highlight: "#555299",
                 label: "迟到早退"
             }
         ];
@@ -398,7 +398,7 @@
                         $("#sl" + studentid).data("status", value.status);
                         $("#sl" + studentid + " td:eq(5) button").removeClass("btn-danger");
                         $("#sl" + studentid + " td:eq(5) button").removeClass("btn-success");
-                        $("#sl" + studentid + " td:eq(5) button").addClass("btn-" + checkin_status_style_json[value.status]);
+                        $("#sl" + studentid + " td:eq(5) button").addClass("bg-" + checkin_status_style_json[value.status]);
                         $("#sl" + studentid + " td:eq(5) button").text(checkin_status_json[value.status]);
                     }
                 },

@@ -16,9 +16,9 @@ def CHECKIN_STATUS_JSON():
 
 @register.assignment_tag
 def CHECKIN_STATUS_STYLE_JSON():
-    data = {CHECKIN_STATUS_NORMAL: "gray", CHECKIN_STATUS_SUCCESS: "success", CHECKIN_STATUS_EARLY: "orange",
+    data = {CHECKIN_STATUS_NORMAL: "gray", CHECKIN_STATUS_SUCCESS: "green", CHECKIN_STATUS_EARLY: "fuchsia",
             CHECKIN_STATUS_LATEEARLY: "purple",
-            CHECKIN_STATUS_LATE: "danger", CHECKIN_STATUS_ASK: "info", CHECKIN_STATUS_CANCEL: "warning"}
+            CHECKIN_STATUS_LATE: "maroon", CHECKIN_STATUS_ASK: "blue", CHECKIN_STATUS_CANCEL: "yellow"}
     return json.dumps(data)
 
 
@@ -57,17 +57,17 @@ def CHECKIN_STATUS_STYLE(status):
     if status == CHECKIN_STATUS_NORMAL:
         return 'gray'
     elif status == CHECKIN_STATUS_SUCCESS:
-        return 'success'
+        return 'green'
     elif status == CHECKIN_STATUS_EARLY:
-        return 'orange'
+        return 'fuchsia'
     elif status == CHECKIN_STATUS_LATEEARLY:
         return 'purple'
     elif status == CHECKIN_STATUS_LATE:
-        return 'danger'
+        return 'maroon'
     elif status == CHECKIN_STATUS_ASK:
-        return 'info'
+        return 'blue'
     elif status == CHECKIN_STATUS_CANCEL:
-        return 'warning'
+        return 'yellow'
 
 
 @register.assignment_tag

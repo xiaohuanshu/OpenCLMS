@@ -11,7 +11,8 @@ SECRET_KEY = ''
 DEBUG = False
 
 ALLOWED_HOSTS = ['*']
-DOMAIN = ''
+DOMAIN = 'http://DOMAIN'
+CHECKINURL = 'http://DOMAIN/checkin/ck'
 
 # Super admin password
 SAFENUMBER = ''

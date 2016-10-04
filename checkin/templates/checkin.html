@@ -290,9 +290,9 @@
         student = new Array();
         time = 0;
         toastEnable = true;
-        {% DOMAIN as domain%}
-        domain = "{{ domain }}{% url 'checkin:ckurl' %}";
-        qrstr = domain + '{{ firstqrstr }}';
+        {% CHECKINURL as checkinurl%}
+        checkinurl = "{{ checkinurl }}/";
+        qrstr = checkinurl + '{{ firstqrstr }}';
         loadingtimeid = null;
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         checkin_status_json ={{ checkin_status_json|safe }};
@@ -338,8 +338,7 @@
                 contentType: "application/json; charset=utf-8",
                 url: '{% url 'checkin:getqrstr' lessondata.id %}',
                 success: function (str) {
-                    {% DOMAIN as domain%}
-                    qrstr = domain + str.qr;
+                    qrstr = checkinurl + str.qr;
                     //generateqr();
                 }
             });

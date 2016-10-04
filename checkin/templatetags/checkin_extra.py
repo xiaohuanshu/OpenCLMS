@@ -68,3 +68,9 @@ def CHECKIN_STATUS_STYLE(status):
         return 'info'
     elif status == CHECKIN_STATUS_CANCEL:
         return 'warning'
+
+
+@register.assignment_tag
+def CHECKINURL():
+    from django.conf import settings
+    return settings.CHECKINURL

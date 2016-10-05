@@ -15,7 +15,7 @@ class UserMiddleware(object):
         urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
         allow_url = ['user:login', 'user:loginProcess', 'user:register', 'user:logout',
                      'user:check_username', 'user:check_email', 'user:registerProcess',
-                     'wechat:api', 'wechat:oauth']
+                     'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword']
         if request.session.get('username', '') == '':
             if request.COOKIES.has_key('username'):
                 remembercode = request.COOKIES['remembercode']

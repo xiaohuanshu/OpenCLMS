@@ -56,24 +56,26 @@
     <!-- Modal -->
     <div aria-hidden="true" aria-labelledby="myModalLabel" role="dialog" tabindex="-1" id="myModal"
          class="modal fade">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header">
-                    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h4 class="modal-title">忘记密码 ?</h4>
-                </div>
-                <div class="modal-body">
-                    <p>输入你的E-mail地址,我们将为您发送密码重置连接</p>
-                    <input type="text" name="email" placeholder="Email" autocomplete="off"
-                           class="form-control placeholder-no-fix">
+        <form action="{% url 'user:forgetpassword' %}" method="get">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">忘记密码 ?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>输入你的E-mail地址,我们将为您发送密码重置连接</p>
+                        <input type="text" name="email" placeholder="Email" autocomplete="off"
+                               class="form-control placeholder-no-fix">
 
-                </div>
-                <div class="modal-footer">
-                    <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
-                    <button class="btn btn-success" type="button">发送</button>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <button class="btn btn-success" type="submit">发送</button>
+                    </div>
                 </div>
             </div>
-        </div>
+        </form>
     </div>
     <!-- modal -->
 {% endblock %}

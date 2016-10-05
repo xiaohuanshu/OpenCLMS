@@ -18,6 +18,9 @@ from django.contrib.auth.hashers import make_password
 from django.conf import settings
 from permission import permission_data
 from auth import permission_required
+from django.core.cache import cache
+from django.core.mail import EmailMultiAlternatives
+import uuid
 
 
 def login(request):
@@ -201,6 +204,7 @@ def authentication(request):
     else:
         return render_to_response('authentication.html', {}, context_instance=RequestContext(request))
 
+
 @permission_required(permission='user_addpermission')
 def add_permission(request):
     if request.META['REQUEST_METHOD'] == 'POST':
@@ -244,3 +248,46 @@ def add_permission(request):
             tree = json.dumps(treedata(permission_data))
             mdata['jurisdictiondata'] = tree
         return render_to_response('addpermission.html', mdata, context_instance=RequestContext(request))
+
+
+def forgetpassword(request):
+    email = request.GET.get('email')
+    try:
+        user = User.objects.get(email=email)
+    except ObjectDoesNotExist:
+        return render_to_response('error.html', {'message': u'找回密码失败', 'submessage': u'没有找到此Email对应的用户'},
+                                  context_instance=RequestContext(request))
+    uuidstr = uuid.uuid1().hex
+    cache.set('fp%s' % uuidstr, user.id, 600)
+    subject, form_email, to = '【checkinsystem】找回密码邮件', settings.SERVER_EMAIL, email
+    text_content = u'亲爱的%s您好,请点击下面的链接找回密码:\n%s%s\n此链接10分钟内有效,请尽快修改密码。\n如果您没有发起找回密码,请无视此邮件' % (
+        user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]))
+    html_content = u'亲爱的%s您好,<br>请点击下面的链接找回密码:<br><a href="%s%s">%s%s</a><br>此链接10分钟内有效,请尽快修改密码。<br>如果您没有发起找回密码,请无视此邮件' % (
+        user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]), settings.DOMAIN,
+        reverse('user:resetpassword', args=[uuidstr]))
+    msg = EmailMultiAlternatives(subject, text_content, form_email, [to])
+    msg.attach_alternative(html_content, 'text/html')
+    msg.send()
+    return render_to_response('success.html',
+                              {'message': u'邮件发送成功', 'submessage': u'密码找回邮件已发送至%s' % email},
+                              context_instance=RequestContext(request))
+
+
+def resetpassword(request, uuidstr):
+    userid = cache.get('fp%s' % uuidstr)
+    if userid is None:
+        return render_to_response('error.html', {'message': u'连接失效', 'submessage': u'连接无效或已经超时'},
+                                  context_instance=RequestContext(request))
+    else:
+        if request.META['REQUEST_METHOD'] == 'POST':
+            password = request.POST.get('password')
+            m = hashlib.md5()
+            m.update(password)
+            password = m.hexdigest()
+            User.objects.filter(id=userid).update(password=password)
+            cache.delete('fp%s' % uuidstr)
+            return render_to_response('success.html', {'message': u'重置成功', 'submessage': u'密码重置成功',
+                                                       'jumpurl': reverse('user:login', args=[])},
+                                      context_instance=RequestContext(request))
+        else:
+            return render_to_response('resetpassword.html', {}, context_instance=RequestContext(request))

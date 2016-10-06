@@ -6,7 +6,7 @@ from school.models import Classroom
 from constant import *
 from django.db.models import ObjectDoesNotExist, Q
 import time
-from function import getweek, gettime, getday, t, splitlesson
+from function import getweek, gettime, getday, t, splitlesson, simplifytime
 from center.functional import classmethod_cache
 
 
@@ -46,6 +46,10 @@ class Course(models.Model):
         lessoncount = Lesson.objects.filter(course=self).count()
         lessonallreadycount = Lesson.objects.filter(course=self, status=LESSON_STATUS_END).count()
         return "%d" % ((lessonallreadycount / (lessoncount * 1.0)) * 100)
+
+    def simplifytime(self):
+        self.time, self.location = simplifytime(self.time, self.location)
+        self.save()
 
     def generatelesson(self):
         count = 0

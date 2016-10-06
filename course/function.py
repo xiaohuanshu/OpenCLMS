@@ -2,6 +2,8 @@
 __author__ = 'xiaohuanshu'
 import re
 
+weekstring = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+
 
 def getweek(str):
     gweek = re.findall(u"(?<=\{第).*?(?=周\})", str, re.DOTALL)[0]
@@ -80,3 +82,25 @@ def splitlesson(timestr, classroomstr):
     return data
 
 
+def simplifytime(timestr, classroomstr):
+    data = splitlesson(timestr, classroomstr)
+    simplifydata = []
+
+    for d in data:
+        addflag = False
+        for s in simplifydata:
+            # print simplifydata
+            if s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == d[
+                'length'] and s['weeklength'] + s['week'] == d['week']:
+                s['weeklength'] += 1
+                addflag = True
+                break
+        if not addflag:
+            d.update({'weeklength': 1})
+            simplifydata.append(d)
+    newtimestr = ';'.join(["%s第%s节{第%d-%d周}" % (
+        weekstring[s['day']],
+        ','.join([str(e) for e in range(s['time'], s['time'] + s['length'])]),
+        s['week'], s['week'] + s['weeklength'] - 1) for s in simplifydata])
+    newclassroomstr = ';'.join(s['location'] for s in simplifydata)
+    return newtimestr, newclassroomstr

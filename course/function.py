@@ -6,10 +6,16 @@ weekstring = ['周日', '周一', '周二', '周三', '周四', '周五', '周�
 
 
 def getweek(str):
-    gweek = re.findall(u"(?<=\{第).*?(?=周\})", str, re.DOTALL)[0]
+    gweek = re.findall(u"(?<=\{第).*?(?=周[\}\|])", str, re.DOTALL)[0]
     week2 = gweek.split('-')
     we = []
+    issingle = u'|单周' in str
+    isdouble = u'|双周' in str
     for i in range(int(week2[0]), int(week2[1]) + 1):
+        if issingle and i % 2 == 0:
+            continue
+        if isdouble and i % 2 == 1:
+            continue
         we.append(i)
     return we
 
@@ -91,16 +97,25 @@ def simplifytime(timestr, classroomstr):
         for s in simplifydata:
             # print simplifydata
             if s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == d[
-                'length'] and s['weeklength'] + s['week'] == d['week']:
+                'length'] and s['weeklength'] + s['week'] == d['week'] and 'interval' not in s:
                 s['weeklength'] += 1
+                addflag = True
+                break
+            elif s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == \
+                    d['length'] and s['weeklength'] + s['week'] + 1 == d['week'] and (
+                            'interval' in s or s['weeklength'] == 1):
+                s['weeklength'] += 2
+                s['interval'] = True
                 addflag = True
                 break
         if not addflag:
             d.update({'weeklength': 1})
             simplifydata.append(d)
-    newtimestr = ';'.join(["%s第%s节{第%d-%d周}" % (
+    newtimestr = ';'.join(["%s第%s节{第%d-%d周%s}" % (
         weekstring[s['day']],
         ','.join([str(e) for e in range(s['time'], s['time'] + s['length'])]),
-        s['week'], s['week'] + s['weeklength'] - 1) for s in simplifydata])
+        s['week'], s['week'] + s['weeklength'] - 1,
+        (('interval' in s and s['interval']) and '|' + (s['week'] % 2 == 0 and '双周' or '单周') or '')) for s in
+                           simplifydata])
     newclassroomstr = ';'.join(s['location'] for s in simplifydata)
     return newtimestr, newclassroomstr

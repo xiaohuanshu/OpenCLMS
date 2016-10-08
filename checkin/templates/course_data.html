@@ -103,7 +103,7 @@
             if (value == "undefined") {
                 $(this).text();
             }else {
-                $(this).html("<button class='btn btn-xs btn-" + checkin_status_style_json[value] + "'>" + checkin_status_json[value] + "</button>");
+                $(this).html("<button class='btn btn-xs bg-" + checkin_status_style_json[value] + "'>" + checkin_status_json[value] + "</button>");
             }
         };
         $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.newrows|safe}}, idField: 'studentid'});

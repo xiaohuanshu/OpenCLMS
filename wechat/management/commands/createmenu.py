@@ -19,24 +19,14 @@ class Command(BaseCommand):
                         {
                             'type': 'view',
                             'name': u'个人数据',
-                            'url': '%s/checkin/data/personal_data'%settings.DOMAIN
+                            'url': '%s/checkin/data/personal_data' % settings.DOMAIN
                         }
                     ]
                 },
                 {
-                    'name': u'信息',
-                    'sub_button': [
-                        {
-                            'type': 'view',
-                            'name': u'个人课表',
-                            'url': '%s/course/schedule'%settings.DOMAIN
-                        },
-                        {
-                            'type': 'view',
-                            'name': u'课程查询',
-                            'url': '%s/course/list'%settings.DOMAIN
-                        }
-                    ]
+                    'type': 'view',
+                    'name': u'个人课表',
+                    'url': '%s/course/schedule' % settings.DOMAIN
                 },
                 {
                     'name': u'其他',

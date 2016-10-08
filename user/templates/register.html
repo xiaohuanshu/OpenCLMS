@@ -155,7 +155,7 @@
                             message: '两次输入的密码不一致'
                         }
                     }
-                },
+                }/*,
                 agree: {
                     validators: {
                         choice: {
@@ -164,21 +164,21 @@
                             message: ' '
                         }
                     }
-                }
+                }*/
             }
         });
-        var bootstrapValidator = $('#signupForm').data('bootstrapValidator');
+        /*var bootstrapValidator = $('#signupForm').data('bootstrapValidator');
         $('#agree').on('ifChanged', function (event) {
             $('#agree').iCheck('update');
             bootstrapValidator.updateStatus('agree', 'NOT_VALIDATED', null);
             bootstrapValidator.validateField('agree');
-            /*if(console.log($('#agree').is(':checked'))){
+            if(console.log($('#agree').is(':checked'))){
                 bootstrapValidator.updateStatus('agree', 'INVALID', null)
             }else{
                 bootstrapValidator.updateStatus('agree', 'VALID', null)
-            }*/
+            }
             //bootstrapValidator.validateField('agree');
-        });
-    //TODO improve bootstrapvalidator agree balidator
+        });*/
+    //TODO add bootstrapvalidator agree balidator(something error happen)
     </script>
 {% endblock %}

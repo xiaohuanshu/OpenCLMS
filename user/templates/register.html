@@ -78,16 +78,13 @@
                 radioClass: 'iradio_square-blue',
                 increaseArea: '20%' // optional
             });
-            $('#agree').on('ifChanged', function (event) {
-                $('#agree').iCheck('update');
-                $('#signupForm').bootstrapValidator('validateField','agree');
-            });/*
-            $('#agree').on('ifChecked', function (event) {
-                $('#agree').attr('checked',true);
-            });
-            $('#agree').on('ifUnchecked', function (event) {
-                $('#agree').attr('checked',false);
-            });*/
+            /*
+             $('#agree').on('ifChecked', function (event) {
+             $('#agree').attr('checked',true);
+             });
+             $('#agree').on('ifUnchecked', function (event) {
+             $('#agree').attr('checked',false);
+             });*/
         });
     </script>
 
@@ -165,8 +162,21 @@
                             message: ' '
                         }
                     }
-                },
+                }
             }
         });
+        var bootstrapValidator = $('#signupForm').data('bootstrapValidator');
+        $('#agree').on('ifChanged', function (event) {
+            $('#agree').iCheck('update');
+            bootstrapValidator.updateStatus('agree', 'NOT_VALIDATED', null);
+            bootstrapValidator.validateField('agree');
+            /*if(console.log($('#agree').is(':checked'))){
+                bootstrapValidator.updateStatus('agree', 'INVALID', null)
+            }else{
+                bootstrapValidator.updateStatus('agree', 'VALID', null)
+            }*/
+            //bootstrapValidator.validateField('agree');
+        });
+    //TODO improve bootstrapvalidator agree balidator
     </script>
 {% endblock %}

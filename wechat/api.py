@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 __author__ = 'xiaohuanshu'
 from django.http.response import HttpResponse, HttpResponseBadRequest, HttpResponseRedirect
-from wechat_sdk import WechatBasic
+from wechat_sdk import WechatBasic, WechatConf
 from wechat_sdk.exceptions import ParseError
 from wechat_sdk.messages import (
     TextMessage, VoiceMessage, ImageMessage, VideoMessage, LinkMessage, LocationMessage, EventMessage
@@ -16,27 +16,45 @@ from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
 
-# 实例化 WechatBasic
-access_token = cache.get('access_token')
-if not access_token:
-    wechat = WechatBasic(
-        token=settings.TOKEN,
-        appid=settings.APPID,
-        appsecret=settings.APPSECRET
-    )
-    get_access_token = wechat.get_access_token()
-    access_token = get_access_token['access_token']
-    access_token_expires_at = get_access_token['access_token_expires_at']
+
+def get_access_token_function():
+    access_token = cache.get('access_token')
+    if access_token:
+        return access_token
+    else:
+        return (None, None)
+
+
+def set_access_token_function(access_token, access_token_expires_at):
+    access_token=(access_token,access_token_expires_at)
     cache.set('access_token', access_token, 7000)
-    cache.set('access_token_expires_at', access_token_expires_at, 7000)
-else:
-    wechat = WechatBasic(
-        token=settings.TOKEN,
-        appid=settings.APPID,
-        appsecret=settings.APPSECRET,
-        access_token=access_token,
-        access_token_expires_at=cache.get('access_token_expires_at')
-    )
+
+def get_jsapi_ticket_function():
+    jsapi_ticket = cache.get('jsapi_ticket')
+    if jsapi_ticket:
+        return jsapi_ticket
+    else:
+        return (None, None)
+
+
+def set_jsapi_ticket_function(jsapi_ticket, jsapi_ticket_expires_at):
+    jsapi_ticket=(jsapi_ticket,jsapi_ticket_expires_at)
+    cache.set('jsapi_ticket', jsapi_ticket, 7000)
+
+conf = WechatConf(
+    token=settings.TOKEN,
+    appid=settings.APPID,
+    appsecret=settings.APPSECRET,
+    encrypt_mode='normal',  # 可选项：normal/compatible/safe，分别对应于 明文/兼容/安全 模式
+    #encoding_aes_key='your_encoding_aes_key',  # 如果传入此值则必须保证同时传入 token, appid
+    access_token_getfunc=get_access_token_function,
+    access_token_setfunc=set_access_token_function,
+    jsapi_ticket_getfunc=get_jsapi_ticket_function,
+    jsapi_ticket_setfunc=set_jsapi_ticket_function,
+)
+
+# 实例化 WechatBasic
+wechat = WechatBasic(conf=conf)
 
 
 # 下面这些变量均假设已由 Request 中提取完毕
@@ -73,7 +91,6 @@ def api(request):
             response = wechat.response_text(content=u'%s' % reply.data)
         else:
             response = wechat.response_text(content=u'文字信息')
-        print message.source
     elif isinstance(message, VoiceMessage):
         response = wechat.response_text(content=u'语音信息')
     elif isinstance(message, ImageMessage):
@@ -179,13 +196,4 @@ def oauth_test(request):
 
 
 def getjsapi_ticket():
-    jsapi_ticket = cache.get('jsapi_ticket')
-    if not jsapi_ticket:
-        get_jsapi_ticket = wechat.get_jsapi_ticket()
-        jsapi_ticket = get_jsapi_ticket['jsapi_ticket']
-        jsapi_ticket_expires_at = get_jsapi_ticket['jsapi_ticket_expires_at']
-        cache.set('jsapi_ticket', jsapi_ticket, 7000)
-        cache.set('jsapi_ticket_expires_at', jsapi_ticket_expires_at, 7000)
-    else:
-        jsapi_ticket_expires_at = cache.get('jsapi_ticket_expires_at')
-    return {'jsapi_ticket': jsapi_ticket, 'jsapi_ticket_expires_at': jsapi_ticket_expires_at}
+    return conf.get_jsapi_ticket()

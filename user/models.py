@@ -51,10 +51,16 @@ class User(models.Model):
             for p in perms:
                 perms_cache = list(set(perms_cache).union(set(p)))
             cache.set('perm_%d_cache' % self.id, perms_cache, 86400)
-        if permission in perm_cache:
-            return True
-        else:
+        if type(permission) == list:
+            for p in permission:
+                if p in perm_cache:
+                    return True
             return False
+        else:
+            if permission in perm_cache:
+                return True
+            else:
+                return False
 
     def updateavatarfromwechat(self):
         if self.openid is not None:

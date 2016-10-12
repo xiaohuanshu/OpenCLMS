@@ -117,7 +117,7 @@ class Seat(models.Model):
 
 
 class Student(models.Model):
-    studentid = models.CharField(primary_key=True,max_length=9)
+    studentid = models.CharField(primary_key=True,max_length=11)
     idnumber = models.CharField(max_length=18, blank=True, null=True)
     name = models.CharField(max_length=20, blank=True, null=True)
     sex = models.SmallIntegerField(blank=True, null=True)

@@ -6,7 +6,7 @@ import xlrd
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('excelfile', type=int)
+        parser.add_argument('excelfile', type=str)
 
     def handle(self, *args, **options):
         rb = xlrd.open_workbook(options['excelfile'])

@@ -14,7 +14,7 @@ from center.functional import classmethod_cache
 
 
 class Course(models.Model):
-    serialnumber = models.CharField(max_length=33, blank=True, null=True)
+    serialnumber = models.CharField(max_length=50, blank=True, null=True)
     number = models.SmallIntegerField(blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     teacher = models.ForeignKey('school.Teacher', models.DO_NOTHING, db_column='teacherid', blank=True, null=True)

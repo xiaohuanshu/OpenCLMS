@@ -16,7 +16,7 @@ class Command(BaseCommand):
             try:
                 count += 1
                 name = rs.cell(i, 0).value
-                data, created = Classroom.objects.get_or_create(name=name)
+                data, created = Classroom.objects.get_or_create(location=name)
                 if not created:
                     data.save()
             except:

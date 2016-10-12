@@ -1,5 +1,5 @@
 from django.conf.urls import include, url, patterns
-import student, management, teacher
+import student, managementview, teacher
 
 urlpatterns = [
 
@@ -8,17 +8,17 @@ urlpatterns = [
     url(r'^ajax/studentselectdata$', student.selectdata, name='getstudentselectdata'),
     url(r'^teacherlist', teacher.teacherlist, name='teacherlist'),
     url(r'^ajax/teacherdata$', teacher.data, name='getteacherdata'),
-    url(r'^classlist', management.classlist, name='classlist'),
-    url(r'^ajax/classdata', management.classdata, name='getclassdata'),
-    url(r'^majorlist', management.majorlist, name='majorlist'),
-    url(r'^ajax/majordata', management.majordata, name='getmajordata'),
-    url(r'^departmentlist', management.departmentlist, name='departmentlist'),
-    url(r'^ajax/departmentdata', management.departmentdata, name='getdepartmentdata'),
-    url(r'^administrationlist', management.administrationlist, name='administrationlist'),
-    url(r'^ajax/administrationdata', management.administrationdata, name='getadministrationdata'),
-    url(r'^classroomlist', management.classroomlist, name='classroomlist'),
-    url(r'^ajax/classroomdata', management.classroomdata, name='getclassroomdata'),
-    url(r'^schoolterm$', management.schoolterm, name='schoolterm'),
-    url(r'^classtime$', management.classtime, name='classtime'),
+    url(r'^classlist', managementview.classlist, name='classlist'),
+    url(r'^ajax/classdata', managementview.classdata, name='getclassdata'),
+    url(r'^majorlist', managementview.majorlist, name='majorlist'),
+    url(r'^ajax/majordata', managementview.majordata, name='getmajordata'),
+    url(r'^departmentlist', managementview.departmentlist, name='departmentlist'),
+    url(r'^ajax/departmentdata', managementview.departmentdata, name='getdepartmentdata'),
+    url(r'^administrationlist', managementview.administrationlist, name='administrationlist'),
+    url(r'^ajax/administrationdata', managementview.administrationdata, name='getadministrationdata'),
+    url(r'^classroomlist', managementview.classroomlist, name='classroomlist'),
+    url(r'^ajax/classroomdata', managementview.classroomdata, name='getclassroomdata'),
+    url(r'^schoolterm$', managementview.schoolterm, name='schoolterm'),
+    url(r'^classtime$', managementview.classtime, name='classtime'),
 
 ]

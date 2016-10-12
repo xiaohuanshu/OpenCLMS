@@ -19,7 +19,7 @@ class Command(BaseCommand):
                 data, created = Student.objects.get_or_create(studentid=studentid)
                 data.name = rs.cell(i, 1).value
                 data.idnumber = rs.cell(i, 2).value
-                if rs.cell(i, 3).value == "男":
+                if rs.cell(i, 3).value == u"男":
                     sex = 1
                 else:
                     sex = 2

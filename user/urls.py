@@ -4,7 +4,7 @@ except ImportError:  # django < 1.4
     from django.conf.urls.defaults import *
 
 # place app url patterns here
-import views, management
+import views, management, control
 
 urlpatterns = [
     url(r'^login$', views.login, name='login'),
@@ -20,5 +20,9 @@ urlpatterns = [
     url(r'^forgetpassword$', views.forgetpassword, name='forgetpassword'),
     url(r'^resetpassword/([^/]+)$', views.resetpassword, name='resetpassword'),
 
+    url(r'^addpermission$', views.add_permission, name='addpermission'),
+
+    url(r'^control/unbindwechat', control.unbindwechat, name='control.unbindwechat'),
+    url(r'^control/resetpassword', control.resetpassword, name='control.resetpassword'),
     url(r'^addpermission$', views.add_permission, name='addpermission'),
 ]

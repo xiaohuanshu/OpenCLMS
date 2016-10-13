@@ -4,11 +4,14 @@
 {% block title %}用户列表{% endblock %}
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link href="{% static 'plugins/toastr-master/toastr.css' %}" rel="stylesheet" type="text/css"/>
 {% endblock %}
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
+    <script src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
 {% endblock %}
 
 {% block content %}
@@ -50,39 +53,127 @@
     <!-- page end-->
 
 
+    {% if perms.user_modify %}
+        <ul id="example2-context-menu" class="dropdown-menu">
+            <li data-item="resetpassword"><a>重置密码</a></li>
+            <li data-item="unbindwechat"><a>解绑微信</a></li>
+            <li data-item="rolemanager"><a>角色管理</a></li>
+        </ul>
+    {% endif %}
 
 {% endblock %}
 {% block page_script %}
     <script>
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "progressBar": false,
+            "positionClass": "toast-top-center",
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
         $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
         var $table = $('#table');
-        $table.bootstrapTable({
-            columns: [{
-                field: 'username',
-                title: '用户名',
-                searchable: true
-            }, {
-                field: 'sex',
-                title: '性别'
-            }, {
-                field: 'ip',
-                title: 'ip'
-            }, {
-                field: 'registertime',
-                title: '注册时间'
-            }, {
-                field: 'lastlogintime',
-                title: '上次登录'
-            }, {
-                field: 'role',
-                title: '角色'
-            }, {
-                field: 'verify',
-                title: '认证状态'
-            }, {
-                field: 'iswechat',
-                title: '微信绑定'
-            }]
-        });
+        columns = [{
+            field: 'username',
+            title: '用户名',
+            searchable: true
+        }, {
+            field: 'sex',
+            title: '性别'
+        }, {
+            field: 'ip',
+            title: 'ip'
+        }, {
+            field: 'registertime',
+            title: '注册时间'
+        }, {
+            field: 'lastlogintime',
+            title: '上次登录'
+        }, {
+            field: 'role',
+            title: '角色'
+        }, {
+            field: 'verify',
+            title: '认证状态'
+        }, {
+            field: 'iswechat',
+            title: '微信绑定'
+        }];
+        {% if perms.user_modify%}
+            function operateFormatter(value, row, index) {
+                return [
+                    '<div class="btn-group btn-group-xs">',
+                    '    <button type="button" class="btn btn-default dropdown-toggle example2-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+                    '        <span class="caret"></span>',
+                    '        <span class="sr-only">操作</span>',
+                    '    </button>',
+                    '</div>'
+                ].join('');
+            }
+            columns.push({
+                field: 'operate',
+                title: '操作',
+                align: 'center',
+                formatter: operateFormatter
+            });
+            $table.bootstrapTable({
+                columns: columns,
+                contextMenu: '#example2-context-menu',
+                contextMenuButton: '.example2-button',
+                onContextMenuItem: function (row, $el) {
+                    if ($el.data("item") == "unbindwechat") {
+                        $.ajax({
+                            url: '{% url 'user:control.unbindwechat' %}',
+                            type: 'GET',
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            data: {
+                                userid: row.id
+                            },
+                            success: function (data) {
+                                if (data.error != 0) {
+                                    toastr['error'](data.message, "操作失败");
+                                } else {
+                                    toastr['success'](data.message, "操作成功");
+                                }
+                            }, error: function (XMLHttpRequest, textStatus) {
+                                toastr['error'](textStatus, "与服务器连接失败");
+                            }
+                        });
+                    } else if ($el.data("item") == "resetpassword") {
+                        $.ajax({
+                            url: '{% url 'user:control.resetpassword' %}',
+                            type: 'GET',
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            data: {
+                                userid: row.id
+                            },
+                            success: function (data) {
+                                if (data.error != 0) {
+                                    toastr['error'](data.message, "操作失败");
+                                } else {
+                                    toastr['success'](data.message, "操作成功");
+                                }
+                            }, error: function (XMLHttpRequest, textStatus) {
+                                toastr['error'](textStatus, "与服务器连接失败");
+                            }
+                        });
+                    }
+                }
+            });
+        {% else %}
+            $table.bootstrapTable({
+                columns: columns
+            });
+        {% endif %}
     </script>
 {% endblock %}

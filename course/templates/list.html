@@ -9,6 +9,7 @@
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 {% block content %}
@@ -84,9 +85,12 @@
         </div>
     </div>
     <!-- page end-->
-
-
-
+    {% if perms.checkin_view %}
+        <ul id="example2-context-menu" class="dropdown-menu">
+            <li data-item="studentlist"><a>学生列表</a></li>
+            <li data-item="checkindata"><a>考勤数据</a></li>
+        </ul>
+    {% endif %}
 {% endblock %}
 {% block page_script %}
     <script>
@@ -103,42 +107,74 @@
 
         $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
         var $table = $('#table');
-        $table.bootstrapTable({
-            columns: [{
-                field: 'title',
-                title: '课程名称',
-                searchable: true,
-                formatter: identifierFormatter
-            }, {
-                field: 'serialnumber',
-                title: '课程编号'
-            }, {
-                field: 'time',
-                title: '上课时间'
-            }, {
-                field: 'location',
-                title: '上课地点',
-                visible: false
-            }, {
-                field: 'teacher',
-                title: '教师'
-            }, {
-                field: 'major',
-                title: '开课专业',
-                visible: false
-            }, {
-                field: 'department',
-                title: '开课系所'
-            }, {
-                field: 'number',
-                title: '人数',
-                sortable: true
-            }, {
-                field: 'schoolterm',
-                title: '学年学期',
-                visible: false
-            }]
-        });
+        columns = [{
+            field: 'title',
+            title: '课程名称',
+            searchable: true,
+            formatter: identifierFormatter
+        }, {
+            field: 'serialnumber',
+            title: '课程编号'
+        }, {
+            field: 'time',
+            title: '上课时间'
+        }, {
+            field: 'location',
+            title: '上课地点',
+            visible: false
+        }, {
+            field: 'teacher',
+            title: '教师'
+        }, {
+            field: 'major',
+            title: '开课专业',
+            visible: false
+        }, {
+            field: 'department',
+            title: '开课系所'
+        }, {
+            field: 'number',
+            title: '人数',
+            sortable: true
+        }, {
+            field: 'schoolterm',
+            title: '学年学期',
+            visible: false
+        }];
+        {% if perms.checkin_view %}
+            function operateFormatter(value, row, index) {
+                return [
+                    '<div class="btn-group btn-group-xs">',
+                    '    <button type="button" class="btn btn-default dropdown-toggle example2-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+                    '        <span class="caret"></span>',
+                    '        <span class="sr-only">查看</span>',
+                    '    </button>',
+                    '</div>'
+                ].join('');
+            }
+            columns.push({
+                field: 'operate',
+                title: '操作',
+                align: 'center',
+                formatter: operateFormatter
+            });
+            $table.bootstrapTable({
+                columns: columns,
+                contextMenu: '#example2-context-menu',
+                contextMenuButton: '.example2-button',
+                onContextMenuItem: function (row, $el) {
+                    if ($el.data("item") == "studentlist") {
+                        window.location.href = '{% url 'course:studentcourse' 0 %}' + row.id;
+                    } else if ($el.data("item") == "checkindata") {
+                        window.location.href = '{% url 'checkin:course_data' 0 %}' + row.id;
+                    }
+                }
+            });
+        {% else %}
+            $table.bootstrapTable({
+                columns: columns
+            });
+        {% endif %}
         function queryParams(params) {
             params['schoolterm'] = $('#schoolterm').val();
             params['major'] = $('#major').val();

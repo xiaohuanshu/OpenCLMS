@@ -85,12 +85,12 @@ def lesson_data(request, lessonid):
         checkinrecord = checkinrecord.order_by('time').all()
         t['checkinrecord'] = checkinrecord
 
-    checkindata = Checkin.objects.filter(lesson=lesson).exclude(status=CHECKIN_STATUS_ASK).select_related(
+    checkindata = Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).select_related(
         'student').select_related('student__classid').select_related('student__classid__department').select_related(
         'student__classid__major').all()
     t['checkindata'] = checkindata
 
-    askdata = Checkin.objects.filter(lesson=lesson, status=CHECKIN_STATUS_ASK).select_related('student').select_related(
+    askdata = Checkin.objects.filter(lesson=lesson, status__gt=10).select_related('student').select_related(
         'student__classid').select_related('student__classid__department').select_related(
         'student__classid__major').all()
     t['askdata'] = askdata
@@ -242,7 +242,7 @@ def teacher_data(request, teacherid):
         for (offset, l) in enumerate(tc.lesson_set.order_by('week', 'day', 'time').all()):
             course[tc.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
     checkindata = Checkin.objects.filter(lesson__course__in=teachercourse).annotate(
-        should=Count(Case(When(~Q(status=CHECKIN_STATUS_ASK), then=1))), actually=Count(Case(
+        should=Count(Case(When(~Q(status__gt=10), then=1))), actually=Count(Case(
             When(Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_SUCCESS) | Q(status=CHECKIN_STATUS_LATE) | Q(
                 status=CHECKIN_STATUS_LATEEARLY), then=2)))).values('lesson__course',
                                                                     'lesson', 'should', 'actually')

@@ -403,7 +403,7 @@
             var $slstudent = $("#sl" + studentid);
             $slstudent.find("td:eq(2) button").remove();
             $slstudent.find("td:eq(2) .btn-group").prepend(statushtml(status));
-            if (checkin_status_json[status] == '请假') {
+            if (checkin_status_json[status].indexOf('假')>=0) {
                 $slstudent.find("td:eq(2) button").attr('disabled', true);
                 $slstudent.find("td:eq(3) button").remove();
             } else if (checkin_status_json[status] != '未到') {

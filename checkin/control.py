@@ -53,7 +53,7 @@ def changecheckinstatus(request, lessonid):
             checkin = Checkin(student=student, lesson=lesson)
         else:
             return HttpResponse(json.dumps({'error': 101, 'message': '学生没有此课'}), content_type="application/json")
-    if checkin.status == CHECKIN_STATUS_ASK:
+    if checkin.status > 10: #ASK
         return HttpResponse(json.dumps({'error': 101, 'message': '学生已经请假'}), content_type="application/json")
     if newstatus == 'newcheckin':
         data = student_checkin(student, lesson)

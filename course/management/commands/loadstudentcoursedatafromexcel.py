@@ -3,7 +3,8 @@ from django.core.management.base import BaseCommand, CommandError
 from school.models import Student
 from course.models import Course, Studentcourse
 import xlrd
-
+from django.db.models import ObjectDoesNotExist
+from progressbar import *
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
@@ -14,14 +15,21 @@ class Command(BaseCommand):
         Studentcourse.objects.all().delete()
         rs = rb.sheets()[0]
         count = 0
-        for i in range(rs.nrows):
+        progress = ProgressBar()
+        for i in progress(range(rs.nrows)):
+            count += 1
             try:
-                count += 1
                 course = Course.objects.get(serialnumber=rs.cell(i, 0).value)
-                student = Student.objects.get(studentid=rs.cell(i, 1).value)
-                data = Studentcourse(course=course, student=student)
-                data.save()
-            except:
-                print "error on row:%d" % i
+            except ObjectDoesNotExist:
                 count -= 1
+                print "error on course not found:%s" % rs.cell(i, 0).value
+                continue
+            try:
+                student = Student.objects.get(studentid=rs.cell(i, 1).value)
+            except ObjectDoesNotExist:
+                count -= 1
+                print "error on student not found:%s" % rs.cell(i, 1).value
+                continue
+            data = Studentcourse(course=course, student=student)
+            data.save()
         print "successful insert %d" % count

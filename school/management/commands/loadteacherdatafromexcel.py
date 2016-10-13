@@ -28,9 +28,10 @@ class Command(BaseCommand):
                 department = Department.objects.get(name=rs.cell(i, 3).value)
                 Teachertodepartment.objects.filter(teacher=data).delete()
                 Teachertodepartment(teacher=Teacher, administration=administration).save()
-                administration = Administration.objects.get(name=rs.cell(i, 4).value)
-                Teachertoadministration.objects.filter(teacher=data).delete()
-                Teachertoadministration(teacher=Teacher, administration=administration).save()
+                if rs.cell_type(i, 4) != 0:
+                    administration = Administration.objects.get(name=rs.cell(i, 4).value)
+                    Teachertoadministration.objects.filter(teacher=data).delete()
+                    Teachertoadministration(teacher=Teacher, administration=administration).save()
                 data.save()
             except:
                 print "error on teacherid:%s" % teacherid

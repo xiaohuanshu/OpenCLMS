@@ -54,14 +54,14 @@ def startcheckin(lessonid, mode='first'):
             return {'error': 101, 'message': '不能进行补签模式'}
         lesson.status = LESSON_STATUS_CHECKIN_ADD
         checkin_record.status = CHECKIN_RECORD_ADD
-        Checkin.objects.filter(lesson=lesson).exclude(status=CHECKIN_STATUS_ASK).update(laststatus=F('status'))
+        Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(laststatus=F('status'))
 
     if mode == 'again':
         if lesson.checkincount == 1:
             return {'error': 101, 'message': '不能进行再签模式'}
         lesson.status = LESSON_STATUS_CHECKIN_AGAIN
         checkin_record.status = CHECKIN_RECORD_AGAIN
-        Checkin.objects.filter(lesson=lesson).exclude(status=CHECKIN_STATUS_ASK).update(
+        Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(
             laststatus=F('status'), status=CHECKIN_STATUS_NORMAL)
 
     checkin_record.lesson = lesson
@@ -148,7 +148,7 @@ def student_checkin(student, lesson):
     checkin = Checkin.objects.get(lesson=lesson, student=student)
     # checkindata.seatid = seatid
     nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    if checkin.status == CHECKIN_STATUS_ASK:
+    if checkin.status > 10: #ASK
         return {'error': 101, 'message': '学生已经请假'}
     if not checkin.time:
         checkin.time = nowtime

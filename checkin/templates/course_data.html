@@ -95,7 +95,7 @@
             }
         };
         $.fn.editable.defaults.validate = function(value){
-            if (checkin_status_json[value]=='请假'){
+            if (checkin_status_json[value].indexOf('假')>=0){
                 return '无权设定为请假';
             }
         };

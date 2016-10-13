@@ -210,36 +210,27 @@
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <h5>学生操作</h5>
-
                                         <div class="input-group">
                                             <input id='control-studentid' type="text" class="form-control"
                                                    placeholder="学号">
-
-                                            <div class="input-group-btn">
-                                                <button type="button" class="btn btn-white dropdown-toggle"
-                                                        data-toggle="dropdown" aria-expanded="false">操作 <span
-                                                        class="caret"></span></button>
-                                                <ul class="dropdown-menu pull-right">
-                                                    <li><a href="#" id="control-success">设为到达</a></li>
-                                                    <li><a href="#" id="control-normal">设为未到</a></li>
-                                                    <li class="divider"></li>
-                                                    <li><a href="#">取消</a></li>
-                                                </ul>
-                                            </div>
+                                            <span class="input-group-btn">
+                      <button id="control-success" class="btn btn-info btn-flat">签入</button>
+                    </span>
                                         </div>
                                     </div>
                                 </div>
+                                <div class="row"><br/></div>
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <a href="?deletethis=1">
-                                            <button type="button" class="btn btn-danger">删除本次签到数据</button>
+                                            <button type="button" class="btn btn-danger btn-block">删除本次签到数据</button>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <a href="?deleteall=1">
-                                            <button type="button" class="btn btn-danger">删除所有签到数据</button>
+                                            <button type="button" class="btn btn-danger btn-block">删除所有签到数据</button>
                                         </a>
                                     </div>
                                 </div>

@@ -23,12 +23,15 @@ class Command(BaseCommand):
                 data, created = Course.objects.get_or_create(serialnumber=serialnumber,schoolterm=options['schoolterm'])
                 data.title = rs.cell(i, 1).value
                 data.number = rs.cell(i, 2).value
-                data.time = rs.cell(i, 3).value
-                data.location = rs.cell(i, 4).value
+                if rs.cell_type(i, 3) != 0 and rs.cell(i, 3).value != '' and rs.cell(i, 3).value != ' ':
+                    data.time = rs.cell(i, 3).value
+                if rs.cell_type(i, 4) != 0 and rs.cell(i, 4).value != '' and rs.cell(i, 4).value != ' ':
+                    data.location = rs.cell(i, 4).value
                 data.department = Department.objects.get(name=rs.cell(i, 5).value)
                 data.teacher = Teacher.objects.get(teacherid=rs.cell(i, 6).value)
-                data.simplifytime()
-                data.generatelesson()
+                if not (data.time is None or data.location is None):
+                    data.simplifytime()
+                    data.generatelesson()
                 data.save()
             except:
                 print "error on serialnumber:%s" % serialnumber

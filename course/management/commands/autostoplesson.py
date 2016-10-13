@@ -17,7 +17,7 @@ class Command(BaseCommand):
         time = nowlessontime['time']
         term = nowlessontime['term']
         qs = {
-            'today': Q(week=week, day=day, time__gt=time - 1 - F('length')),
+            'today': Q(week=week, day=day, time__lt=time - 1 - F('length')),
             'week': Q(week=week, day__lt=day),
             'term': Q(week__lt=week)
         }

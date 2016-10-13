@@ -2,7 +2,7 @@
 __author__ = 'xiaohuanshu'
 import re
 
-weekstring = ['周日', '周一', '周二', '周三', '周四', '周五', '周六']
+weekstring = [u'周日', u'周一', u'周二', u'周三', u'周四', u'周五', u'周六']
 
 
 def getweek(str):
@@ -111,11 +111,11 @@ def simplifytime(timestr, classroomstr):
         if not addflag:
             d.update({'weeklength': 1})
             simplifydata.append(d)
-    newtimestr = ';'.join(["%s第%s节{第%d-%d周%s}" % (
+    newtimestr = ';'.join([u"%s第%s节{第%d-%d周%s}" % (
         weekstring[s['day']],
         ','.join([str(e) for e in range(s['time'], s['time'] + s['length'])]),
         s['week'], s['week'] + s['weeklength'] - 1,
-        (('interval' in s and s['interval']) and '|' + (s['week'] % 2 == 0 and '双周' or '单周') or '')) for s in
+        (('interval' in s and s['interval']) and '|' + (s['week'] % 2 == 0 and u'双周' or u'单周') or '')) for s in
                            simplifydata])
-    newclassroomstr = ';'.join(s['location'] for s in simplifydata)
+    newclassroomstr = u';'.join(s['location'] for s in simplifydata)
     return newtimestr, newclassroomstr

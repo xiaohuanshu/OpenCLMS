@@ -27,7 +27,7 @@ class Command(BaseCommand):
 
                 department = Department.objects.get(name=rs.cell(i, 3).value)
                 Teachertodepartment.objects.filter(teacher=data).delete()
-                Teachertodepartment(teacher=Teacher, administration=administration).save()
+                Teachertodepartment(teacher=Teacher, department=department).save()
                 if rs.cell_type(i, 4) != 0:
                     administration = Administration.objects.get(name=rs.cell(i, 4).value)
                     Teachertoadministration.objects.filter(teacher=data).delete()

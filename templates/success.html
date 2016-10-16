@@ -62,11 +62,12 @@
     {% if wechatclose %}
         <script language="JavaScript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
         {% load wechat_extra %}
-        {% wxconfig request.get_full_path 'closeWindow,hideOptionMenu,getNetworkType,getLocation' as wxc %}
+        {% wxconfig request.get_full_path 'closeWindow,hideOptionMenu' as wxc %}
         {{ wxc | safe }}
         <script type="text/javascript">
             wx.ready(function () {
                 wx.hideOptionMenu();
+                {% comment %}
                 wx.getLocation({
                     type: 'wgs84', // 默认为wgs84的gps坐标，如果要返回直接给openLocation用的火星坐标，可传入'gcj02'
                     success: function (res) {
@@ -81,6 +82,7 @@
                         var networkType = res.networkType; // 返回网络类型2g，3g，4g，wifi
                     }
                 });
+                {% endcomment %}
                 var wait = document.getElementById('wait');
                 var interval = setInterval(function () {
                     var time = --wait.innerHTML;
@@ -88,7 +90,6 @@
                         wx.closeWindow();
                         clearInterval(interval);
                     }
-                    ;
                 }, 1000);
             });
         </script>

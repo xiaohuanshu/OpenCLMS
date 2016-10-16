@@ -28,7 +28,7 @@ class UserMiddleware(object):
                     if (not request.user.verify) and urlname != 'user:authentication':
                         return redirect(reverse('user:authentication'))
                     return None
-            if "MicroMessenger" in agent:
+            if agent and "MicroMessenger" in agent:
                 if 'wechat:oauth' == urlname:
                     return None
                 if not request.session.get('openid', default=False):

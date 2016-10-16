@@ -46,11 +46,11 @@ class User(models.Model):
         # permbool = Role.objects.filter(user=self,permission__contains=[permission]).exists()
         perm_cache = cache.get('perm_%d_cache' % self.id)
         if not perm_cache:
-            perms_cache = []
+            perm_cache = []
             perms = list(Role.objects.filter(user=self).values_list('permission', flat=True))
             for p in perms:
-                perms_cache = list(set(perms_cache).union(set(p)))
-            cache.set('perm_%d_cache' % self.id, perms_cache, 86400)
+                perm_cache = list(set(perm_cache).union(set(p)))
+            cache.set('perm_%d_cache' % self.id, perm_cache, 86400)
         if type(permission) == list:
             for p in permission:
                 if p in perm_cache:

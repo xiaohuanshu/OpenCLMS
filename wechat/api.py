@@ -15,7 +15,8 @@ from models import Wechatkeyword, Wechatuser
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
-
+from django.contrib.auth.hashers import make_password
+from datetime import datetime, timedelta
 
 def get_access_token_function():
     access_token = cache.get('access_token')
@@ -156,15 +157,20 @@ def oauth(request):
         resp = urllib2.urlopen(req)
         content = resp.read()
         response = json.loads(content)
+        httpresponse = HttpResponseRedirect(request.GET.get('state'))
         if response['scope'] == 'snsapi_base':
             request.session['openid'] = response['openid']
             try:
                 user = User.objects.get(openid=response['openid'])
-                request.session['username'] = user.username
-                request.session['userid'] = user.id
                 if not user.verify:
                     request.session['origin'] = request.GET.get('state')
-                    return redirect(reverse('user:authentication', args=[]))
+                    httpresponse =  redirect(reverse('user:authentication', args=[]))
+                request.session['username'] = user.username
+                request.session['userid'] = user.id
+                remembercode = make_password("%d%s%s" % (user.id, settings.SECRET_KEY, user.username), None, 'pbkdf2_sha256')
+                httpresponse.set_cookie('remembercode', remembercode, None, datetime.now() + timedelta(days=365))
+                httpresponse.set_cookie('userid', user.id, None, datetime.now() + timedelta(days=365))
+                httpresponse.set_cookie('username', user.username, None, datetime.now() + timedelta(days=365))
             except ObjectDoesNotExist:
                 pass
         else:
@@ -175,7 +181,7 @@ def oauth(request):
             content = resp.read()
             response = json.loads(content)
             request.session['userinfo'] = response
-        return HttpResponseRedirect(request.GET.get('state'))
+        return httpresponse
 
 
 def oauth_getuserinfo(state='STATE', scope=1):

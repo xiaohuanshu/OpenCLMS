@@ -39,6 +39,6 @@ class UserMiddleware(object):
                 return redirect(reverse('user:login'))
         else:
             request.user = User.objects.get(id=request.session.get('userid'))
-            if (not request.user.verify) and urlname != 'user:authentication':
+            if (not request.user.verify) and urlname != 'user:authentication' and urlname != 'user:logout':
                 return redirect(reverse('user:authentication'))
         return None

@@ -293,6 +293,7 @@ def askmanager(request):
 
 
 def askdata(request):
+    typedata = {CHECKIN_STATUS_PRIVATE_ASK: '私假', CHECKIN_STATUS_PUBLIC_ASK: '公假'}
     order = request.GET['order']
     limit = int(request.GET['limit'])
     offset = int(request.GET['offset'])
@@ -324,10 +325,10 @@ def askdata(request):
 
     rows = []
     for p in ask:
-        ld = {'id': p.id, 'student': ", ".join("%s(%d)" % (s.name, s.studentid) for s in p.student.all()),
+        ld = {'id': p.id, 'student': ", ".join("%s(%s)" % (s.name, s.studentid) for s in p.student.all()),
               'starttime': datetime.datetime.strftime(p.starttime, '%Y-%m-%d %I:%M %p'),
               'endtime': datetime.datetime.strftime(p.endtime, '%Y-%m-%d %I:%M %p'),
-              'reason': p.reason, 'status': p.status}
+              'reason': p.reason, 'status': p.status, 'type': typedata[p.type]}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

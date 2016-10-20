@@ -21,5 +21,6 @@ urlpatterns = [
     url(r'^askmanager$', views.askmanager, name='askmanager'),
     url(r'^ajax/getaskdata$', views.askdata, name='getaskdata'),
     url(r'^ajax/addask$', control.addask, name='addask'),
+    url(r'^ajax/delask$', control.delask, name='delask'),
 
 ]

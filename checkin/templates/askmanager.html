@@ -75,6 +75,14 @@
                     </div>
                     <!-- /.form-group -->
                     <div class="form-group">
+                        <label>请假类型</label>
+                        <select class="form-control" id="typeselecter">
+                            <option>私假</option>
+                            <option>公假</option>
+                        </select>
+                    </div>
+                    <!-- /.form-group -->
+                    <div class="form-group">
                         <label>请假原因</label>
                         <textarea class="form-control" rows="2" placeholder="请假原因 ..." maxlength="100"
                                   id="reasontextarea"></textarea>
@@ -87,7 +95,8 @@
         </div>
         <!-- /.box-body -->
         <div class="box-footer">
-            <button type="submit" class="btn btn-primary" id="submitbutton">提交</button> <label class="text-danger" id="errormessage"></label>
+            <button type="submit" class="btn btn-primary" id="submitbutton">提交</button>
+            <label class="text-danger" id="errormessage"></label>
         </div>
     </div>
     <!-- /.box -->
@@ -228,7 +237,7 @@
         }
         function operateFormatter(value, row, index) {
             return [
-                '<a class="like" href="javascript:void(0)" title="Like">',
+                '<a class="edit" href="javascript:void(0)" title="Like">',
                 '<i class="glyphicon glyphicon-edit"></i>',
                 '</a>  ',
                 '<a class="remove" href="javascript:void(0)" title="Remove">',
@@ -238,13 +247,30 @@
         }
 
         window.operateEvents = {
-            'click .like': function (e, value, row, index) {
+            'click .edit': function (e, value, row, index) {
                 alert('You click like action, row: ' + JSON.stringify(row));
             },
             'click .remove': function (e, value, row, index) {
-                $table.bootstrapTable('remove', {
-                    field: 'id',
-                    values: [row.id]
+                $.ajax({
+                    contentType: "application/json; charset=utf-8",
+                    url: '{% url 'checkin:delask' %}',
+                    dataType: 'json',
+                    data: {
+                        'askid': row.id
+                    },
+                    success: function (value) {
+                        if (value.error && value.error != 0) {
+                            alert(value.message);
+                        } else {
+                            $table.bootstrapTable('remove', {
+                                field: 'id',
+                                values: [row.id]
+                            });
+                        }
+                    },
+                    error: function () {
+                        alert(value.message);
+                    }
                 });
             }
         };
@@ -263,6 +289,10 @@
                 field: 'endtime',
                 title: '结束时间',
                 sortable: true,
+                order: 'desc'
+            }, {
+                field: 'type',
+                title: '类型',
                 order: 'desc'
             }, {
                 field: 'reason',
@@ -288,6 +318,7 @@
             var starttime = time[0];
             var endtime = time[1];
             var reason = $('#reasontextarea').val();
+            var type = $('#typeselecter').val()
             var students = [];
             var studentstring = "";
             $.each(data, function () {
@@ -306,7 +337,8 @@
                     'students': students,
                     'starttime': starttime,
                     'endtime': endtime,
-                    'reason': reason
+                    'reason': reason,
+                    'type': type
                 },
                 success: function (value) {
                     if (value.error && value.error != 0) {
@@ -318,7 +350,9 @@
                                 starttime: starttime,
                                 endtime: endtime,
                                 reason: reason,
-                                status: value.status
+                                type: type,
+                                status: value.status,
+                                id: value.askid
                             }
                         });
                         $studentselecter.select2("val", "");

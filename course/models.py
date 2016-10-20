@@ -122,7 +122,7 @@ class Lesson(models.Model):
         from checkin.models import Checkin
         shouldnumber = Studentcourse.objects.filter(course=self.course).count()
         leavenumber = Checkin.objects.filter(lesson=self, status__gt=10).count()
-        #TODO leavenumver counter
+        # TODO leavenumver counter
         return shouldnumber - leavenumber
 
     @classmethod_cache
@@ -163,9 +163,10 @@ class Lesson(models.Model):
 
         # for checkin
         from checkin.models import Checkin, Ask
-        from checkin.constant import CHECKIN_STATUS_NORMAL, ASK_STATUS_APPROVE,CHECKIN_STATUS_PRIVATE_ASK,CHECKIN_STATUS_PUBLIC_ASK
+        from checkin.constant import CHECKIN_STATUS_NORMAL, ASK_STATUS_APPROVE, CHECKIN_STATUS_PRIVATE_ASK, \
+            CHECKIN_STATUS_PUBLIC_ASK
         nowstudent = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
-        studentcourse = Studentcourse.objects.filter(course=self.course).exclude(student__in=nowstudent)
+        studentcourse = Studentcourse.objects.filter(course=self.course).exclude(student__in=nowstudent).all()
         newstudent = []
         for s in studentcourse:
             newstudent.append(
@@ -175,11 +176,16 @@ class Lesson(models.Model):
         starttime, endtime = self.getTime()
         starttime = time.strftime('%Y-%m-%d %H:%M:%S', starttime)
         endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
-        askstudents = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE).filter(
+        askstudents_private = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE,
+                                                 type=CHECKIN_STATUS_PRIVATE_ASK).filter(
             Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).values_list(
             'student', flat=True)
-        Checkin.objects.filter(lesson=self, student__in=askstudents).update(status=CHECKIN_STATUS_PRIVATE_ASK)
-        #TODO public ask
+        askstudents_public = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE,
+                                                type=CHECKIN_STATUS_PUBLIC_ASK).filter(
+            Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).values_list(
+            'student', flat=True)
+        Checkin.objects.filter(lesson=self, student__in=askstudents_private).update(status=CHECKIN_STATUS_PRIVATE_ASK)
+        Checkin.objects.filter(lesson=self, student__in=askstudents_public).update(status=CHECKIN_STATUS_PUBLIC_ASK)
         return {'error': 0, 'message': u'课程成功开启', 'newstatus': self.status,
                 'starttime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 

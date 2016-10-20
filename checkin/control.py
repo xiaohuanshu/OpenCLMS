@@ -7,7 +7,8 @@ from course.constant import *
 from checkin.constant import *
 from django.shortcuts import redirect, HttpResponseRedirect, render, render_to_response, RequestContext
 from django.core.urlresolvers import reverse
-from function import startcheckin, endcheckin, student_checkin, generateqrstr
+from function import startcheckin, endcheckin, student_checkin, generateqrstr, addaskinformationinstartedlesson, \
+    delaskinformationinstartedlesson
 from models import Checkin, Ask, Asktostudent
 from user.models import User
 from school.models import Student
@@ -15,10 +16,11 @@ from django.db.models import ObjectDoesNotExist, Q
 from course.auth import has_course_permission
 import datetime
 from school.function import getCurrentSchoolYearTerm
+from user.auth import permission_required
 
 
 def getqrstr(request, lessonid):
-    lesson=Lesson.objects.get(id=lessonid)
+    lesson = Lesson.objects.get(id=lessonid)
     if not (has_course_permission(request.user, lesson.course) or request.user.has_perm('course_control')):
         return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
     str = generateqrstr(lessonid)
@@ -53,7 +55,7 @@ def changecheckinstatus(request, lessonid):
             checkin = Checkin(student=student, lesson=lesson)
         else:
             return HttpResponse(json.dumps({'error': 101, 'message': '学生没有此课'}), content_type="application/json")
-    if checkin.status > 10: #ASK
+    if checkin.status > 10:  # ASK
         return HttpResponse(json.dumps({'error': 101, 'message': '学生已经请假'}), content_type="application/json")
     if newstatus == 'newcheckin':
         data = student_checkin(student, lesson)
@@ -163,24 +165,48 @@ def addask(request):
     starttime = datetime.datetime.strptime(request.GET.get('starttime', default=False), "%Y-%m-%d %I:%M %p")
     endtime = datetime.datetime.strptime(request.GET.get('endtime', default=False), "%Y-%m-%d %I:%M %p")
     reason = request.GET.get('reason', default='')
+    typedata = {u'公假': CHECKIN_STATUS_PUBLIC_ASK, u'私假': CHECKIN_STATUS_PRIVATE_ASK}
+    type = typedata[request.GET.get('type')]
     schoolterm = getCurrentSchoolYearTerm()['term']
     students = Student.objects.in_bulk(student)
 
     if (Ask.objects.filter(student__in=students, schoolterm=schoolterm).filter(
                 Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).exists()):
-        return HttpResponse(json.dumps({'error': 101, 'message': "时间冲突"}), content_type="application/json")
+        return HttpResponse(json.dumps({'error': 101, 'message': "部分学生在此时间段内有请假信息,时间冲突!"}),
+                            content_type="application/json")
     ask = Ask()
     ask.starttime = starttime
     ask.endtime = endtime
     ask.reason = reason
-    ask.status = ASK_STATUS_APPROVE
+    ask.type = type
+    if request.user.has_perm('checkin_ask_approve'):
+        ask.status = ASK_STATUS_APPROVE
+        ask.operater = request.user
+        for s in students:
+            addaskinformationinstartedlesson(s, starttime, endtime, type)
+    else:
+        ask.status = ASK_STATUS_WAITING
     ask.schoolterm = schoolterm
-    ask.operater = request.user
+
     ask.save()
     querysetlist = []
     for i in students:
         s = students[i]
         querysetlist.append(Asktostudent(ask=ask, student=s))
     Asktostudent.objects.bulk_create(querysetlist)
-    data = {'error': 0, 'message': '添加成功', 'status': ask.status}
+    data = {'error': 0, 'message': '添加成功', 'status': ask.status, 'askid': ask.id}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@permission_required(permission='checkin_ask_modify')
+def delask(request):
+    ask = Ask.objects.get(id=request.GET.get('askid'))
+    asktostudents = Asktostudent.objects.filter(ask=ask)
+    starttime = ask.starttime
+    endtime = ask.endtime
+    for a in asktostudents:
+        delaskinformationinstartedlesson(a.student, starttime, endtime)
+    asktostudents.delete()
+    ask.delete()
+    data = {'error': 0, 'message': '删除成功', 'status': ask.status}
     return HttpResponse(json.dumps(data), content_type="application/json")

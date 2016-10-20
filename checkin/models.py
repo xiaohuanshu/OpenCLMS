@@ -51,7 +51,7 @@ class Ask(models.Model):
     reason = models.CharField(max_length=100, blank=True, null=True)
     student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
     operater = models.ForeignKey('user.User', models.DO_NOTHING, db_column='operater', blank=True, null=True)
-
+    type = models.IntegerField(blank=True, null=True)
     student = models.ManyToManyField('school.Student', through='Asktostudent',
                                             through_fields=('ask', 'student'))
     class Meta:

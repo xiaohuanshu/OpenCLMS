@@ -7,6 +7,8 @@ from constant import *
 from django.db.models import F, Q
 import time, os
 from django.core.cache import cache
+from school.function import timetoclasstime, datetoTermdate
+import datetime
 
 
 def startcheckin(lessonid, mode='first'):
@@ -148,7 +150,7 @@ def student_checkin(student, lesson):
     checkin = Checkin.objects.get(lesson=lesson, student=student)
     # checkindata.seatid = seatid
     nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    if checkin.status > 10: #ASK
+    if checkin.status > 10:  # ASK
         return {'error': 101, 'message': '学生已经请假'}
     if not checkin.time:
         checkin.time = nowtime
@@ -178,6 +180,62 @@ def student_checkin(student, lesson):
 
 
 def generateqrstr(lessonid):
-    qrstr = str(lessonid).join(map(lambda xx:(hex(ord(xx))[2:]),os.urandom(2)))
+    qrstr = str(lessonid).join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(2)))
     cache.set("qr%s" % (qrstr), lessonid, 20)
     return qrstr
+
+
+def addaskinformationinstartedlesson(student, starttime, endtime, typestatus):
+    starttimestr = datetime.datetime.strftime(starttime, '%Y-%m-%d')
+    endtimestr = datetime.datetime.strftime(endtime, '%Y-%m-%d')
+    startinf = datetoTermdate(starttimestr)
+    endinf = datetoTermdate(endtimestr)
+    startinf['time'] = timetoclasstime(starttime.time())
+    endinf['time'] = timetoclasstime(endtime.time())
+
+    courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
+    plessonlist = Lesson.objects.select_related('course').select_related('classroom') \
+        .filter(term=startinf['term'], course__in=courses).exclude(status=LESSON_STATUS_CANCLE).exclude(
+        status=LESSON_STATUS_AWAIT).exclude(status=LESSON_STATUS_AGREE)
+    plessonlist = plessonlist.filter(
+        Q(week__gt=startinf['week'], week__lt=endinf['week']) |
+        Q(Q(week=startinf['week']) &
+          Q(Q(day__gt=startinf['day']) |
+            Q(day=startinf['day'], time__gt=startinf['time'])
+            )
+          ) |
+        Q(Q(week=endinf['week']) &
+          Q(Q(day__lt=endinf['day']) |
+            Q(day=endinf['day'], time__lt=endinf['time'])
+            )
+          )
+    )
+    Checkin.objects.filter(student=student, lesson__in=plessonlist).update(laststatus=F('status'), status=typestatus)
+
+
+def delaskinformationinstartedlesson(student, starttime, endtime):
+    starttimestr = datetime.datetime.strftime(starttime, '%Y-%m-%d')
+    endtimestr = datetime.datetime.strftime(endtime, '%Y-%m-%d')
+    startinf = datetoTermdate(starttimestr)
+    endinf = datetoTermdate(endtimestr)
+    startinf['time'] = timetoclasstime(starttime.time())
+    endinf['time'] = timetoclasstime(endtime.time())
+
+    courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
+    plessonlist = Lesson.objects.select_related('course').select_related('classroom') \
+        .filter(term=startinf['term'], course__in=courses).exclude(status=LESSON_STATUS_CANCLE).exclude(
+        status=LESSON_STATUS_AWAIT).exclude(status=LESSON_STATUS_AGREE)
+    plessonlist = plessonlist.filter(
+        Q(week__gt=startinf['week'], week__lt=endinf['week']) |
+        Q(Q(week=startinf['week']) &
+          Q(Q(day__gt=startinf['day']) |
+            Q(day=startinf['day'], time__gt=startinf['time'])
+            )
+          ) |
+        Q(Q(week=endinf['week']) &
+          Q(Q(day__lt=endinf['day']) |
+            Q(day=endinf['day'], time__lt=endinf['time'])
+            )
+          )
+    )
+    Checkin.objects.filter(student=student, lesson__in=plessonlist).update(status=F('laststatus'))

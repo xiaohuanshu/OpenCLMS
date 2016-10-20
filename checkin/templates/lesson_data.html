@@ -234,7 +234,7 @@
                                         <td>
                                             <div class="btn-group">
                                                 <button data-toggle="dropdown"
-                                                        class="btn bg-{{ s.status | CHECKIN_STATUS_STYLE }} dropdown-toggle btn-xs"
+                                                        class="btn dropdown-toggle btn-xs bg-{{ s.status | CHECKIN_STATUS_STYLE }}"
                                                         type="button"
                                                         aria-expanded="false">{{ s.status | CHECKIN_STATUS }}
                                                 </button>
@@ -249,6 +249,9 @@
                                                         </li>
                                                         <li>
                                                             <a href="#" class="set-early">早退</a>
+                                                        </li>
+                                                        <li>
+                                                            <a href="#" class="set-normal">未到</a>
                                                         </li>
                                                     </ul>
                                                 {% endif %}
@@ -396,9 +399,9 @@
                     if (value.error && value.error != 0) {
                     } else {
                         $("#sl" + studentid).data("status", value.status);
-                        $("#sl" + studentid + " td:eq(5) button").removeClass("btn-danger");
-                        $("#sl" + studentid + " td:eq(5) button").removeClass("btn-success");
-                        $("#sl" + studentid + " td:eq(5) button").addClass("bg-" + checkin_status_style_json[value.status]);
+                        //$("#sl" + studentid + " td:eq(5) button").removeClass("btn-danger");
+                        //$("#sl" + studentid + " td:eq(5) button").removeClass("btn-success");
+                        $("#sl" + studentid + " td:eq(5) button").attr("class", "btn dropdown-toggle btn-xs bg-" + checkin_status_style_json[value.status]);
                         $("#sl" + studentid + " td:eq(5) button").text(checkin_status_json[value.status]);
                     }
                 },
@@ -417,6 +420,9 @@
         });
         $(".set-early").bind('click', function () {
             changestatus($(this).parents('tr').data("studentid"), 'early');
+        });
+        $(".set-normal").bind('click', function () {
+            changestatus($(this).parents('tr').data("studentid"), 'delete');
         });
 
         var chart = document.getElementById("numberData").getContext("2d");

@@ -12,6 +12,13 @@
     <link href="{% static 'plugins/toastr-master/toastr.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
     <style>
+        .modal-backdrop {
+            opacity: 0 !important;
+        }
+
+        .modal {
+            background: rgba(0, 0, 0, 0) !important;
+        }
 
         #qrcode canvas {
             width: 100%;
@@ -126,7 +133,7 @@
 
 
     <div class="modal fade full-width-modal-left" id="StudentList" role="dialog"
-         aria-hidden="true" style="display: none;" data-backdrop="">
+         aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-sm">
             <div class="modal-content" id="studentlistbody">
                 <div class="modal-header">
@@ -190,7 +197,7 @@
         </div>
     </div>
     <div class="modal fade full-width-modal-right" id="CheckinControl" tabindex="-1" role="dialog"
-         aria-hidden="true" style="display: none;" data-backdrop="">
+         aria-hidden="true" style="display: none;">
         <div class="modal-dialog modal-sm">
             <div class="modal-content">
                 <div class="modal-header">
@@ -403,7 +410,7 @@
             var $slstudent = $("#sl" + studentid);
             $slstudent.find("td:eq(2) button").remove();
             $slstudent.find("td:eq(2) .btn-group").prepend(statushtml(status));
-            if (checkin_status_json[status].indexOf('假')>=0) {
+            if (checkin_status_json[status].indexOf('假') >= 0) {
                 $slstudent.find("td:eq(2) button").attr('disabled', true);
                 $slstudent.find("td:eq(3) button").remove();
             } else if (checkin_status_json[status] != '未到') {

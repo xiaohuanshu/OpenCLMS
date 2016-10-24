@@ -32,7 +32,8 @@ def checkin(request, lessonid):
                                        reverse('course:information', args=[lesson.course.id]))},
                                   context_instance=RequestContext(request))
 
-    studentlist = Studentcourse.objects.filter(course=lesson.course).select_related('student').all()
+    studentlist = Studentcourse.objects.filter(course=lesson.course).select_related('student').order_by(
+        'student__studentid').all()
     data = {'lessondata': lesson, 'studentlist': studentlist}
     if lesson.status == LESSON_STATUS_CHECKIN_ADD:
         data['checkintype'] = u'补签'
@@ -82,7 +83,7 @@ def lesson_data(request, lessonid):
 
     checkindata = Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).select_related(
         'student').select_related('student__classid').select_related('student__classid__department').select_related(
-        'student__classid__major').all()
+        'student__classid__major').order_by('student__studentid').all()
     t['checkindata'] = checkindata
 
     askdata = Checkin.objects.filter(lesson=lesson, status__gt=10).select_related('student').select_related(

@@ -4,7 +4,7 @@ import datetime
 from school.function import getTermDate, getClassTime
 from school.models import Classroom
 from constant import *
-from django.db.models import ObjectDoesNotExist, Q
+from django.db.models import ObjectDoesNotExist, Q, F
 import time
 from function import getweek, gettime, getday, t, splitlesson, simplifytime
 from center.functional import classmethod_cache
@@ -178,14 +178,16 @@ class Lesson(models.Model):
         endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
         askstudents_private = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE,
                                                  type=CHECKIN_STATUS_PRIVATE_ASK).filter(
-            Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).values_list(
-            'student', flat=True)
+            Q(starttime__lte=starttime, endtime__gte=starttime) | Q(starttime__lte=endtime, endtime__gte=endtime) | Q(
+                starttime__gte=starttime, endtime__lte=endtime)).values_list('student', flat=True)
         askstudents_public = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE,
                                                 type=CHECKIN_STATUS_PUBLIC_ASK).filter(
-            Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).values_list(
-            'student', flat=True)
-        Checkin.objects.filter(lesson=self, student__in=askstudents_private).update(status=CHECKIN_STATUS_PRIVATE_ASK)
-        Checkin.objects.filter(lesson=self, student__in=askstudents_public).update(status=CHECKIN_STATUS_PUBLIC_ASK)
+            Q(starttime__lte=starttime, endtime__gte=starttime) | Q(starttime__lte=endtime, endtime__gte=endtime) | Q(
+                starttime__gte=starttime, endtime__lte=endtime)).values_list('student', flat=True)
+        Checkin.objects.filter(lesson=self, student__in=askstudents_private).update(laststatus=F('status'),
+                                                                                    status=CHECKIN_STATUS_PRIVATE_ASK)
+        Checkin.objects.filter(lesson=self, student__in=askstudents_public).update(laststatus=F('status'),
+                                                                                   status=CHECKIN_STATUS_PUBLIC_ASK)
         return {'error': 0, 'message': u'课程成功开启', 'newstatus': self.status,
                 'starttime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 

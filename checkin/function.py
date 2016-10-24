@@ -190,8 +190,9 @@ def addaskinformationinstartedlesson(student, starttime, endtime, typestatus):
     endtimestr = datetime.datetime.strftime(endtime, '%Y-%m-%d')
     startinf = datetoTermdate(starttimestr)
     endinf = datetoTermdate(endtimestr)
-    startinf['time'] = timetoclasstime(starttime.time())
-    endinf['time'] = timetoclasstime(endtime.time())
+    startinf['time'] = timetoclasstime(starttime.time(), -1)
+    endinf['time'] = timetoclasstime(endtime.time(), 1)
+    print startinf,endinf
 
     courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
     plessonlist = Lesson.objects.select_related('course').select_related('classroom') \
@@ -218,8 +219,8 @@ def delaskinformationinstartedlesson(student, starttime, endtime):
     endtimestr = datetime.datetime.strftime(endtime, '%Y-%m-%d')
     startinf = datetoTermdate(starttimestr)
     endinf = datetoTermdate(endtimestr)
-    startinf['time'] = timetoclasstime(starttime.time())
-    endinf['time'] = timetoclasstime(endtime.time())
+    startinf['time'] = timetoclasstime(starttime.time(), -1)
+    endinf['time'] = timetoclasstime(endtime.time(), 1)
 
     courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
     plessonlist = Lesson.objects.select_related('course').select_related('classroom') \
@@ -229,12 +230,12 @@ def delaskinformationinstartedlesson(student, starttime, endtime):
         Q(week__gt=startinf['week'], week__lt=endinf['week']) |
         Q(Q(week=startinf['week']) &
           Q(Q(day__gt=startinf['day']) |
-            Q(day=startinf['day'], time__gt=startinf['time'])
+            Q(day=startinf['day'], time__gte=startinf['time'])
             )
           ) |
         Q(Q(week=endinf['week']) &
           Q(Q(day__lt=endinf['day']) |
-            Q(day=endinf['day'], time__lt=endinf['time'])
+            Q(day=endinf['day'], time__lte=endinf['time'])
             )
           )
     )

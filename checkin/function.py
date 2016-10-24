@@ -117,12 +117,8 @@ def endcheckin(lessonid):
     return {'error': 0}
 
 
-def clear_checkin(lessonid):
-    try:
-        lesson = Lesson.objects.get(id=lessonid)
-    except ObjectDoesNotExist:
-        return {'error': 101, 'message': '课程不存在'}
-    if lesson.status == LESSON_STATUS_AWAIT:
+def clear_checkin(lesson):
+    if not (lesson.isnow or lesson.isend()):
         return {'error': 101, 'message': '课程还未开始'}
     Checkinrecord.objects.filter(lesson=lesson).all().delete()
     Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(status=CHECKIN_STATUS_SUCCESS)
@@ -131,11 +127,8 @@ def clear_checkin(lessonid):
     lesson.save()
 
 
-def clear_last_checkin(lessonid):
-    try:
-        lesson = Lesson.objects.get(id=lessonid)
-    except ObjectDoesNotExist:
-        return {'error': 101, 'message': '课程不存在'}
+def clear_last_checkin(lesson):
+    #TODO judge is there last checkin
     if not lesson.status == LESSON_STATUS_CHECKIN and not lesson.status == LESSON_STATUS_CHECKIN_ADD and not lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         return {'error': 101, 'message': '课程未开始签到'}
     Checkinrecord.objects.filter(lesson=lesson).order_by('-time').first().delete()

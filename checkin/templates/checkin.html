@@ -230,14 +230,14 @@
                                 <div class="row"><br/></div>
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
-                                        <a href="?deletethis=1">
+                                        <a href="{% url 'checkin:clearcheckin' lessondata.id %}?deletethis=1">
                                             <button type="button" class="btn btn-danger btn-block">删除本次签到数据</button>
                                         </a>
                                     </div>
                                 </div>
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
-                                        <a href="?deleteall=1">
+                                        <a href="{% url 'checkin:clearcheckin' lessondata.id %}?deleteall=1">
                                             <button type="button" class="btn btn-danger btn-block">删除所有签到数据</button>
                                         </a>
                                     </div>

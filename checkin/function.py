@@ -192,7 +192,6 @@ def addaskinformationinstartedlesson(student, starttime, endtime, typestatus):
     endinf = datetoTermdate(endtimestr)
     startinf['time'] = timetoclasstime(starttime.time(), -1)
     endinf['time'] = timetoclasstime(endtime.time(), 1)
-    print startinf,endinf
 
     courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
     plessonlist = Lesson.objects.select_related('course').select_related('classroom') \

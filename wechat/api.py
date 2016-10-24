@@ -196,7 +196,7 @@ def oauth_getuserinfo(state='STATE', scope=1):
 
 def oauth_test(request):
     if request.session.get('openid', default=False):
-        print request.session.get('openid')
+        pass
     else:
         return oauth_getuserinfo(state=request.get_full_path(), scope=2)
 

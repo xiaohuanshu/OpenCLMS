@@ -4,6 +4,8 @@ import datetime
 from school.function import getTermDate, getClassTime
 from school.models import Classroom
 from constant import *
+from checkin.constant import *
+from checkin.models import Checkin,Asktostudent,Ask
 from django.db.models import ObjectDoesNotExist, Q, F
 import time
 from function import getweek, gettime, getday, t, splitlesson, simplifytime
@@ -119,17 +121,12 @@ class Lesson(models.Model):
 
     @classmethod_cache
     def shouldnumber(self):
-        from checkin.models import Checkin
         shouldnumber = Studentcourse.objects.filter(course=self.course).count()
-        leavenumber = Checkin.objects.filter(lesson=self, status__gt=10).count()
-        # TODO leavenumver counter
+        leavenumber = self.asknumber()
         return shouldnumber - leavenumber
 
     @classmethod_cache
     def actuallynumber(self):
-        from checkin.models import Checkin
-        from checkin.constant import CHECKIN_STATUS_EARLY, CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_LATE, \
-            CHECKIN_STATUS_LATEEARLY
         checkindata = Checkin.objects.filter(lesson=self)
         realnumber = checkindata.filter(
             Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_SUCCESS) | Q(status=CHECKIN_STATUS_LATE) | Q(
@@ -138,15 +135,24 @@ class Lesson(models.Model):
 
     @classmethod_cache
     def asknumber(self):
-        from checkin.models import Checkin
-        checkindata = Checkin.objects.filter(lesson=self)
-        asknumber = checkindata.filter(status__gt=10).count()
+        if self.isnow() or self.isend():
+            checkindata = Checkin.objects.filter(lesson=self)
+            asknumber = checkindata.filter(status__gt=10).count()
+        else:
+            starttime, endtime = self.getTime()
+            starttime = time.strftime('%Y-%m-%d %H:%M:%S', starttime)
+            endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
+            students = Studentcourse.objects.filter(course=self.course).values_list('student', flat=True)
+            asks = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE).filter(
+                Q(starttime__lte=starttime, endtime__gte=starttime) | Q(starttime__lte=endtime,
+                                                                        endtime__gte=endtime) | Q(
+                    starttime__gte=starttime, endtime__lte=endtime))
+            asknumber = Asktostudent.objects.filter(ask__in=asks).count()
         return asknumber
 
     @classmethod_cache
     def notreachnumber(self):
         from checkin.models import Checkin
-        from checkin.constant import CHECKIN_STATUS_NORMAL
         checkindata = Checkin.objects.filter(lesson=self)
         notreach = checkindata.filter(status=CHECKIN_STATUS_NORMAL).count()
         return notreach
@@ -162,9 +168,6 @@ class Lesson(models.Model):
         self.save()
 
         # for checkin
-        from checkin.models import Checkin, Ask
-        from checkin.constant import CHECKIN_STATUS_NORMAL, ASK_STATUS_APPROVE, CHECKIN_STATUS_PRIVATE_ASK, \
-            CHECKIN_STATUS_PUBLIC_ASK
         nowstudent = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
         studentcourse = Studentcourse.objects.filter(course=self.course).exclude(student__in=nowstudent).all()
         newstudent = []

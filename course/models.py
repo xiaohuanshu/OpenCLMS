@@ -173,7 +173,7 @@ class Lesson(models.Model):
         newstudent = []
         for s in studentcourse:
             newstudent.append(
-                Checkin(lesson=self, status=CHECKIN_STATUS_NORMAL, student=s.student))
+                Checkin(lesson=self, status=CHECKIN_STATUS_SUCCESS, student=s.student))
         Checkin.objects.bulk_create(newstudent)
         students = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
         starttime, endtime = self.getTime()

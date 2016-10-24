@@ -40,6 +40,8 @@ def startcheckin(lessonid, mode='first'):
             return {'error': 101, 'message': '不能进行首签模式'}
         lesson.status = LESSON_STATUS_CHECKIN
         checkin_record.status = CHECKIN_RECORD_FIRST
+        Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(laststatus=F('status'))
+        Checkin.objects.filter(lesson=lesson,status=CHECKIN_STATUS_SUCCESS).update(status=CHECKIN_STATUS_NORMAL)
         '''
         nowstudent = Checkin.objects.filter(lesson=lesson).values_list('student', flat=True)
         studentcourse = Studentcourse.objects.filter(course=lesson.course).exclude(student__in=nowstudent)
@@ -123,7 +125,7 @@ def clear_checkin(lessonid):
     if lesson.status == LESSON_STATUS_AWAIT:
         return {'error': 101, 'message': '课程还未开始'}
     Checkinrecord.objects.filter(lesson=lesson).all().delete()
-    Checkin.objects.filter(lesson=lesson).all().delete()
+    Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(status=CHECKIN_STATUS_SUCCESS)
     lesson.status = LESSON_STATUS_NOW
     lesson.checkincount = 0
     lesson.save()
@@ -137,10 +139,7 @@ def clear_last_checkin(lessonid):
     if not lesson.status == LESSON_STATUS_CHECKIN and not lesson.status == LESSON_STATUS_CHECKIN_ADD and not lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         return {'error': 101, 'message': '课程未开始签到'}
     Checkinrecord.objects.filter(lesson=lesson).order_by('-time').first().delete()
-    if lesson.checkincount == 1:
-        Checkin.objects.filter(lesson=lesson).delete()
-    else:
-        Checkin.objects.filter(lesson=lesson).update(status=F('laststatus'))
+    Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(status=F('laststatus'))
     lesson.checkincount -= 1
     lesson.status = LESSON_STATUS_NOW
     lesson.save()

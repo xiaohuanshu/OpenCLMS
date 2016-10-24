@@ -8,7 +8,7 @@ from checkin.constant import *
 from django.shortcuts import redirect, HttpResponseRedirect, render, render_to_response, RequestContext
 from django.core.urlresolvers import reverse
 from function import startcheckin, endcheckin, student_checkin, generateqrstr, addaskinformationinstartedlesson, \
-    delaskinformationinstartedlesson
+    delaskinformationinstartedlesson, clear_checkin, clear_last_checkin
 from models import Checkin, Ask, Asktostudent
 from user.models import User
 from school.models import Student
@@ -210,3 +210,17 @@ def delask(request):
     ask.delete()
     data = {'error': 0, 'message': '删除成功', 'status': ask.status}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def clearcheckin(request, lessonid):
+    lesson = Lesson.objects.get(id=lessonid)
+    if not has_course_permission(request.user, lesson.course):
+        return render_to_response('error.html',
+                                  {'message': '没有权限'},
+                                  context_instance=RequestContext(request))
+    if request.GET.get('deleteall', 0):
+        clear_checkin(lesson)
+        return redirect(reverse('checkin:lesson_data', args=[lesson.id]))
+    if request.GET.get('deletethis', 0):
+        clear_last_checkin(lesson)
+        return redirect(reverse('checkin:lesson_data', args=[lesson.id]))

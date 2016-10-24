@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^ajax/changecheckinstatus/(\d+)$', control.changecheckinstatus, name='changecheckinstatus'),
     url(r'^control/startcheckin/(\d+)$', control.startCheckin, name='startcheckin'),
     url(r'^control/stopcheckin/(\d+)$', control.stopCheckin, name='stopcheckin'),
+    url(r'^control/clearcheckin/(\d+)$', control.clearcheckin, name='clearcheckin'),
 
     url(r'^data/course_data/(\d+)$', views.course_data, name='course_data'),
     url(r'^data/student_data/(\d+)$', views.student_data, name='student_data'),

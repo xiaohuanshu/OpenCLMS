@@ -31,12 +31,7 @@ def checkin(request, lessonid):
                                    'jumpurl': str(
                                        reverse('course:information', args=[lesson.course.id]))},
                                   context_instance=RequestContext(request))
-    if request.GET.get('deleteall', 0):
-        clear_checkin(lessonid)
-        return redirect(reverse('course:information', args=[lesson.course.id]))
-    if request.GET.get('deletethis', 0):
-        clear_last_checkin(lessonid)
-        return redirect(reverse('course:information', args=[lesson.course.id]))
+
     studentlist = Studentcourse.objects.filter(course=lesson.course).select_related('student').all()
     data = {'lessondata': lesson, 'studentlist': studentlist}
     if lesson.status == LESSON_STATUS_CHECKIN_ADD:

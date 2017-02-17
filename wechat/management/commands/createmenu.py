@@ -1,12 +1,12 @@
 # -*- coding: utf-8 -*-
-from django.core.management.base import BaseCommand, CommandError
+from django.core.management.base import BaseCommand
 from django.conf import settings
-from wechat.api import wechat
+from wechat.client import wechat_client
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        wechat.create_menu({
+        wechat_client.menu.create(settings.AGENTID, {
             'button': [
                 {
                     'name': u'考勤',

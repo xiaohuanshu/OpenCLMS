@@ -1,17 +1,18 @@
 from django import template
-from wechat.api import getjsapi_ticket, wechat
+from wechat.client import wechat_client
 from django.conf import settings
-import uuid, json
+import uuid, json, time
 
 register = template.Library()
 
 
 @register.assignment_tag
 def wxconfig(url, jsApiList='closeWindow'):
-    get_jsapi_ticket = getjsapi_ticket()
+    ticket = wechat_client.jsapi.get_jsapi_ticket()
     noncestr = uuid.uuid4().hex
-    signature = wechat.generate_jsapi_signature(get_jsapi_ticket['jsapi_ticket_expires_at'], noncestr,
-                                                '%s%s' % (settings.DOMAIN, url), get_jsapi_ticket['jsapi_ticket'])
+    timestamp = int(time.time())
+    signature = wechat_client.jsapi.get_jsapi_signature(noncestr, ticket, timestamp,
+                                                        '%s%s' % (settings.DOMAIN, url))
     return '''
     <script>
         wx.config({
@@ -25,8 +26,8 @@ def wxconfig(url, jsApiList='closeWindow'):
     </script>
     ''' % (
         (settings.DEBUG and ['true'] or ['false'])[0],
-        settings.APPID,
-        get_jsapi_ticket['jsapi_ticket_expires_at'],
+        settings.CORPID,
+        timestamp,
         noncestr,
         signature,
         json.dumps(jsApiList.split(','))

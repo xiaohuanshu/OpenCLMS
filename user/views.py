@@ -21,6 +21,8 @@ from auth import permission_required
 from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
 import uuid
+from django.core import signing
+from wechat.client import wechat_client
 
 
 def login(request):
@@ -60,6 +62,9 @@ def registerProcess(request):
     email = request.POST.get('email')
     password = request.POST.get('password')
     sex = request.POST.get('sex')
+    wxauth = request.GET.get('wxauth', default=None)
+    if wxauth:
+        wxauth = signing.loads(wxauth)
     if username == '' or not re.search('^\w*[a-zA-Z]+\w*$', username) or email == '' or not re.search(
             "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
             email) or password == '' or sex == '' or User.objects.filter(
@@ -70,20 +75,43 @@ def registerProcess(request):
         m.update(password)
         password = m.hexdigest()
         nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-        openid = request.session.get('openid', default=None)
         user = User(username=username, password=password, email=email, sex=sex, registertime=nowtime,
-                    lastlogintime=nowtime, ip=request.META['REMOTE_ADDR'], openid=openid)
+                    lastlogintime=nowtime, ip=request.META['REMOTE_ADDR'])
+        if wxauth:
+            user.openid = wxauth['userid']
+            user.verify = True
+        else:
+            user.openid = None
         user.save()
         request.session['username'] = username
         request.session['userid'] = user.id
-        '''
+        if wxauth:
+            if wxauth['usertype'] == 'student':
+                student = Student.objects.get(studentid=wxauth['workid'])
+                student.user = user
+                student.save()
+                studentrole = Role.objects.get(name='学生')
+                Usertorole(user=user, role=studentrole).save()
+            elif wxauth['usertype'] == 'teacher':
+                teacher = Teacher.objects.get(teacherid=wxauth['workid'])
+                teacher.user = user
+                teacher.save()
+                teacherrole = Role.objects.get(name='教师')
+                Usertorole(user=user, role=teacherrole).save()
+            wechat_client.user.verify(wxauth['userid'])
+            return render_to_response('success.html',
+                                      {'message': u'认证成功',
+                                       'wechatclose': True},
+                                      context_instance=RequestContext(request))
+        else:
+            '''
         origin = request.session.get('origin', '')
         if origin != '':
             del request.session['origin']
             return HttpResponseRedirect(origin)
         else:
             return redirect(reverse('home', args=[]))'''
-        return redirect(reverse('user:authentication', args=[]))
+            return redirect(reverse('user:authentication', args=[]))
 
 
 def loginProcess(request):

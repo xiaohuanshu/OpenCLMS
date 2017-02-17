@@ -5,8 +5,10 @@ except ImportError:  # django < 1.4
 '''
 # place app url patterns here
 from django.conf.urls import url
-import api
+import api, oauth,views
+
 urlpatterns = [
     url(r'^api$', api.api, name='api'),
-    url(r'^oauth', api.oauth, name='oauth'),
+    url(r'^wxauth$', views.wxauth, name='wxauth'),
+    url(r'^oauth', oauth.oauth, name='oauth'),
 ]

@@ -8,6 +8,7 @@ from center.functional import classmethod_cache
 
 class Administration(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
+    wechattagtid = models.SmallIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -24,6 +25,7 @@ class Class(models.Model):
     schoolyear = models.SmallIntegerField(blank=True, null=True)
     major = models.ForeignKey('Major', models.DO_NOTHING, db_column='majorid', blank=True, null=True)
     name = models.CharField(max_length=255, blank=True, null=True)
+    wechatdepartmentid = models.SmallIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -54,6 +56,7 @@ class Classroom(models.Model):
 
 class Department(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
+    wechatdepartmentid = models.SmallIntegerField(blank=True, null=True)
 
     def majoramount(self):
         return self.major_set.count()
@@ -74,6 +77,7 @@ class Department(models.Model):
 class Major(models.Model):
     department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
     name = models.CharField(max_length=50, blank=True, null=True)
+    wechattagid = models.SmallIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)

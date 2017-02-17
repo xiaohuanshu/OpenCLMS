@@ -14,7 +14,8 @@
             {% if request.GET.error %}
                 <label class="text-danger">{{ request.GET.error }}</label>
             {% endif %}
-            <form action="{% url 'user:registerProcess' %}" method="post" id="signupForm">
+            <form action="{% url 'user:registerProcess' %}?wxauth={{ request.GET.wxauth }}" method="post"
+                  id="signupForm">
                 {% csrf_token %}
                 <div class="form-group has-feedback">
                     <input type="text" class="form-control" placeholder="用户名" name="username" id="username" autofocus>
@@ -156,29 +157,29 @@
                         }
                     }
                 }/*,
-                agree: {
-                    validators: {
-                        choice: {
-                            max:1,
-                            min:1,
-                            message: ' '
-                        }
-                    }
-                }*/
+                 agree: {
+                 validators: {
+                 choice: {
+                 max:1,
+                 min:1,
+                 message: ' '
+                 }
+                 }
+                 }*/
             }
         });
         /*var bootstrapValidator = $('#signupForm').data('bootstrapValidator');
-        $('#agree').on('ifChanged', function (event) {
-            $('#agree').iCheck('update');
-            bootstrapValidator.updateStatus('agree', 'NOT_VALIDATED', null);
-            bootstrapValidator.validateField('agree');
-            if(console.log($('#agree').is(':checked'))){
-                bootstrapValidator.updateStatus('agree', 'INVALID', null)
-            }else{
-                bootstrapValidator.updateStatus('agree', 'VALID', null)
-            }
-            //bootstrapValidator.validateField('agree');
-        });*/
-    //TODO add bootstrapvalidator agree balidator(something error happen)
+         $('#agree').on('ifChanged', function (event) {
+         $('#agree').iCheck('update');
+         bootstrapValidator.updateStatus('agree', 'NOT_VALIDATED', null);
+         bootstrapValidator.validateField('agree');
+         if(console.log($('#agree').is(':checked'))){
+         bootstrapValidator.updateStatus('agree', 'INVALID', null)
+         }else{
+         bootstrapValidator.updateStatus('agree', 'VALID', null)
+         }
+         //bootstrapValidator.validateField('agree');
+         });*/
+        //TODO add bootstrapvalidator agree balidator(something error happen)
     </script>
 {% endblock %}

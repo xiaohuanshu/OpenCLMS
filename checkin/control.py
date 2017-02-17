@@ -97,7 +97,11 @@ def ck(request, qr_str):
                                   context_instance=RequestContext(request))
     lesson = Lesson.objects.get(id=lessonid)
     user = User.objects.get(id=request.session.get('userid'))
-    student = Student.objects.get(user=user)
+    try:
+        student = Student.objects.get(user=user)
+    except ObjectDoesNotExist:
+        return render_to_response('error.html', {'message': u'签到失败', 'submessage': u'您的身份不是学生', 'wechatclose': True},
+                                  context_instance=RequestContext(request))
     if not Studentcourse.objects.filter(course=lesson.course, student=student).exists():
         return render_to_response('error.html', {'message': u'签到失败', 'submessage': u'上课名单中没有你', 'wechatclose': True},
                                   context_instance=RequestContext(request))

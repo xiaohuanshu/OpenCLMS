@@ -2,7 +2,7 @@ __author__ = 'xiaohuanshu'
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import resolve
-from wechat.api import oauth_getuserinfo
+from wechat.oauth import getuserinfo
 from django.contrib.auth.hashers import check_password
 from django.conf import settings
 from user.models import User
@@ -15,7 +15,10 @@ class UserMiddleware(object):
         urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
         allow_url = ['user:login', 'user:loginProcess', 'user:register', 'user:logout',
                      'user:check_username', 'user:check_email', 'user:registerProcess',
-                     'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword']
+                     'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword',
+                     'wechat:wxauth']
+        wechat_allow_url = ['wechat:oauth', 'wechat:wxauth', 'user:register', 'user:check_username', 'user:check_email',
+                            'user:registerProcess']
         if request.session.get('username', '') == '':
             if request.COOKIES.has_key('username'):
                 remembercode = request.COOKIES['remembercode']
@@ -29,10 +32,10 @@ class UserMiddleware(object):
                         return redirect(reverse('user:authentication'))
                     return None
             if agent and "MicroMessenger" in agent:
-                if 'wechat:oauth' == urlname:
+                if urlname in wechat_allow_url:
                     return None
                 if not request.session.get('openid', default=False):
-                    return oauth_getuserinfo(state=request.get_full_path(), scope=2)
+                    return getuserinfo(state=request.get_full_path())
 
             if urlname not in allow_url:
                 request.session['origin'] = request.get_full_path()

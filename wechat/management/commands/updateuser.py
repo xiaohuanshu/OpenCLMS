@@ -36,8 +36,8 @@ class Command(BaseCommand):
             userinfo = getinfomation(s.studentid)
             if userinfo:
                 print 'exist'
-                if userinfo['department'][0] != s.classid.wechatdepartmentid or getidnumber(userinfo)[
-                                                                                -6:] != s.idnumber:
+                if userinfo['department'][0] != s.classid.wechatdepartmentid or getidnumber(userinfo) != s.idnumber[
+                                                                                                         -6:]:
                     wechat_client.user.update(userinfo['userid'], department=[s.classid.wechatdepartmentid], extattr={
                         "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"身份证号", "value": s.idnumber[-6:]}]})
             else:
@@ -56,8 +56,7 @@ class Command(BaseCommand):
 
             if userinfo:
                 print 'exist'
-                if sorted(userinfo['department']) != sorted(tdeps) or getidnumber(userinfo)[
-                                                                      -6:] != t.idnumber:
+                if sorted(userinfo['department']) != sorted(tdeps) or getidnumber(userinfo) != t.idnumber[-6:]:
                     wechat_client.user.update(userinfo['userid'], department=tdeps, extattr={
                         "attrs": [{"name": u"学工号", "value": t.teacherid}, {"name": u"身份证号", "value": t.idnumber[-6:]}]})
             else:

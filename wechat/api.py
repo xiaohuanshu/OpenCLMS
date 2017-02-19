@@ -65,12 +65,12 @@ def api(request):
             if isfirst:
                 userinfo = wechat_client.user.get(msg.source)
                 wechatuser.openid = msg.source
-                wechatuser.nickname = userinfo['nickname']
-                wechatuser.sex = userinfo['sex']
-                wechatuser.city = userinfo['city']
-                wechatuser.province = userinfo['province']
-                wechatuser.country = userinfo['country']
-                wechatuser.headimgurl = userinfo['headimgurl']
+                #wechatuser.nickname = userinfo['nickname']
+                wechatuser.sex = userinfo['gender']
+                #wechatuser.city = userinfo['city']
+                #wechatuser.province = userinfo['province']
+                #wechatuser.country = userinfo['country']
+                #wechatuser.headimgurl = userinfo['headimgurl']
                 wechatuser.subscribe_time = time.strftime('%Y-%m-%d %H:%M:%S',
                                                           time.localtime(userinfo['subscribe_time']))
                 wechatuser.unsubscribe = False

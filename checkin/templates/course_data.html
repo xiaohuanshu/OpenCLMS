@@ -94,11 +94,12 @@
                 return response.message;
             }
         };
+        /*
         $.fn.editable.defaults.validate = function(value){
             if (checkin_status_json[value].indexOf('假')>=0){
                 return '无权设定为请假';
             }
-        };
+        };*/
         $.fn.editable.defaults.display = function (value, sourceData) {
             if (value == "undefined") {
                 $(this).text();

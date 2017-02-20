@@ -44,7 +44,7 @@ class Command(BaseCommand):
                 print 'create'
                 wechat_client.user.create('S%s' % s.studentid, s.name, s.classid.wechatdepartmentid, u'学生',
                                           gender=s.sex,
-                                          email='%s@gengdan.edu.cn' % s.studentid, extattr={
+                                          email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL), extattr={
                         "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"身份证号", "value": s.idnumber[-6:]}]})
 
         # for teacher

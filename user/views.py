@@ -65,6 +65,10 @@ def registerProcess(request):
     wxauth = request.GET.get('wxauth', default=None)
     if wxauth:
         wxauth = signing.loads(wxauth)
+    if wxauth and request.GET.get('quick'):
+        username = wxauth['workid']
+        password = wxauth['workid']
+        email = '%s@%s' % (wxauth['workid'], settings.SCHOOLEMAIL)
     if username == '' or not re.search('^\w*[a-zA-Z]+\w*$', username) or email == '' or not re.search(
             "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
             email) or password == '' or sex == '' or User.objects.filter(

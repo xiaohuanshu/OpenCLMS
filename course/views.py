@@ -9,6 +9,7 @@ from course.auth import has_course_permission
 from models import Course, Lesson, Studentcourse
 from school.models import Student
 from user.auth import permission_required
+from school.function import getCurrentSchoolYearTerm
 
 
 def information(request, courseid):
@@ -22,7 +23,8 @@ def information(request, courseid):
 
 @permission_required(permission='course_viewlist')
 def list(request):
-    return render_to_response('list.html', {}, context_instance=RequestContext(request))
+    return render_to_response('list.html', {'term': getCurrentSchoolYearTerm()},
+                              context_instance=RequestContext(request))
 
 
 @permission_required(permission='course_viewlist')

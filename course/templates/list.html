@@ -43,7 +43,11 @@
                                         {% getterm as termdata %}
 
                                         {% for m in termdata %}
-                                            <option value="{{ m }}">{{ m }}</option>
+                                            {% if m == term.term %}
+                                                <option value="{{ m }}" selected>{{ m }}</option>
+                                            {% else %}
+                                                <option value="{{ m }}">{{ m }}</option>
+                                            {% endif %}
                                         {% endfor %}
                                     </select>
                                 </div>

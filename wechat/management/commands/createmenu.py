@@ -25,8 +25,8 @@ class Command(BaseCommand):
                 },
                 {
                     'type': 'view',
-                    'name': u'个人课表',
-                    'url': '%s/course/schedule' % settings.DOMAIN
+                    'name': u'考勤系统',
+                    'url': settings.DOMAIN
                 },
                 {
                     'name': u'其他',

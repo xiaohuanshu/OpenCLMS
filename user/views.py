@@ -163,8 +163,10 @@ def loginProcess(request):
 
 
 def logout(request):
-    del request.session['username']
-    del request.session['userid']
+    if request.session.get('username', default=False):
+        del request.session['username']
+    if request.session.get('userid', default=False):
+        del request.session['userid']
     if request.session.get('openid', default=False):
         del request.session['openid']
     response = redirect(reverse('user:login', args=[]))

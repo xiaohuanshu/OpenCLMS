@@ -25,9 +25,15 @@ class UserMiddleware(object):
                 if check_password("%s%s%s" % (
                         request.COOKIES['userid'], settings.SECRET_KEY, request.COOKIES['username']),
                                   remembercode):
+                    try:
+                        request.user = User.objects.get(id=request.COOKIES['userid'])
+                    except ObjectDoesNotExist:
+                        if urlname != 'user:logout':
+                            return redirect(reverse('user:logout'))
+                        else:
+                            return None
                     request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
-                    request.user = User.objects.get(id=request.session.get('userid'))
                     if (not request.user.verify) and urlname != 'user:authentication':
                         return redirect(reverse('user:authentication'))
                     return None

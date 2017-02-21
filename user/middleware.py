@@ -44,7 +44,8 @@ class UserMiddleware(object):
             try:
                 request.user = User.objects.get(id=request.session.get('userid'))
             except ObjectDoesNotExist:
-                return redirect(reverse('user:logout'))
+                if urlname != 'user:logout':
+                    return redirect(reverse('user:logout'))
             if (not request.user.verify) and urlname != 'user:authentication' and urlname != 'user:logout':
                 return redirect(reverse('user:authentication'))
         return None

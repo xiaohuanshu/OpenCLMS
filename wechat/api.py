@@ -59,7 +59,8 @@ def api(request):
                 response = TextReply(content='text reply', message=msg)
     elif msg.type == 'event':
         if msg.event == 'subscribe':  # 关注事件
-            response = TextReply(content=u'欢迎关注', message=msg)
+            response = EmptyReply()
+            #response = TextReply(content=u'欢迎关注', message=msg)
             wechatuser, isfirst = Wechatuser.objects.get_or_create(openid=msg.source)
 
             if isfirst:

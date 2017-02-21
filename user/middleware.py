@@ -6,7 +6,7 @@ from wechat.oauth import getuserinfo
 from django.contrib.auth.hashers import check_password
 from django.conf import settings
 from user.models import User
-
+from django.db.models import ObjectDoesNotExist
 
 class UserMiddleware(object):
     def process_request(self, request):
@@ -41,7 +41,10 @@ class UserMiddleware(object):
                 request.session['origin'] = request.get_full_path()
                 return redirect(reverse('user:login'))
         else:
-            request.user = User.objects.get(id=request.session.get('userid'))
+            try:
+                request.user = User.objects.get(id=request.session.get('userid'))
+            except ObjectDoesNotExist:
+                return redirect(reverse('user:logout'))
             if (not request.user.verify) and urlname != 'user:authentication' and urlname != 'user:logout':
                 return redirect(reverse('user:authentication'))
         return None

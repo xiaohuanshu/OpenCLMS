@@ -49,12 +49,10 @@
                     <!-- /.col -->
                 </div>
             </form>
-            {% comment %}
             {% if request.GET.wxauth %}
                 <a href="{% url 'user:registerProcess' %}?wxauth={{ request.GET.wxauth }}&quick=yes"
                    class="text-center text-red">快速注册(用户名密码均为学工号)</a><br/>
             {% endif %}
-            {% endcomment %}
             <a href="{% url 'user:login' %}" class="text-center">已有帐号?点击登录</a>
         </div>
         <!-- /.form-box -->

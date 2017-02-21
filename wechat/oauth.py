@@ -24,7 +24,10 @@ def oauth(request):
             request.session['userinfo'] = user_info
             if 'UserId' in user_info:
                 userid = user_info['UserId']
-                user = User.objects.get(openid=userid)
+                try:
+                    user = User.objects.get(openid=userid)
+                except ObjectDoesNotExist:
+                    return HttpResponseRedirect(reverse('user:wxauth', args=[]) + '?code=%s' % code)
                 if not user.verify:
                     request.session['origin'] = request.GET.get('state')
                     httpresponse = redirect(reverse('user:authentication', args=[]))

@@ -8,12 +8,11 @@ from school.models import Student, Teacher
 # Create your views here.
 # @resourcejurisdiction_view_auth(jurisdiction='school')
 def home(request):
-    userid = request.session.get('userid')
     if request.user.isteacher():
-        teacher = Teacher.objects.get(user=userid)
+        teacher = Teacher.objects.get(user=request.user)
         termcourse = Course.objects.filter(teacher=teacher, schoolterm=getCurrentSchoolYearTerm()['term'])
     else:
-        student = Student.objects.get(user=userid)
+        student = Student.objects.get(user=request.user)
         # alreadycount = Checkin.objects.filter(studentid=student)
         # alreadycount.query.group_by = ['lessonruntimeid__lessonid__id']
         termcourse = Studentcourse.objects.filter(student=student, course__schoolterm=getCurrentSchoolYearTerm()[

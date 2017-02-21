@@ -88,6 +88,7 @@ class Usertorole(models.Model):
 
     class Meta:
         db_table = 'UsertoRole'
+        index_together = ["user", "role"]
 
 
 @receiver(post_save, sender=Role)

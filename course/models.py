@@ -246,3 +246,4 @@ class Studentcourse(models.Model):
 
     class Meta:
         db_table = 'StudentCourse'
+        index_together = ["student", "course"]

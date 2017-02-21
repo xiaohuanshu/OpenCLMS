@@ -121,7 +121,7 @@ class Seat(models.Model):
 
 
 class Student(models.Model):
-    studentid = models.CharField(primary_key=True,max_length=11)
+    studentid = models.CharField(primary_key=True, max_length=11)
     idnumber = models.CharField(max_length=18, blank=True, null=True)
     name = models.CharField(max_length=20, blank=True, null=True)
     sex = models.SmallIntegerField(blank=True, null=True)
@@ -141,7 +141,7 @@ class Student(models.Model):
 
 
 class Teacher(models.Model):
-    teacherid = models.CharField(primary_key=True,max_length=8)
+    teacherid = models.CharField(primary_key=True, max_length=8)
     name = models.CharField(max_length=20, blank=True, null=True)
     sex = models.SmallIntegerField(blank=True, null=True)
     idnumber = models.CharField(max_length=18, blank=True, null=True)
@@ -165,6 +165,7 @@ class Teachertoadministration(models.Model):
 
     class Meta:
         db_table = 'TeachertoAdministration'
+        index_together = ["teacher", "administration"]
 
 
 class Teachertodepartment(models.Model):
@@ -173,6 +174,7 @@ class Teachertodepartment(models.Model):
 
     class Meta:
         db_table = 'TeachertoDepartment'
+        index_together = ["teacher", "department"]
 
 
 @receiver(post_save, sender=Schoolterm)

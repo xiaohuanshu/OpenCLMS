@@ -27,7 +27,7 @@ def oauth(request):
                 try:
                     user = User.objects.get(openid=userid)
                 except ObjectDoesNotExist:
-                    return HttpResponseRedirect(reverse('user:wxauth', args=[]) + '?code=%s' % code)
+                    return HttpResponseRedirect(reverse('wechat:wxauth', args=[]) + '?code=%s' % code)
                 if not user.verify:
                     request.session['origin'] = request.GET.get('state')
                     httpresponse = redirect(reverse('user:authentication', args=[]))

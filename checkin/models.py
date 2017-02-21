@@ -23,6 +23,7 @@ class Checkin(models.Model):
 
     class Meta:
         db_table = 'Checkin'
+        unique_together = ["lesson", "student"]
 
 
 class Checkinrecord(models.Model):
@@ -53,7 +54,8 @@ class Ask(models.Model):
     operater = models.ForeignKey('user.User', models.DO_NOTHING, db_column='operater', blank=True, null=True)
     type = models.IntegerField(blank=True, null=True)
     student = models.ManyToManyField('school.Student', through='Asktostudent',
-                                            through_fields=('ask', 'student'))
+                                     through_fields=('ask', 'student'))
+
     class Meta:
         db_table = 'Ask'
 
@@ -64,3 +66,4 @@ class Asktostudent(models.Model):
 
     class Meta:
         db_table = 'AsktoStudent'
+        index_together = ["student", "ask"]

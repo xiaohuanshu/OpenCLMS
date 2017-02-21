@@ -46,6 +46,8 @@ class UserMiddleware(object):
             except ObjectDoesNotExist:
                 if urlname != 'user:logout':
                     return redirect(reverse('user:logout'))
+                else:
+                    return None
             if (not request.user.verify) and urlname != 'user:authentication' and urlname != 'user:logout':
                 return redirect(reverse('user:authentication'))
         return None

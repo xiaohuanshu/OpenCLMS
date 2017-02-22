@@ -29,6 +29,14 @@ class Course(models.Model):
     major = models.ForeignKey('school.Major', models.DO_NOTHING, db_column='majorid', blank=True, null=True)
     department = models.ForeignKey('school.Department', models.DO_NOTHING, db_column='departmentid', blank=True,
                                    null=True)
+    teachclass = models.ForeignKey('school.Class', models.DO_NOTHING, db_column='teachclassid', blank=True,
+                                   null=True)
+
+    def gettitlewithclass(self):
+        if self.teachclass:
+            return "%s(%s)" % (self.title, self.teachclass.name)
+        else:
+            return self.title
 
     @classmethod_cache
     def lastlessontime(self):

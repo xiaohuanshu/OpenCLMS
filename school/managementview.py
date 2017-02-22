@@ -8,6 +8,9 @@ from django.shortcuts import render_to_response, RequestContext, redirect
 
 from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
 from user.auth import permission_required
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @permission_required(permission='school_schoolterm_view')
@@ -37,10 +40,12 @@ def schoolterm(request):
         newterm = Schoolterm.objects.get(id=request.GET.get('changeterm'))
         newterm.now = True
         newterm.save()
+        logger.info('term changed to %s' % newterm.description)
         return redirect(reverse('school:schoolterm', args=[]))
     if request.GET.get('deleteterm', default=False):
         oldterm = Schoolterm.objects.get(id=request.GET.get('deleteterm'))
         oldterm.delete()
+        logger.info('term %s deleted' % oldterm.description)
         return redirect(reverse('school:schoolterm', args=[]))
     term = Schoolterm.objects.all().order_by('-startdate')
     return render_to_response('schoolterm.html', {'term': term}, context_instance=RequestContext(request))
@@ -60,6 +65,7 @@ def classtime(request):
         elif request.POST.get('name') == 'endtime':
             data.endtime = request.POST.get('value')
             data.save()
+        logger.info('classtime changed')
         return HttpResponse(json.dumps({'status': 'ok'}), content_type="application/json")
     classtimedata = Classtime.objects.all().order_by('id')
     return render_to_response('classtime.html', {'classtimedata': classtimedata},

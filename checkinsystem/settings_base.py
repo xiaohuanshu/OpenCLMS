@@ -34,7 +34,7 @@ INSTALLED_APPS = [
     'school',
     'course',
     'checkin',
-    #'rbac'
+    # 'rbac'
 
 ]
 
@@ -109,8 +109,15 @@ LOGGING = {
         'request': {
             'format': '%(asctime)s [%(levelname)s] [status_code:%(status_code)s]- %(message)s'
         },
+        'mainlog': {
+            'format': '%(asctime)s [%(levelname)s] - %(message)s'
+        },
     },
     'handlers': {
+        'console': {
+            'level': 'DEBUG',
+            'class': 'logging.StreamHandler',
+        },
         'request': {
             'level': 'DEBUG',
             'class': 'logging.handlers.RotatingFileHandler',
@@ -118,6 +125,46 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'request',
+        },
+        'userfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'userlog.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'mainlog',
+        },
+        'wechatfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'wechatlog.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'mainlog',
+        },
+        'coursefile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'courselog.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'mainlog',
+        },
+        'checkinfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'checkinlog.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'mainlog',
+        },
+        'schoolfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'schoollog.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'mainlog',
         }
     },
     'loggers': {
@@ -125,6 +172,31 @@ LOGGING = {
             'handlers': ['request'],
             'propagate': True,
             'level': 'WARNING',
+        },
+        'user': {
+            'handlers': ['userfile', 'console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'wechat': {
+            'handlers': ['wechatfile', 'console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'course': {
+            'handlers': ['coursefile', 'console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'checkin': {
+            'handlers': ['checkinfile', 'console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'school': {
+            'handlers': ['schoolfile', 'console'],
+            'propagate': True,
+            'level': 'INFO',
         },
     }
 }

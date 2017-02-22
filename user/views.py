@@ -23,6 +23,9 @@ from django.core.mail import EmailMultiAlternatives
 import uuid
 from django.core import signing
 from wechat.client import wechat_client
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 def login(request):
@@ -297,6 +300,7 @@ def forgetpassword(request):
     except ObjectDoesNotExist:
         return render_to_response('error.html', {'message': u'找回密码失败', 'submessage': u'没有找到此Email对应的用户'},
                                   context_instance=RequestContext(request))
+    logger.info('user %s forgetpassword' % user.username)
     uuidstr = uuid.uuid1().hex
     cache.set('fp%s' % uuidstr, user.id, 600)
     subject, form_email, to = '【checkinsystem】找回密码邮件', settings.SERVER_EMAIL, email
@@ -326,6 +330,7 @@ def resetpassword(request, uuidstr):
             password = m.hexdigest()
             User.objects.filter(id=userid).update(password=password)
             cache.delete('fp%s' % uuidstr)
+            logger.info('userid %d reset password by email' % userid)
             return render_to_response('success.html', {'message': u'重置成功', 'submessage': u'密码重置成功',
                                                        'jumpurl': reverse('user:login', args=[])},
                                       context_instance=RequestContext(request))

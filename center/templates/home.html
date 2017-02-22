@@ -95,7 +95,7 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td>
                                             {% if request.user.isteacher %}
-                                            <a href="{% url 'checkin:lesson_data' lesson.id %}">{{ lesson.course.title }}</a>
+                                            <a href="{% url 'checkin:lesson_data' lesson.id %}">{{ lesson.course.gettitlewithclass }}</a>
                                             {% else %}
                                             <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
                                             {% endif %}

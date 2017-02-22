@@ -5,11 +5,14 @@ from school.function import getTermDate, getClassTime
 from school.models import Classroom
 from constant import *
 from checkin.constant import *
-from checkin.models import Checkin,Asktostudent,Ask
+from checkin.models import Checkin, Asktostudent, Ask
 from django.db.models import ObjectDoesNotExist, Q, F
 import time
 from function import getweek, gettime, getday, t, splitlesson, simplifytime
 from center.functional import classmethod_cache
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 # Create your models here.
@@ -78,6 +81,7 @@ class Course(models.Model):
                 p.day = ele['day']
                 p.save()
                 count = count + 1
+        logger.info('course %d generate %d lessons' % (self.id, count))
         return count
 
     def __unicode__(self):
@@ -191,6 +195,7 @@ class Lesson(models.Model):
                                                                                     status=CHECKIN_STATUS_PRIVATE_ASK)
         Checkin.objects.filter(lesson=self, student__in=askstudents_public).update(laststatus=F('status'),
                                                                                    status=CHECKIN_STATUS_PUBLIC_ASK)
+        logger.info('lesson %d start' % self.id)
         return {'error': 0, 'message': u'课程成功开启', 'newstatus': self.status,
                 'starttime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 
@@ -201,6 +206,7 @@ class Lesson(models.Model):
         self.endtime = time.strftime('%Y-%m-%d %H:%M:%S', nowtime)
         self.status = LESSON_STATUS_END
         self.save()
+        logger.info('lesson %d stoped' % self.id)
         return {'error': 0, 'message': u'课程已结束', 'newstatus': self.status,
                 'endtime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 
@@ -209,6 +215,7 @@ class Lesson(models.Model):
         self.starttime = None
         self.endtime = None
         self.save()
+        logger.info('lesson %d cleared' % self.id)
         return {'error': 0, 'message': u'成功清除', 'newstatus': self.status,
                 'endtime': u'没有数据'}
 

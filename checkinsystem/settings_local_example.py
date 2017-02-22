@@ -13,14 +13,18 @@ DEBUG = False
 ALLOWED_HOSTS = ['*']
 DOMAIN = 'http://DOMAIN'
 CHECKINURL = 'http://DOMAIN/checkin/ck'
+SCHOOLEMAIL = ''
 
 # Super admin password
 SAFENUMBER = ''
 
 # Wechatmanage.py
 TOKEN = ''
-APPID = ''
+CORPID = ''
+AGENTID = ''
 APPSECRET = ''
+ENCODINGAESKEY = ''
+WECHATQRCODEURL = ''
 
 # Database
 DATABASES = {
@@ -37,8 +41,32 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '',
+        'LOCATION': '', #example: "127.0.0.1:11211"
     }
 }
 
+#if use redis
+'''
+CACHES = {
+    "default": {
+        "BACKEND": "django_redis.cache.RedisCache",
+        "LOCATION": "", #example: "redis://127.0.0.1:6379/1"
+        "OPTIONS": {
+            "CLIENT_CLASS": "django_redis.client.DefaultClient",
+        }
+    }
+}
+'''
+
 INTERNAL_IPS = ("127.0.0.1")
+
+# mail setting
+EMAIL_HOST = ''  # SMTP
+EMAIL_PORT = 25  # SMTP port
+EMAIL_HOST_USER = ''  # email address
+EMAIL_HOST_PASSWORD = ''  # email password
+EMAIL_SUBJECT_PREFIX = '[CheckinSystem]'  # subject-line prefix
+EMAIL_USE_TLS = True
+# admin email
+SERVER_EMAIL = ''  # The email address that error messages come from, such as those sent to ADMINS and MANAGERS.
+

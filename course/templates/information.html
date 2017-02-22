@@ -103,10 +103,12 @@
                         <tr>
                             <th>节数</th>
                             <th class="hidden-xs">时间</th>
+                            {% comment %}
                             {% if courseperms %}
                                 <th>应到</th>
                                 <th>实到</th>
                             {% endif %}
+                            {% endcomment %}
                             <th class="hidden-xs">开始时间</th>
                             <th class="hidden-xs">结束时间</th>
                             <th>状态</th>
@@ -126,6 +128,7 @@
                                     第{{ lesson.week }}周{{ lesson.day|weekdeal }}
                                     ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节
                                 </td>
+                                {% comment %}
                                 {% if courseperms %}
                                     <td>
                                         {{ lesson.shouldnumber }}
@@ -134,6 +137,7 @@
                                         {{ lesson.actuallynumber|default:'没有数据' }}
                                     </td>
                                 {% endif %}
+                                {% endcomment %}
                                 <td class="hidden-xs lesson-starttime">
                                     {{ lesson.starttime|date:'Y-m-d H:i:s'|default:'还未开始' }}
                                 </td>
@@ -257,29 +261,29 @@
             "hideMethod": "fadeOut"
         };
         /*function hidepanelforunopenedlesson() {
-            $(".lessontr").each(function () {
-                status = $(this).data('lessonstatus');
-                var statustext = lesson_status_json[status];
-                var controlpanel = $(this).find('.control-panel');
-                if (statustext == '正在上课') {
-                    controlpanel.show()
-                } else {
-                    controlpanel.hide()
-                }
-            });
-        }
-        function showpanelforunclosedlesson() {
-            $(".lessontr").each(function () {
-                status = $(this).data('lessonstatus');
-                var statustext = lesson_status_json[status];
-                var controlpanel = $(this).find('.control-panel');
-                if (statustext == '课程结束') {
-                    controlpanel.hide()
-                } else {
-                    controlpanel.show()
-                }
-            });
-        }*/
+         $(".lessontr").each(function () {
+         status = $(this).data('lessonstatus');
+         var statustext = lesson_status_json[status];
+         var controlpanel = $(this).find('.control-panel');
+         if (statustext == '正在上课') {
+         controlpanel.show()
+         } else {
+         controlpanel.hide()
+         }
+         });
+         }
+         function showpanelforunclosedlesson() {
+         $(".lessontr").each(function () {
+         status = $(this).data('lessonstatus');
+         var statustext = lesson_status_json[status];
+         var controlpanel = $(this).find('.control-panel');
+         if (statustext == '课程结束') {
+         controlpanel.hide()
+         } else {
+         controlpanel.show()
+         }
+         });
+         }*/
         function changelessonstatus(lessonid, status) {
             var lessontr = $('.lessontr[data-lessonid=' + lessonid + ']');
             if (typeof(status) == "undefined") {

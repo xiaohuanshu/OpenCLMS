@@ -5,7 +5,8 @@ from school.models import Student, Teacher
 from django.db.models import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core import signing
-from django.shortcuts import HttpResponseRedirect, render_to_response, RequestContext
+from django.shortcuts import HttpResponseRedirect, render_to_response, RequestContext, redirect
+from user.models import User
 import logging
 
 logger = logging.getLogger(__name__)
@@ -67,7 +68,16 @@ def wxauth(request):
 
 
 def wechatlogin(request):
-    auth_code=request.GET.get('auth_code')
-    data = wechat_client.service.get_login_info(auth_code=auth_code,provider_access_token=None)
-    #TODO 微信扫码登录
-    return HttpResponseBadRequest('Failed')
+    auth_code = request.GET.get('auth_code')
+    data = wechat_client.service.get_login_info(auth_code=auth_code, provider_access_token=None)
+    userid = data['user_info']['userid']
+    user = User.objects.get(openid=userid)
+    request.session['username'] = user.username
+    request.session['userid'] = user.id
+    origin = request.session.get('origin', '')
+    if origin != '':
+        del request.session['origin']
+        response = HttpResponseRedirect(origin)
+    else:
+        response = redirect(reverse('home', args=[]))
+    return response

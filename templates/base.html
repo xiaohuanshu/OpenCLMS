@@ -4,30 +4,33 @@
 {% block page_css %}
 {% endblock %}
 <script>document.title = '{% block title %}默认标题{% endblock %} - Checkin system'</script>
-<body class="hold-transition skin-blue sidebar-mini">
-
-<div class="wrapper">
+{% if not request.GET.simpleview %}
+    <body class="hold-transition skin-blue sidebar-mini">
+    <div class="wrapper">
     {% include 'header.html' %}
     {% include 'sidebar.html' %}
 
 
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
-
-        <!-- Main content -->
-        <section class="content">
-            {% block content %}
-                <!-- Your Page Content Here -->
-            {% endblock %}
-        </section>
-        <!-- /.content -->
+{% else %}
+    <body class="hold-transition skin-blue sidebar-mini" style="background-color: #ecf0f5;">
+{% endif %}
+<!-- Main content -->
+<section class="content">
+    {% block content %}
+        <!-- Your Page Content Here -->
+    {% endblock %}
+</section>
+<!-- /.content -->
+{% if not request.GET.simpleview %}
     </div>
     <!-- /.content-wrapper -->
 
 
     {% include 'footer.html' %}
-</div>
-
+    </div>
+{% endif %}
 
 {% include 'endscript.html' %}
 {% block page_js %}

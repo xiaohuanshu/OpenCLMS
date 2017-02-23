@@ -32,4 +32,5 @@ class Command(BaseCommand):
         }
         unstoplessons = Lesson.objects.filter(term=term).filter(qbefore[options['before']])
         count = unstoplessons.filter(status=LESSON_STATUS_NOW).update(status=LESSON_STATUS_END)
-        logger.info('autostop %d lessons' % count)
+        if count:
+            logger.info('autostop %d lessons this %s' % (count,options['before']))

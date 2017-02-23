@@ -4,6 +4,9 @@ from school.function import getnowlessontime
 from course.models import Lesson
 from course.constant import *
 from django.db.models import Q, F
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -28,4 +31,5 @@ class Command(BaseCommand):
             'all': qs['today'] | qs['term'] | qs['week']  # stop lesson in this term
         }
         unstoplessons = Lesson.objects.filter(term=term).filter(qbefore[options['before']])
-        unstoplessons.filter(status=LESSON_STATUS_NOW).update(status=LESSON_STATUS_END)
+        count = unstoplessons.filter(status=LESSON_STATUS_NOW).update(status=LESSON_STATUS_END)
+        logger.info('autostop %d lessons' % count)

@@ -19,14 +19,14 @@ class Command(BaseCommand):
                         {
                             'type': 'view',
                             'name': u'个人数据',
-                            'url': '%s/checkin/data/personal_data' % settings.DOMAIN
+                            'url': '%s/checkin/data/personal_data?simpleview=true' % settings.DOMAIN
                         }
                     ]
                 },
                 {
                     'type': 'view',
                     'name': u'考勤系统',
-                    'url': settings.DOMAIN
+                    'url': '%s?simpleview=true' % settings.DOMAIN
                 },
                 {
                     'name': u'其他',

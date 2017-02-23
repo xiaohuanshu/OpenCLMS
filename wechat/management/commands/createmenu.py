@@ -26,7 +26,7 @@ class Command(BaseCommand):
                 {
                     'type': 'view',
                     'name': u'考勤系统',
-                    'url': '%s?simpleview=true' % settings.DOMAIN
+                    'url': settings.DOMAIN
                 },
                 {
                     'name': u'其他',

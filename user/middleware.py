@@ -8,6 +8,7 @@ from django.conf import settings
 from user.models import User
 from django.db.models import ObjectDoesNotExist
 
+
 class UserMiddleware(object):
     def process_request(self, request):
         agent = request.META.get('HTTP_USER_AGENT', None)
@@ -16,7 +17,7 @@ class UserMiddleware(object):
         allow_url = ['user:login', 'user:loginProcess', 'user:register', 'user:logout',
                      'user:check_username', 'user:check_email', 'user:registerProcess',
                      'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword',
-                     'wechat:wxauth']
+                     'wechat:wxauth', 'wechat:wechatlogin']
         wechat_allow_url = ['wechat:oauth', 'wechat:wxauth', 'user:register', 'user:check_username', 'user:check_email',
                             'user:registerProcess']
         if request.session.get('username', '') == '':

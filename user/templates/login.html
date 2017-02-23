@@ -42,8 +42,15 @@
                     <!-- /.col -->
                 </div>
             </form>
-
-
+            {% comment %}
+            {% if wechatloginurl %}
+                <div class="social-auth-links text-center">
+                    <a href="{{ wechatloginurl }}" class="btn btn-block btn-social btn-linkedin btn-flat"><i
+                            class="fa fa-wechat"></i>
+                        通过微信扫一扫登录</a>
+                </div>
+            {% endif %}
+            {% endcomment %}
             <a data-toggle="modal" href="#myModal">忘记密码?</a><br>
             <a href="{% url 'user:register' %}" class="text-center">注册一个新的帐号</a>
 

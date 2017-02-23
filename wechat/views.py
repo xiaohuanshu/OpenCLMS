@@ -64,3 +64,10 @@ def wxauth(request):
 
     else:
         return HttpResponseBadRequest('Failed')
+
+
+def wechatlogin(request):
+    auth_code=request.GET.get('auth_code')
+    data = wechat_client.service.get_login_info(auth_code=auth_code,provider_access_token=None)
+    #TODO 微信扫码登录
+    return HttpResponseBadRequest('Failed')

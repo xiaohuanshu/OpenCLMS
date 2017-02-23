@@ -5,7 +5,7 @@
 {% endblock %}
 <script>document.title = '{% block title %}默认标题{% endblock %} - Checkin system'</script>
 {% if not request.GET.simpleview %}
-    <body class="hold-transition skin-blue sidebar-mini">
+    <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
     <div class="wrapper">
     {% include 'header.html' %}
     {% include 'sidebar.html' %}
@@ -14,7 +14,7 @@
     <!-- Content Wrapper. Contains page content -->
     <div class="content-wrapper">
 {% else %}
-    <body class="hold-transition skin-blue sidebar-mini" style="background-color: #ecf0f5;">
+    <body class="hold-transition skin-blue" style="background-color: #ecf0f5;">
 {% endif %}
 <!-- Main content -->
 <section class="content">

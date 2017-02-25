@@ -2,6 +2,9 @@
 from django.core.management.base import BaseCommand, CommandError
 from school.models import Classroom
 import xlrd
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -19,7 +22,7 @@ class Command(BaseCommand):
                 data, created = Classroom.objects.get_or_create(location=name)
                 if not created:
                     data.save()
-            except:
-                print "error on class:%s" % name
+            except Exception,e:
+                logger.error("[loadclassroomdatafromexcel]error on classroom:%s\n%s" % (name, e))
                 count -= 1
-        print "successful upgrade %d" % count
+        logger.info("[loadclassroomdatafromexcel]successful upgrade %d class on %s" % (count, options['excelfile']))

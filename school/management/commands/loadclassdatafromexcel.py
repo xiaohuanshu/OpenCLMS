@@ -2,6 +2,7 @@
 from django.core.management.base import BaseCommand, CommandError
 from school.models import Class, Department, Major
 import xlrd
+from django.db.models import ObjectDoesNotExist
 
 
 class Command(BaseCommand):
@@ -18,7 +19,12 @@ class Command(BaseCommand):
                 name = rs.cell(i, 0).value
                 data, created = Class.objects.get_or_create(name=name)
                 data.department = Department.objects.get(name=rs.cell(i, 2).value)
-                data.major = Major.objects.get(name=rs.cell(i, 1).value)
+                try:
+                    data.major = Major.objects.get(name=rs.cell(i, 1).value)
+                except ObjectDoesNotExist:
+                    major = Major(department=data.department, name=rs.cell(i, 1).value)
+                    data.major = major.save()
+                    print "add major %s" % rs.cell(i, 1).value
                 data.schoolyear = rs.cell(i, 3).value
                 data.save()
             except:

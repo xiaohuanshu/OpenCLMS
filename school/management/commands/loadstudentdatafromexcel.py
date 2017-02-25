@@ -2,6 +2,10 @@
 from django.core.management.base import BaseCommand, CommandError
 from school.models import Student, Class, Department, Major
 import xlrd
+from django.db.models import ObjectDoesNotExist
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 class Command(BaseCommand):
@@ -12,6 +16,7 @@ class Command(BaseCommand):
         rb = xlrd.open_workbook(options['excelfile'])
         rs = rb.sheets()[0]
         count = 0
+        students = list(Student.objects.values_list('studentid', flat=True))
         for i in range(rs.nrows):
             try:
                 count += 1
@@ -26,9 +31,19 @@ class Command(BaseCommand):
                 data.sex = sex
                 data.classid = Class.objects.get(name=rs.cell(i, 4).value)
                 data.department = Department.objects.get(name=rs.cell(i, 5).value)
-                data.major = Major.objects.get(name=rs.cell(i, 6).value)
+                data.available = True
+                try:
+                    data.major = Major.objects.get(name=rs.cell(i, 6).value)
+                except ObjectDoesNotExist:
+                    data.major = data.classid.major
                 data.save()
-            except:
-                print "error on studentid:%s" % studentid
+                try:
+                    students.remove(studentid)
+                except ValueError:
+                    pass
+            except Exception, e:
+                logger.error("[loadstudentdatafromexcel]error on studentid:%s\n%s" % (studentid, e))
                 count -= 1
-        print "successful upgrade %d" % count
+        notavailablecount = Student.objects.filter(studentid__in=students).update(available=False)
+        logger.info("[loadstudentdatafromexcel]setnotavailable %d student on %s" % (notavailablecount, str(students)))
+        logger.info("[loadstudentdatafromexcel]successful upgrade %d student on %s" % (count, options['excelfile']))

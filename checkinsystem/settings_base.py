@@ -181,7 +181,7 @@ LOGGING = {
         'wechat': {
             'handlers': ['wechatfile', 'console'],
             'propagate': True,
-            'level': 'INFO',
+            'level': 'DEBUG',
         },
         'course': {
             'handlers': ['coursefile', 'console'],

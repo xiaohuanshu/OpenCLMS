@@ -132,6 +132,7 @@ class Student(models.Model):
     department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
     major = models.ForeignKey(Major, models.DO_NOTHING, db_column='majorid', blank=True, null=True)
     user = models.ForeignKey('user.User', models.DO_NOTHING, db_column='userid', blank=True, null=True)
+    available = models.BooleanField(default=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -150,6 +151,7 @@ class Teacher(models.Model):
                                             through_fields=('teacher', 'administration'))
     department = models.ManyToManyField(Department, through='Teachertodepartment',
                                         through_fields=('teacher', 'department'))
+    available = models.BooleanField(default=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)

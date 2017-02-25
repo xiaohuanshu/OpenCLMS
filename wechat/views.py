@@ -5,8 +5,10 @@ from school.models import Student, Teacher
 from django.db.models import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core import signing
+from django.core.cache import cache
 from django.shortcuts import HttpResponseRedirect, render_to_response, RequestContext, redirect
 from user.models import User
+from django.conf import settings
 import logging
 
 logger = logging.getLogger(__name__)
@@ -81,3 +83,20 @@ def wechatlogin(request):
     else:
         response = redirect(reverse('home', args=[]))
     return response
+
+
+def toqywechat(request, target):
+    auth_code = request.GET.get('auth_code', default=None)
+    if auth_code:
+        data = wechat_client.service.get_login_info(auth_code=auth_code, provider_access_token=None)
+        login_ticket = data['redirect_login_info']['login_ticket']
+        cache.set('%d_wechat_login_ticket' % request.user.id, login_ticket, 36000)
+    else:
+        login_ticket = cache.get('%d_wechat_login_ticket' % request.user.id)
+        if not login_ticket:
+            wechatloginurl = 'https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=%s&redirect_uri=%s%s&state=xxxx&usertype=admin' % (
+                settings.CORPID, settings.DOMAIN, reverse('wechat:toqywechat', args=[target]))
+            return HttpResponseRedirect(wechatloginurl)
+    data = wechat_client.service.get_login_url(login_ticket, target, settings.AGENTID)
+    login_url = data['login_url']
+    return HttpResponseRedirect(login_url)

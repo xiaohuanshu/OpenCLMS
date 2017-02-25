@@ -40,11 +40,11 @@
                     <a href="#"><i class="fa fa-wechat"></i> <span>微信平台</span> <i
                             class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>信息群发</a></li>
+                        <li class=""><a href="{% url 'wechat:toqywechat' 'send_msg' %}" target="_blank"><i
+                                class="fa fa-circle-o"></i>信息发送</a></li>
+                        <li class=""><a href="{% url 'wechat:toqywechat' 'contact' %}" target="_blank"><i
+                                class="fa fa-circle-o"></i>通讯录</a></li>
                         <li class=""><a href="#"><i class="fa fa-circle-o"></i>关键词回复</a></li>
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>关注者</a></li>
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>素材</a></li>
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>菜单</a></li>
                     </ul>
                 </li>
             {% endif %}

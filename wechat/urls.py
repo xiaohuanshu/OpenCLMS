@@ -11,5 +11,6 @@ urlpatterns = [
     url(r'^api$', api.api, name='api'),
     url(r'^wxauth$', views.wxauth, name='wxauth'),
     url(r'^wechatlogin$', views.wechatlogin, name='wechatlogin'),
+    url(r'^toqywechat/([^/]+)$', views.toqywechat, name='toqywechat'),
     url(r'^oauth', oauth.oauth, name='oauth'),
 ]

@@ -33,7 +33,7 @@ def login(request):
         return redirect(reverse('home', args=[]))
     data = {}
     if not "MicroMessenger" in request.META.get('HTTP_USER_AGENT', ''):
-        wechatloginurl = 'https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=%s&redirect_uri=%s%s&state=xxxx&usertype=all' % (
+        wechatloginurl = 'https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=%s&redirect_uri=%s%s&state=xxxx&usertype=member' % (
             settings.CORPID, settings.DOMAIN, reverse('wechat:wechatlogin', args=[]))
         data['wechatloginurl'] = wechatloginurl
     return render_to_response('login.html', data, context_instance=RequestContext(request))

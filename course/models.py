@@ -23,7 +23,7 @@ class Course(models.Model):
     number = models.SmallIntegerField(blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     teacher = models.ForeignKey('school.Teacher', models.DO_NOTHING, db_column='teacherid', blank=True, null=True)
-    time = models.CharField(max_length=255, blank=True, null=True)
+    time = models.CharField(max_length=400, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     schoolterm = models.CharField(max_length=20, blank=True, null=True)
     major = models.ForeignKey('school.Major', models.DO_NOTHING, db_column='majorid', blank=True, null=True)

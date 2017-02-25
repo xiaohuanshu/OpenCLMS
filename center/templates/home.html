@@ -95,13 +95,13 @@
                                         <td>{{ forloop.counter }}</td>
                                         <td>
                                             {% if request.user.isteacher %}
-                                            <a href="{% url 'checkin:lesson_data' lesson.id %}">{{ lesson.course.gettitlewithclass }}</a>
+                                                <a href="{% url 'checkin:lesson_data' lesson.id %}">{{ lesson.course.gettitlewithclass }}</a>
                                             {% else %}
-                                            <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                                                <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
                                             {% endif %}
                                         </td>
                                         <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                                        <td>{{ lesson.classroom.location }}</td>
+                                        <td>{{ lesson.classroom.location|default:'' }}</td>
                                         <td>
                                             <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
@@ -124,8 +124,10 @@
                                         <td>
                                             <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
                                         </td>
-                                        <td>{{ lesson.day|weekdeal }} 第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                                        <td>{{ lesson.classroom.location }}</td>
+                                        <td>{{ lesson.day|weekdeal }}
+                                            第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节
+                                        </td>
+                                        <td>{{ lesson.classroom.location|default:'' }}</td>
                                         <td>
                                             <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
@@ -149,7 +151,7 @@
                                             <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
                                         </td>
                                         <td>{{ course.time }}</td>
-                                        <td>{{ course.location }}</td>
+                                        <td>{{ course.location|default:'' }}</td>
                                         <td>
                                             <small class="label label-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</small>
                                         </td>

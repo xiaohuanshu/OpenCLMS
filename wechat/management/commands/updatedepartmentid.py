@@ -5,6 +5,9 @@ from wechat.client import wechat_client
 from school.models import Class,Department
 
 import json
+import logging
+
+logger = logging.getLogger(__name__)
 class Command(BaseCommand):
     def handle(self, *args, **options):
         departmentlist = wechat_client.department.get()
@@ -18,4 +21,4 @@ class Command(BaseCommand):
                 c.wechatdepartmentid=dep['id']
                 c.save()
 
-        print 'Successful!'
+        logger.info("[updatedepartmentid] Successful")

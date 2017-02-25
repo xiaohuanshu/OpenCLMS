@@ -41,6 +41,8 @@ class Course(models.Model):
     @classmethod_cache
     def lastlessontime(self):
         lessondata = Lesson.objects.filter(course=self).order_by('-starttime').all()[:1]
+        if len(lessondata) == 0:
+            return None
         if lessondata[0].starttime:
             return lessondata[0].starttime
         else:
@@ -57,6 +59,8 @@ class Course(models.Model):
     @classmethod_cache
     def progress(self):
         lessoncount = Lesson.objects.filter(course=self).count()
+        if lessoncount == 0:
+            return "0"
         lessonallreadycount = Lesson.objects.filter(course=self, status=LESSON_STATUS_END).count()
         return "%d" % ((lessonallreadycount / (lessoncount * 1.0)) * 100)
 

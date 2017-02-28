@@ -93,7 +93,6 @@ class Course(models.Model):
                 p.day = ele['day']
                 p.save()
                 count = count + 1
-        logger.info('course %d generate %d lessons' % (self.id, count))
         return count
 
     def __unicode__(self):

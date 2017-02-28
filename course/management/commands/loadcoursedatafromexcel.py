@@ -41,11 +41,11 @@ class Command(BaseCommand):
                             data.techclass = Class.objects.get(name=teachclass)
                         except:
                             pass
+                data.save()
                 if data.time is not None and data.location is not None:
                     data.simplifytime()
                     data.generatelesson()
-                data.save()
             except Exception, e:
-                logger.error("[loadcoursedatafromexcel]error on serialnumber:%s\n%s" % (serialnumber, e))
+                logger.exception("[loadcoursedatafromexcel]error on serialnumber:%s\n%s" % (serialnumber, e))
                 count -= 1
         logger.info("[loadcoursedatafromexcel]successful upgrade %d course on %s" % (count, options['excelfile']))

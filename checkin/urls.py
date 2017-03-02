@@ -24,4 +24,8 @@ urlpatterns = [
     url(r'^ajax/addask$', control.addask, name='addask'),
     url(r'^ajax/delask$', control.delask, name='delask'),
 
+
+
+    url(r'^settings/scoreregulation/(\d+)', views.scoreregulationsetting, name='scoreregulation'),
+
 ]

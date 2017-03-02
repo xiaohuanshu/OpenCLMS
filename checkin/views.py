@@ -1,16 +1,16 @@
 # coding:utf-8
 from __future__ import division
 from course.models import Lesson, Studentcourse, Course
-from models import Checkin, Checkinrecord, Ask
+from models import Checkin, Checkinrecord, Ask, Scoreregulation
 from school.models import Student, Teacher
 from school.function import getCurrentSchoolYearTerm
 from constant import *
 from django.shortcuts import render_to_response, RequestContext
 from django.core.urlresolvers import reverse
 from course.constant import *
-from checkin.function import clear_checkin, clear_last_checkin
+from django.db.models import ObjectDoesNotExist
 import json
-from django.shortcuts import redirect, HttpResponse
+from django.shortcuts import redirect, HttpResponse, HttpResponseRedirect
 from course.auth import has_course_permission
 from function import generateqrstr
 import datetime
@@ -115,6 +115,7 @@ def course_data(request, courseid):
          {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True,
           'sortable': True},
          {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+         {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
          {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'}], []]
     # for i in range(0, count - 1):
     #    columns.append({'field': 'lesson%d' % i, 'title': i + 1, 'formatter': 'identifierFormatter'})
@@ -127,7 +128,7 @@ def course_data(request, courseid):
             columns[1].append(
                 {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center', 'formatter': 'identifierFormatter',
                  'cellStyle': 'cellStyle'})
-    studentdata = Studentcourse.objects.filter(course=course).order_by('student').all()
+    studentdata = Studentcourse.objects.filter(course=course).select_related('student').order_by('student').all()
     lessoncheckindata = []
     '''for s in studentdata:
         studentcheckindata[s.student.studentid] = {'studentid': s.student.studentid, 'name': s.student.name}
@@ -136,6 +137,10 @@ def course_data(request, courseid):
         for c in checkin:
     '''
     count = Checkin.objects.filter(lesson__course=course).distinct('lesson').count()
+    try:
+        scoreregulation = Scoreregulation.objects.get(course=course)
+    except ObjectDoesNotExist:
+        scoreregulation = Scoreregulation(course=course)
     for s in studentdata:
         studentcheckindata = {'studentid': s.student.studentid, 'name': s.student.name}
         checkindata = Checkin.objects.filter(student=s.student, lesson__course=course).order_by(
@@ -144,15 +149,24 @@ def course_data(request, courseid):
             'lesson__time').select_related(
             'lesson').all()
         ratio = 0.0
+        score = 0.0
+        totalscore = 0
         for c in checkindata:
             studentcheckindata['lesson%d' % (c.lesson.id)] = c.status
-            if c.status != 0:
+            if c.status != CHECKIN_STATUS_NORMAL:
                 ratio += 1
+            score += scoreregulation.getscore(c.status)
+            totalscore += 100
         if count == 0:
             ratio = 1
         else:
             ratio = ratio / count
+        if totalscore == 0:
+            score = 100
+        else:
+            score = int((score / totalscore) * 100)
         studentcheckindata['ratio'] = '%.1f%%' % (ratio * 100)
+        studentcheckindata['score'] = '%d' % (score)
         lessoncheckindata.append(studentcheckindata)
     data = {'header': json.dumps(columns), 'newrows': json.dumps(lessoncheckindata)}
     return render_to_response('course_data.html', {'coursedata': course, 'data': data},
@@ -170,7 +184,7 @@ def student_data(request, studentid):
     course = {}
     maxlength = 0
     for sc in studentcourse:
-        course[sc.course.id] = {'name': sc.course.title, 'courseid': sc.course.id, 'checkindata': {}}
+        course[sc.course.id] = {'course': sc.course, 'checkindata': {}}
         if sc.course.lesson_set.count() > maxlength:
             maxlength = sc.course.lesson_set.count()
         for (offset, l) in enumerate(sc.course.lesson_set.order_by('week', 'day', 'time').all()):
@@ -181,21 +195,34 @@ def student_data(request, studentid):
 
     rows = []
     for (k, v) in course.items():
-        ld = {'courseid': v['courseid'], 'name': v['name']}
+        ld = {'courseid': v['course'].id, 'name': v['course'].title}
         # ld['data'] = []
         ratio = 0.0
+        score = 0.0
+        totalscore = 0
+        try:
+            scoreregulation = Scoreregulation.objects.get(course=v['course'])
+        except ObjectDoesNotExist:
+            scoreregulation = Scoreregulation(course=v['course'])
         len = 0
         for (key, item) in v['checkindata'].items():
             if item['status'] != None:
                 len += 1
                 if item['status'] != 0:
                     ratio = ratio + 1
+                score += scoreregulation.getscore(item['status'])
+                totalscore += 100
             ld.update({'lesson%d' % item['offset']: item['status']})
         if len == 0:
             ratio = 1
         else:
             ratio = ratio / len
+        if totalscore == 0:
+            score = 100
+        else:
+            score = int((score / totalscore) * 100)
         ld['ratio'] = '%.1f%%' % (ratio * 100)
+        ld['score'] = '%d' % (score)
         rows.append(ld)
     '''
     newrows = []
@@ -210,6 +237,7 @@ def student_data(request, studentid):
     columns = [
         [{'field': 'name', 'title': u'课程名称', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
          {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+         {'field': 'score', 'title': u'考勤成绩', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
          {'title': u'签到数据', 'colspan': maxlength, 'align': 'center'}], []]
 
     for i in range(0, maxlength):
@@ -328,3 +356,32 @@ def askdata(request):
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def scoreregulationsetting(request, courseid):
+    course = Course.objects.get(id=courseid)
+    try:
+        scoreregulation = Scoreregulation.objects.get(course=course)
+    except ObjectDoesNotExist:
+        scoreregulation = Scoreregulation(course=course)
+    if request.META['REQUEST_METHOD'] == 'POST':
+        scoreregulation.normal = request.POST.get('normal')
+        scoreregulation.success = request.POST.get('success')
+        scoreregulation.early = request.POST.get('early')
+        scoreregulation.lateearly = request.POST.get('lateearly')
+        scoreregulation.late = request.POST.get('late')
+        scoreregulation.private_ask = request.POST.get('private_ask')
+        scoreregulation.public_ask = request.POST.get('public_ask')
+        scoreregulation.save()
+        return HttpResponseRedirect(reverse('course:information', args=[courseid]))
+    else:
+        data = {'normal': scoreregulation.normal,
+                'success': scoreregulation.success,
+                'early': scoreregulation.early,
+                'lateearly': scoreregulation.lateearly,
+                'late': scoreregulation.late,
+                'private_ask': scoreregulation.private_ask,
+                'public_ask': scoreregulation.public_ask,
+                }
+        return render_to_response('scoreregulation.html', data,
+                                  context_instance=RequestContext(request))

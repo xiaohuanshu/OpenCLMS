@@ -19,6 +19,9 @@
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
     <script src="{% static 'plugins/x-editable/js/bootstrap-editable.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js' %}"></script>
+    <script src="{% static 'plugins/tableExport/tableExport.js' %}"></script>
+    <script src="{% static 'plugins/tableExport/jquery.base64.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
 {% endblock %}
@@ -34,9 +37,9 @@
                     <div class="adv-table">
                         <div id="custom-toolbar">
                             {% if request.GET.mode == 'modify' %}
-                            <a class="btn btn-default" href="?mode=view">退出编辑模式</a>
+                                <a class="btn btn-default" href="?mode=view">退出编辑模式</a>
                             {% else %}
-                            <a class="btn btn-success" href="?mode=modify">进入编辑模式</a>
+                                <a class="btn btn-success" href="?mode=modify">进入编辑模式</a>
                             {% endif %}
                         </div>
                         <table id="table"
@@ -51,7 +54,13 @@
                                data-side-pagination="client"
                                data-toolbar="#custom-toolbar"
                                data-striped="true"
-                        >
+                               data-export-types="['csv']"
+                               data-exportDataType="all"
+                               data-export-options='{
+         "fileName": "考勤数据-{{ coursedata.title }}",
+         "worksheetName": "考勤数据-{{ coursedata.title }}",
+         "escape": "false",
+         }'>
                         </table>
                     </div>
                 </div>
@@ -87,26 +96,26 @@
         $.fn.editable.defaults.type = 'select';
         $.fn.editable.defaults.emptytext = '无';
         $.fn.editable.defaults.showbuttons = false;
-        $.fn.editable.defaults.ajaxOptions = {type:'get',dataType:'json'};
+        $.fn.editable.defaults.ajaxOptions = {type: 'get', dataType: 'json'};
         $.fn.editable.defaults.source = checkin_status_json;
-        $.fn.editable.defaults.success = function(response){
-            if (response.error){
+        $.fn.editable.defaults.success = function (response) {
+            if (response.error) {
                 return response.message;
             }
         };
         /*
-        $.fn.editable.defaults.validate = function(value){
-            if (checkin_status_json[value].indexOf('假')>=0){
-                return '无权设定为请假';
-            }
-        };*/
+         $.fn.editable.defaults.validate = function(value){
+         if (checkin_status_json[value].indexOf('假')>=0){
+         return '无权设定为请假';
+         }
+         };*/
         $.fn.editable.defaults.display = function (value, sourceData) {
             if (value == "undefined") {
                 $(this).text();
-            }else {
+            } else {
                 $(this).html("<button class='btn btn-xs bg-" + checkin_status_style_json[value] + "'>" + checkin_status_json[value] + "</button>");
             }
         };
-        $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.newrows|safe}}, idField: 'studentid'});
+        $table.bootstrapTable({columns:{{ data.header|safe }}, data:{{ data.newrows|safe }}, idField: 'studentid'});
     </script>
 {% endblock %}

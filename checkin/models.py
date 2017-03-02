@@ -1,6 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
+from constant import *
 
 
 # Create your models here.
@@ -67,3 +68,35 @@ class Asktostudent(models.Model):
     class Meta:
         db_table = 'AsktoStudent'
         index_together = ["student", "ask"]
+
+
+class Scoreregulation(models.Model):
+    course = models.ForeignKey('course.Course', models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    normal = models.IntegerField(default=0)
+    success = models.IntegerField(default=100)
+    early = models.IntegerField(default=30)
+    lateearly = models.IntegerField(default=0)
+    late = models.IntegerField(default=70)
+    private_ask = models.IntegerField(default=70)
+    public_ask = models.IntegerField(default=95)
+
+    def getscore(self, status):
+        if status == CHECKIN_STATUS_NORMAL:
+            return self.normal
+        elif status == CHECKIN_STATUS_SUCCESS:
+            return self.success
+        elif status == CHECKIN_STATUS_EARLY:
+            return self.early
+        elif status == CHECKIN_STATUS_LATEEARLY:
+            return self.lateearly
+        elif status == CHECKIN_STATUS_LATE:
+            return self.late
+        elif status == CHECKIN_STATUS_PRIVATE_ASK:
+            return self.private_ask
+        elif status == CHECKIN_STATUS_PUBLIC_ASK:
+            return self.public_ask
+        else:
+            return 0
+
+    class Meta:
+        db_table = 'ScoreRegulation'

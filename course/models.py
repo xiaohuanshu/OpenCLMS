@@ -268,9 +268,8 @@ class Studentcourse(models.Model):
 
 
 class Courseresource(models.Model):
-    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True,
-                               related_name='courses')
+    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     uploadtime = models.DateTimeField(blank=True, null=True)
-    downloadcount = models.SmallIntegerField(default=0)
+    #downloadcount = models.SmallIntegerField(default=0)
     file = models.FileField(upload_to='courseresource')

@@ -1,0 +1,27 @@
+{% load center_extra %}
+<ul class="nav nav-pills">
+    <li role="presentation" class="{% nav_active request.path 'information' %}">
+        <a href="{% url 'course:information' coursedata.id %}">课程信息</a>
+    </li>
+    {% if courseperms or perms.checkin_view %}
+        <li role="presentation" class="{% nav_active request.path 'lesson_data' %}">
+            <a href="{% url 'checkin:jumptolesson_data' coursedata.id %}">课堂考勤</a>
+        </li>
+    {% endif %}
+    <li role="presentation">
+        <a href="#">课程资源</a>
+    </li>
+    {% if courseperms or perms.checkin_view %}
+        <li role="presentation" class="{% nav_active request.path 'course_data' %}">
+            <a href="{% url 'checkin:course_data' coursedata.id %}">考勤数据</a>
+        </li>
+        <li role="presentation" class="{% nav_active request.path 'studentcourse' %}">
+            <a href="{% url 'course:studentcourse' coursedata.id %}">学生列表</a>
+        </li>
+    {% endif %}
+    {% if courseperms %}
+        <li role="presentation" class="{% nav_active request.path 'scoreregulation' %}">
+            <a href="{% url 'checkin:scoreregulation' coursedata.id %}">考勤评分规则设置</a>
+        </li>
+    {% endif %}
+</ul>

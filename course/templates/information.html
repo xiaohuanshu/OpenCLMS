@@ -11,16 +11,19 @@
     <script src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
 {% endblock %}
 
-
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+        </h1>
+    </section>
+{% endblock %}
 {% block content %}
     <!-- page start-->
+    {% include 'coursenav.html' %}
     <div class="row">
         <div class="col-md-12">
             <div class="box box-primary">
-                <div class="box-header text-center">
-                    <h3 class="box-title">[{{ coursedata.title }}]{% if coursedata.teachclass %}(
-                        {{ coursedata.teachclass.name }}){% endif %}</h3>
-                </div>
                 <div class="box-body">
                     <!--<h1>New Dashboard BS3 </h1>-->
                     <div class="row">
@@ -75,28 +78,6 @@
                             </dl>
                         </div>
                     </div>
-                    {% if courseperms or perms.checkin_view %}
-                        <div class="row">
-                            <div class="col-sm-3">
-                                <button type="button" class="btn btn-info btn-block"
-                                        onclick="window.location.href = '{% url 'checkin:course_data' coursedata.id %}'">
-                                    签到数据
-                                </button>
-                            </div>
-                            <div class="col-sm-3">
-                                <button type="button" class="btn btn-primary btn-block"
-                                        onclick="window.location.href = '{% url 'course:studentcourse' coursedata.id %}'">
-                                    学生列表
-                                </button>
-                            </div>
-                            <div class="col-sm-3">
-                                <button type="button" class="btn btn-primary btn-block"
-                                        onclick="window.location.href = '{% url 'checkin:scoreregulation' coursedata.id %}'">
-                                    考勤评分规则设置
-                                </button>
-                            </div>
-                        </div>
-                    {% endif %}
                 </div>
 
             </div>
@@ -157,9 +138,12 @@
                                     </td>
                                     {% if courseperms %}
                                         <td>
-                                            <button type="button" class="control-lessonenter btn btn-xs btn-success"
+                                            <button type="button" class="control-checkindata btn btn-xs btn-info"
                                                     onclick="window.location.href = '{% url 'checkin:lesson_data' lesson.id %}'">
-                                                进入课程
+                                                进入考勤
+                                            </button>
+                                            <button type="button" class="control-lessonstart btn btn-xs btn-default">
+                                                开启课程
                                             </button>
                                             <div class="btn-group">
                                                 <button data-toggle="dropdown"
@@ -168,8 +152,8 @@
                                                         class="caret"></span>
                                                 </button>
                                                 <ul role="menu" class="dropdown-menu">
-                                                    <li><a class="control-checkinstart"
-                                                           href="{% url 'checkin:startcheckin' lesson.id %}">开始签到</a>
+                                                    <li><a class="control-checkindata"
+                                                           href="{% url 'checkin:lesson_data' lesson.id %}">考勤数据</a>
                                                     </li>
                                                     <li class="divider"></li>
                                                     <li>
@@ -270,30 +254,6 @@
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
-        /*function hidepanelforunopenedlesson() {
-         $(".lessontr").each(function () {
-         status = $(this).data('lessonstatus');
-         var statustext = lesson_status_json[status];
-         var controlpanel = $(this).find('.control-panel');
-         if (statustext == '正在上课') {
-         controlpanel.show()
-         } else {
-         controlpanel.hide()
-         }
-         });
-         }
-         function showpanelforunclosedlesson() {
-         $(".lessontr").each(function () {
-         status = $(this).data('lessonstatus');
-         var statustext = lesson_status_json[status];
-         var controlpanel = $(this).find('.control-panel');
-         if (statustext == '课程结束') {
-         controlpanel.hide()
-         } else {
-         controlpanel.show()
-         }
-         });
-         }*/
         function changelessonstatus(lessonid, status) {
             var lessontr = $('.lessontr[data-lessonid=' + lessonid + ']');
             if (typeof(status) == "undefined") {
@@ -305,35 +265,28 @@
             starttimetd = lessontr.find('.lesson-starttime');
             endtimetd = lessontr.find('.lesson-endtime');
             statusspan = lessontr.find('.lesson-status');
-            enterlesson = lessontr.find('.control-lessonenter');
-            startcheckin = lessontr.find('.control-checkinstart');
+            checkindata = lessontr.find('.control-checkindata');
             startlesson = lessontr.find('.control-lessonstart');
             stoplesson = lessontr.find('.control-lessonstop');
             controlpanel = lessontr.find('.control-panel');
             statusspan.text(statustext);
             statusspan.attr('class', 'lesson-status label label-' + lesson_status_style_json[status]);
             if (statustext == '正在上课') {
-                startcheckin.show();
+                checkindata.show();
                 stoplesson.show();
                 startlesson.hide();
-                enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-success');
             } else if (statustext == '未开始') {
-                if (lesson_status_json[lessontr.prev().data('lessonstatus')] == "课程结束") {
-                    enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-success');
-                } else {
-                    enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-default');
-                }
-                startcheckin.hide();
+                checkindata.hide();
                 stoplesson.hide();
                 startlesson.show();
             } else if (statustext == '正在签到') {
-                startcheckin.show();
+                checkindata.show();
                 stoplesson.hide();
                 startlesson.hide();
-                enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-success');
             } else {
                 controlpanel.hide();
-                enterlesson.attr('class', 'control-lessonenter btn btn-xs btn-danger');
+                startlesson.hide();
+                checkindata.removeClass('btn-info').addClass('btn-warning').text('考勤数据');
             }
         }
         $(".lessontr").each(function () {

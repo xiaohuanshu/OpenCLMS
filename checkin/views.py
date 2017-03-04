@@ -50,9 +50,15 @@ def lesson_data(request, lessonid):
         return render_to_response('error.html',
                                   {'message': '没有权限'},
                                   context_instance=RequestContext(request))
-    t = {'lessondata': lesson}
-    if lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_AGAIN or lesson.status == LESSON_STATUS_CHECKIN_ADD:
+    t = {'lessondata': lesson, 'coursedata': lesson.course,
+         'courseperms': has_course_permission(request.user, lesson.course)}
+    if lesson.ischeckinnow():
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
+    if not (lesson.isnow() or lesson.isend()):
+        return render_to_response('error.html',
+                                  {'message': '课程还未开启',
+                                   'jumpurl': reverse('course:information', args=[lesson.course_id])},
+                                  context_instance=RequestContext(request))
     checkinrecord = Checkinrecord.objects.filter(lesson=lesson)
     checkincount = checkinrecord.count()
 
@@ -169,7 +175,8 @@ def course_data(request, courseid):
         studentcheckindata['score'] = '%d' % (score)
         lessoncheckindata.append(studentcheckindata)
     data = {'header': json.dumps(columns), 'newrows': json.dumps(lessoncheckindata)}
-    return render_to_response('course_data.html', {'coursedata': course, 'data': data},
+    return render_to_response('course_data.html', {'coursedata': course, 'data': data,
+                                                   'courseperms': has_course_permission(request.user, course)},
                               context_instance=RequestContext(request))
 
 
@@ -373,15 +380,31 @@ def scoreregulationsetting(request, courseid):
         scoreregulation.private_ask = request.POST.get('private_ask')
         scoreregulation.public_ask = request.POST.get('public_ask')
         scoreregulation.save()
-        return HttpResponseRedirect(reverse('course:information', args=[courseid]))
-    else:
-        data = {'normal': scoreregulation.normal,
-                'success': scoreregulation.success,
-                'early': scoreregulation.early,
-                'lateearly': scoreregulation.lateearly,
-                'late': scoreregulation.late,
-                'private_ask': scoreregulation.private_ask,
-                'public_ask': scoreregulation.public_ask,
-                }
-        return render_to_response('scoreregulation.html', data,
+    data = {'normal': scoreregulation.normal,
+            'success': scoreregulation.success,
+            'early': scoreregulation.early,
+            'lateearly': scoreregulation.lateearly,
+            'late': scoreregulation.late,
+            'private_ask': scoreregulation.private_ask,
+            'public_ask': scoreregulation.public_ask,
+            'coursedata': course,
+            'courseperms': has_course_permission(request.user, course)
+            }
+    return render_to_response('scoreregulation.html', data,
+                              context_instance=RequestContext(request))
+
+
+def jumptolesson_data(request, courseid):
+    course = Course.objects.get(id=courseid)
+    try:
+        lesson = Lesson.objects.filter(course=course,
+                                       status__in=[LESSON_STATUS_NOW, LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_ADD,
+                                                   LESSON_STATUS_CHECKIN_AGAIN]).get()
+        return HttpResponseRedirect(reverse('checkin:lesson_data', args=[lesson.id]))
+    except ObjectDoesNotExist:
+        return render_to_response('error.html',
+                                  {'message': '没有课程开启',
+                                   'submessage': '请在课程详情中开启课程',
+                                   'jumpurl': str(
+                                       reverse('course:information', args=[courseid]))},
                                   context_instance=RequestContext(request))

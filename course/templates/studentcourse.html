@@ -7,10 +7,18 @@
 {% endblock %}
 {% block page_css %}
 {% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+        </h1>
+    </section>
+{% endblock %}
 {% block content %}
-    <div class="box">
+    {% include 'coursenav.html' %}
+    <div class="box box-primary">
         <div class="box-header">
-            <h3 class="box-title">{{ coursedata.title }} - 学生列表</h3>
+            <h3 class="box-title">学生列表</h3>
         </div>
         <div class="box-body">
             <div class="row">

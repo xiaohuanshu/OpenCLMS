@@ -50,11 +50,9 @@ class Course(models.Model):
 
     @classmethod_cache
     def status(self):
-        try:
-            lessondata = Lesson.objects.filter(course=self, status=LESSON_STATUS_NOW).get()
-        except ObjectDoesNotExist:
-            return 0
-        return 1
+        return Lesson.objects.filter(course=self,
+                                     status__in=[LESSON_STATUS_NOW, LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_ADD,
+                                                 LESSON_STATUS_CHECKIN_AGAIN]).exists()
 
     @classmethod_cache
     def progress(self):
@@ -238,7 +236,7 @@ class Lesson(models.Model):
             return False
 
     def isend(self):
-        if self.status == LESSON_STATUS_CANCLE or self.status == LESSON_STATUS_END or self.status == LESSON_STATUS_END_EARLY:
+        if self.status == LESSON_STATUS_END or self.status == LESSON_STATUS_END_EARLY:
             return True
         else:
             return False
@@ -271,5 +269,5 @@ class Courseresource(models.Model):
     course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     uploadtime = models.DateTimeField(blank=True, null=True)
-    #downloadcount = models.SmallIntegerField(default=0)
+    # downloadcount = models.SmallIntegerField(default=0)
     file = models.FileField(upload_to='courseresource')

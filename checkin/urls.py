@@ -27,5 +27,6 @@ urlpatterns = [
 
 
     url(r'^settings/scoreregulation/(\d+)', views.scoreregulationsetting, name='scoreregulation'),
+    url(r'^jumptolesson_data/(\d+)', views.jumptolesson_data, name='jumptolesson_data'),
 
 ]

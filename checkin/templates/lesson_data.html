@@ -1,13 +1,112 @@
 {% extends 'base.html' %}
 {% load static %}
 {% load checkin_extra %}
+{% load center_extra %}
 {% block title %}{{ lessondata.course.title }}{% endblock %}
 {% block page_js %}
     <script src="{% static 'plugins/chartjs/Chart.min.js' %}"></script>
 {% endblock %}
 {% block page_css %}
 {% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+            <small>第{{ lessondata.week }}周{{ lessondata.day|weekdeal }}
+                ,第{{ lessondata.time }}-{{ lessondata.time|add:lessondata.length|add:-1 }}节
+            </small>
+        </h1>
+    </section>
+{% endblock %}
 {% block content %}
+    {% include 'coursenav.html' %}
+
+    <div class="row">
+        <div class="col-xs-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-aqua"><i class="fa fa-users"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">应到人数</span>
+                    <span class="info-box-number">{{ shouldnumber }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-xs-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-red"><i class="fa fa-thumbs-up"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">实到人数</span>
+                    <span class="info-box-number">{{ actuallynumber }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+
+        <!-- fix for small devices only -->
+        <div class="clearfix visible-sm-block"></div>
+
+        <div class="col-xs-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-green"><i class="fa fa-medkit"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">请假人数</span>
+                    <span class="info-box-number">{{ asknumber }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+        <div class="col-xs-6 col-lg-3">
+            <div class="info-box">
+                <span class="info-box-icon bg-yellow"><i class="fa fa-exclamation-circle"></i></span>
+
+                <div class="info-box-content">
+                    <span class="info-box-text">未到人数</span>
+                    <span class="info-box-number">{{ notreachnumber }}</span>
+                </div>
+                <!-- /.info-box-content -->
+            </div>
+            <!-- /.info-box -->
+        </div>
+        <!-- /.col -->
+    </div>
+    {% if lessondata.isnow %}
+        <div class="box box-primary">
+            <div class="box-body">
+                {% if checkincount == 0 %}
+                    <a class="btn btn-app" href="{% url 'checkin:startcheckin' lessondata.id %}">
+                        <i class="fa fa-edit"></i> 开始签到
+                    </a>
+                {% else %}
+                    <a class="btn btn-app" href="{% url 'checkin:startcheckin' lessondata.id %}?mode=add">
+                        <i class="fa fa-play"></i> 补签
+                    </a>
+                    <a class="btn btn-app" href="{% url 'checkin:startcheckin' lessondata.id %}?mode=again">
+                        <i class="fa fa-circle-o-notch"></i> 再签
+                    </a>
+                    <a class="btn btn-app">
+                        <i class="fa fa-repeat"></i> 撤回上次数据
+                    </a>
+                    <a class="btn btn-app">
+                        <i class="fa fa-trash"></i> 清除全部数据
+                    </a>
+                {% endif %}
+                <a class="btn btn-app" data-toggle="modal" href="#LessonCloseModal">
+                    <i class="fa fa-stop"></i> 结束课程
+                </a>
+            </div>
+        </div>
+    {% endif %}
+    {% comment %}
     <div class="box">
         <div class="box-header">
             <h3 class="box-title">{{ lessondata.course.title }}</h3>
@@ -25,7 +124,7 @@
                         <div class="row">
                             <div class="col-sm-6">
                                 <button type="button" class="btn btn-success btn-lg btn-block"
-                                        onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}'">
+                                        onclick="window.location.href = ''">
                                     开始签到
                                 </button>
                             </div>
@@ -81,75 +180,14 @@
             {% endif %}
         </div>
     </div>
-
-
-
-    <div class="row">
-        <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box">
-                <span class="info-box-icon bg-aqua"><i class="fa fa-users"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">应到人数</span>
-                    <span class="info-box-number">{{ shouldnumber }}</span>
-                </div>
-                <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-        </div>
-        <!-- /.col -->
-        <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box">
-                <span class="info-box-icon bg-red"><i class="fa fa-thumbs-up"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">实到人数</span>
-                    <span class="info-box-number">{{ actuallynumber }}</span>
-                </div>
-                <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-        </div>
-        <!-- /.col -->
-
-        <!-- fix for small devices only -->
-        <div class="clearfix visible-sm-block"></div>
-
-        <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box">
-                <span class="info-box-icon bg-green"><i class="fa fa-medkit"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">请假人数</span>
-                    <span class="info-box-number">{{ asknumber }}</span>
-                </div>
-                <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-        </div>
-        <!-- /.col -->
-        <div class="col-md-3 col-sm-6 col-xs-12">
-            <div class="info-box">
-                <span class="info-box-icon bg-yellow"><i class="fa fa-exclamation-circle"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">未到人数</span>
-                    <span class="info-box-number">{{ notreachnumber }}</span>
-                </div>
-                <!-- /.info-box-content -->
-            </div>
-            <!-- /.info-box -->
-        </div>
-        <!-- /.col -->
-    </div>
-
+{% endcomment %}
 
 
     {% if lessondata.isnow or lessondata.isend %}
         {% if checkincount != 0 %}
             <div class="row">
                 <div class="col-md-4">
-                    <div class="box">
+                    <div class="box box-primary">
                         <div class="box-body">
                             <canvas id="numberData" height="200"></canvas>
                         </div>
@@ -206,7 +244,7 @@
             <div class="col-lg-12">
                 <div class="nav-tabs-custom">
                     <ul class="nav nav-tabs">
-                        <li class="active"><a href="#tab_1" data-toggle="tab">学生列表</a></li>
+                        <li class="active"><a href="#tab_1" data-toggle="tab">应到学生</a></li>
                         <li><a href="#tab_2" data-toggle="tab">请假学生</a></li>
                     </ul>
                     <div class="tab-content">

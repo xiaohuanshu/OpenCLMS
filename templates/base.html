@@ -3,7 +3,7 @@
 {% include 'head.html' %}
 {% block page_css %}
 {% endblock %}
-<script>document.title = '{% block title %}默认标题{% endblock %} - Checkin system'</script>
+<script>document.title = '{% block title %}{% endblock %} - Checkin system'</script>
 {% if not request.GET.simpleview %}
     <body class="hold-transition skin-blue sidebar-mini sidebar-collapse">
     <div class="wrapper">
@@ -16,6 +16,7 @@
 {% else %}
     <body class="hold-transition skin-blue" style="background-color: #ecf0f5;">
 {% endif %}
+{% block beforecontent %}{% endblock %}
 <!-- Main content -->
 <section class="content">
     {% block content %}

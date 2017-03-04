@@ -80,5 +80,6 @@ def studentcourse(request, courseid):
                                                                               'student__classid__major',
                                                                               'student__classid__department').all()
     return render_to_response('studentcourse.html',
-                              {'coursedata': coursedata, 'students': students},
+                              {'coursedata': coursedata, 'students': students,
+                               'courseperms': has_course_permission(request.user, coursedata)},
                               context_instance=RequestContext(request))

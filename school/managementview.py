@@ -4,7 +4,7 @@ import json
 
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, RequestContext, redirect
+from django.shortcuts import render, redirect
 
 from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
 from user.auth import permission_required
@@ -48,7 +48,7 @@ def schoolterm(request):
         logger.info('term %s deleted' % oldterm.description)
         return redirect(reverse('school:schoolterm', args=[]))
     term = Schoolterm.objects.all().order_by('-startdate')
-    return render_to_response('schoolterm.html', {'term': term}, context_instance=RequestContext(request))
+    return render(request, 'schoolterm.html', {'term': term})
 
 
 @permission_required(permission='school_classtime_view')
@@ -68,13 +68,12 @@ def classtime(request):
         logger.info('classtime changed')
         return HttpResponse(json.dumps({'status': 'ok'}), content_type="application/json")
     classtimedata = Classtime.objects.all().order_by('id')
-    return render_to_response('classtime.html', {'classtimedata': classtimedata},
-                              context_instance=RequestContext(request))
+    return render(request, 'classtime.html', {'classtimedata': classtimedata})
 
 
 @permission_required(permission='school_class_view')
 def classlist(request):
-    return render_to_response('class.html', {}, context_instance=RequestContext(request))
+    return render(request, 'class.html')
 
 
 @permission_required(permission='school_class_view')
@@ -120,7 +119,7 @@ def classdata(request):
 
 @permission_required(permission='school_major_view')
 def majorlist(request):
-    return render_to_response('major.html', {}, context_instance=RequestContext(request))
+    return render(request, 'major.html')
 
 
 @permission_required(permission='school_major_view')
@@ -152,7 +151,7 @@ def majordata(request):
 
 @permission_required(permission='school_department_view')
 def departmentlist(request):
-    return render_to_response('department.html', {}, context_instance=RequestContext(request))
+    return render(request, 'department.html')
 
 
 @permission_required(permission='school_department_view')
@@ -180,7 +179,7 @@ def departmentdata(request):
 
 @permission_required(permission='school_administration_view')
 def administrationlist(request):
-    return render_to_response('administration.html', {}, context_instance=RequestContext(request))
+    return render(request, 'administration.html')
 
 
 @permission_required(permission='school_administration_view')
@@ -207,7 +206,7 @@ def administrationdata(request):
 
 @permission_required(permission='school_classroom_view')
 def classroomlist(request):
-    return render_to_response('classroom.html', {}, context_instance=RequestContext(request))
+    return render(request, 'classroom.html')
 
 
 @permission_required(permission='school_classroom_view')

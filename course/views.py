@@ -3,11 +3,10 @@ import json
 
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 
 from course.auth import has_course_permission
 from models import Course, Lesson, Studentcourse
-from school.models import Student
 from user.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 
@@ -15,16 +14,14 @@ from school.function import getCurrentSchoolYearTerm
 def information(request, courseid):
     coursedata = Course.objects.get(id=courseid)
     lessondata = Lesson.objects.filter(course=coursedata).order_by('week', 'day', 'time').all()
-    return render_to_response('information.html',
-                              {'coursedata': coursedata, 'lessondata': lessondata,
-                               'courseperms': has_course_permission(request.user, coursedata)},
-                              context_instance=RequestContext(request))
+    return render(request, 'information.html',
+                  {'coursedata': coursedata, 'lessondata': lessondata,
+                   'courseperms': has_course_permission(request.user, coursedata)})
 
 
 @permission_required(permission='course_viewlist')
 def list(request):
-    return render_to_response('list.html', {'term': getCurrentSchoolYearTerm()},
-                              context_instance=RequestContext(request))
+    return render(request, 'list.html', {'term': getCurrentSchoolYearTerm()})
 
 
 @permission_required(permission='course_viewlist')
@@ -79,7 +76,6 @@ def studentcourse(request, courseid):
     students = Studentcourse.objects.filter(course=coursedata).select_related('student', 'student__classid',
                                                                               'student__classid__major',
                                                                               'student__classid__department').all()
-    return render_to_response('studentcourse.html',
-                              {'coursedata': coursedata, 'students': students,
-                               'courseperms': has_course_permission(request.user, coursedata)},
-                              context_instance=RequestContext(request))
+    return render(request, 'studentcourse.html',
+                  {'coursedata': coursedata, 'students': students,
+                   'courseperms': has_course_permission(request.user, coursedata)})

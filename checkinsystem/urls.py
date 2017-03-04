@@ -13,7 +13,7 @@ Including another URLconf
     1. Import the include() function: from django.conf.urls import url, include
     2. Add a URL to urlpatterns:  url(r'^blog/', include('blog.urls'))
 """
-from django.conf.urls import url, include, patterns
+from django.conf.urls import url, include
 from django.conf import settings
 from center.views import home
 urlpatterns = [
@@ -28,10 +28,6 @@ urlpatterns = [
 ]
 
 if settings.DEBUG:
-    urlpatterns += patterns('',
-                            url(r'^media/(?P<path>.*)$', 'django.views.static.serve',
-                                {'document_root': settings.MEDIA_ROOT}),
-                            )
     import debug_toolbar
 
     urlpatterns += [

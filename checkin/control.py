@@ -5,7 +5,7 @@ from django.http import HttpResponse
 from course.models import Lesson, Studentcourse
 from course.constant import *
 from checkin.constant import *
-from django.shortcuts import redirect, HttpResponseRedirect, render, render_to_response, RequestContext
+from django.shortcuts import redirect, render
 from django.core.urlresolvers import reverse
 from function import startcheckin, endcheckin, student_checkin, generateqrstr, addaskinformationinstartedlesson, \
     delaskinformationinstartedlesson, clear_checkin, clear_last_checkin
@@ -88,77 +88,64 @@ def changecheckinstatus(request, lessonid):
 def ck(request, qr_str):
     agent = request.META.get('HTTP_USER_AGENT', None)
     if "MicroMessenger" not in agent:
-        return render_to_response('error.html', {'message': u'签到失败', 'submessage': u'请在微信中打开此链接'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'请在微信中打开此链接'})
     lessonid = cache.get("qr%s" % (qr_str), default=None)
     if not lessonid:
-        return render_to_response('error.html', {'message': u'签到失败', 'submessage': u'二维码失效或不存在', 'wechatclose': True},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'二维码失效或不存在', 'wechatclose': True})
     lesson = Lesson.objects.get(id=lessonid)
     user = User.objects.get(id=request.session.get('userid'))
     try:
         student = Student.objects.get(user=user)
     except ObjectDoesNotExist:
-        return render_to_response('error.html', {'message': u'签到失败', 'submessage': u'您的身份不是学生', 'wechatclose': True},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'您的身份不是学生', 'wechatclose': True})
     if not Studentcourse.objects.filter(course=lesson.course, student=student).exists():
-        return render_to_response('error.html', {'message': u'签到失败', 'submessage': u'上课名单中没有你', 'wechatclose': True},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'上课名单中没有你', 'wechatclose': True})
     else:
         re = student_checkin(student, lesson)
         if re['error'] != 0:
-            return render_to_response('error.html', {'message': re['message'], 'submessage': lesson.course.title,
-                                                     'wechatclose': True}, context_instance=RequestContext(request))
-        return render_to_response('success.html',
-                                  {'message': u'签到成功', 'submessage': lesson.course.title, 'wechatclose': True},
-                                  context_instance=RequestContext(request))
+            return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title,
+                                                  'wechatclose': True})
+        return render(request, 'success.html',
+                      {'message': u'签到成功', 'submessage': lesson.course.title, 'wechatclose': True})
 
 
 def startCheckin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     mode = request.GET.get('mode', default='first')
     if lesson.status == LESSON_STATUS_AWAIT:
-        return render_to_response('error.html',
-                                  {'message': '课程还未开始',
-                                   'submessage': lesson.course.title,
-                                   'jumpurl': str(
-                                       reverse('course:information', args=[lesson.course.id]))},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html',
+                      {'message': '课程还未开始',
+                       'submessage': lesson.course.title,
+                       'jumpurl': str(
+                           reverse('course:information', args=[lesson.course.id]))})
     elif lesson.status == LESSON_STATUS_NOW:
         re = startcheckin(lessonid, mode)
         if re['error'] != 0:
-            return render_to_response('error.html', {'message': re['message'], 'submessage': lesson.course.title},
-                                      context_instance=RequestContext(request))
+            return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title})
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
     elif lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_ADD or lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
-    return render_to_response('error.html',
-                              {'message': '开始签到失败',
-                               'submessage': lesson.course.title,
-                               'jumpurl': str(
-                                   reverse('course:information', args=[lesson.course.id]))},
-                              context_instance=RequestContext(request))
+    return render(request, 'error.html',
+                  {'message': '开始签到失败',
+                   'submessage': lesson.course.title,
+                   'jumpurl': str(
+                       reverse('course:information', args=[lesson.course.id]))})
 
 
 def stopCheckin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     if lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_ADD or lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         re = endcheckin(lessonid)
         if re['error'] != 0:
-            return render_to_response('error.html',
-                                      {'message': re['message'],
-                                       'submessage': lesson.course.title,
-                                       'jumpurl': str(
-                                           reverse('course:information', args=[lesson.course.id]))},
-                                      context_instance=RequestContext(request))
+            return render(request, 'error.html',
+                          {'message': re['message'],
+                           'submessage': lesson.course.title,
+                           'jumpurl': str(
+                               reverse('course:information', args=[lesson.course.id]))})
     # checkin_start(lessonruntimeid)
     return redirect(reverse('checkin:lesson_data', args=[lesson.id]))
 
@@ -218,9 +205,7 @@ def delask(request):
 def clearcheckin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     if request.GET.get('deleteall', 0):
         clear_checkin(lesson)
         return redirect(reverse('checkin:lesson_data', args=[lesson.id]))

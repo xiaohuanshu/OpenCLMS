@@ -1,4 +1,4 @@
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 
 from course.models import Studentcourse, Lesson, Course
 from school.function import getCurrentSchoolYearTerm, getnowlessontime
@@ -22,13 +22,12 @@ def home(request):
     nowlessontime = getnowlessontime()
     lesson = Lesson.objects.filter(course__in=termcourse, week=nowlessontime['week'])
 
-    return render_to_response('home.html',
-                              {'term': getCurrentSchoolYearTerm(), 'alreadycount': 0,
-                               'termcourse': termcourse.all(),
-                               'weeklesson': lesson.select_related('course').all(),
-                               },
-                              context_instance=RequestContext(request))
+    return render(request, 'home.html',
+                  {'term': getCurrentSchoolYearTerm(), 'alreadycount': 0,
+                   'termcourse': termcourse.all(),
+                   'weeklesson': lesson.select_related('course').all(),
+                   })
 
 
 def seat(request):
-    return render_to_response('seat.html', {}, context_instance=RequestContext(request))
+    return render(request, 'seat.html')

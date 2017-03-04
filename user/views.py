@@ -1,12 +1,11 @@
 # coding=utf-8
-from django.shortcuts import render
 import json
 from django.http import HttpResponse
 from django.db.models import Q
 from models import User, Usertorole, Role
 from school.models import Student, Teacher
 from django.views.decorators.csrf import csrf_exempt
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
 from datetime import datetime, timedelta
@@ -36,13 +35,13 @@ def login(request):
         wechatloginurl = 'https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=%s&redirect_uri=%s%s&state=xxxx&usertype=member' % (
             settings.CORPID, settings.DOMAIN, reverse('wechat:wechatlogin', args=[]))
         data['wechatloginurl'] = wechatloginurl
-    return render_to_response('login.html', data, context_instance=RequestContext(request))
+    return render(request, 'login.html', data)
 
 
 def register(request):
     if request.session.get('username', '') != '':
         return redirect(reverse('home', args=[]))
-    return render_to_response('register.html', {}, context_instance=RequestContext(request))
+    return render(request, 'register.html', {})
 
 
 @csrf_exempt
@@ -117,10 +116,9 @@ def registerProcess(request):
             teacherrole = Role.objects.get(name='教师')
             Usertorole(user=user, role=teacherrole).save()
         wechat_client.user.verify(wxauth['userid'])
-        return render_to_response('success.html',
-                                  {'message': u'认证成功',
-                                   'wechatclose': True},
-                                  context_instance=RequestContext(request))
+        return render(request, 'success.html',
+                      {'message': u'认证成功',
+                       'wechatclose': True})
     else:
         '''
         origin = request.session.get('origin', '')
@@ -250,7 +248,7 @@ def authentication(request):
         else:
             return redirect(reverse('user:authentication', args=[]))
     else:
-        return render_to_response('authentication.html', {}, context_instance=RequestContext(request))
+        return render(request, 'authentication.html', {})
 
 
 @permission_required(permission='user_addpermission')
@@ -295,7 +293,7 @@ def add_permission(request):
 
             tree = json.dumps(treedata(permission_data))
             mdata['jurisdictiondata'] = tree
-        return render_to_response('addpermission.html', mdata, context_instance=RequestContext(request))
+        return render(request, 'addpermission.html', mdata)
 
 
 def forgetpassword(request):
@@ -303,8 +301,7 @@ def forgetpassword(request):
     try:
         user = User.objects.get(email=email)
     except ObjectDoesNotExist:
-        return render_to_response('error.html', {'message': u'找回密码失败', 'submessage': u'没有找到此Email对应的用户'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': u'找回密码失败', 'submessage': u'没有找到此Email对应的用户'})
     logger.info('user %s forgetpassword' % user.username)
     uuidstr = uuid.uuid1().hex
     cache.set('fp%s' % uuidstr, user.id, 600)
@@ -317,16 +314,14 @@ def forgetpassword(request):
     msg = EmailMultiAlternatives(subject, text_content, form_email, [to])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
-    return render_to_response('success.html',
-                              {'message': u'邮件发送成功', 'submessage': u'密码找回邮件已发送至%s' % email},
-                              context_instance=RequestContext(request))
+    return render(request, 'success.html',
+                  {'message': u'邮件发送成功', 'submessage': u'密码找回邮件已发送至%s' % email})
 
 
 def resetpassword(request, uuidstr):
     userid = cache.get('fp%s' % uuidstr)
     if userid is None:
-        return render_to_response('error.html', {'message': u'连接失效', 'submessage': u'连接无效或已经超时'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': u'连接失效', 'submessage': u'连接无效或已经超时'})
     else:
         if request.META['REQUEST_METHOD'] == 'POST':
             password = request.POST.get('password')
@@ -336,8 +331,7 @@ def resetpassword(request, uuidstr):
             User.objects.filter(id=userid).update(password=password)
             cache.delete('fp%s' % uuidstr)
             logger.info('userid %d reset password by email' % userid)
-            return render_to_response('success.html', {'message': u'重置成功', 'submessage': u'密码重置成功',
-                                                       'jumpurl': reverse('user:login', args=[])},
-                                      context_instance=RequestContext(request))
+            return render(request, 'success.html', {'message': u'重置成功', 'submessage': u'密码重置成功',
+                                                    'jumpurl': reverse('user:login', args=[])})
         else:
-            return render_to_response('resetpassword.html', {}, context_instance=RequestContext(request))
+            return render(request, 'resetpassword.html', {})

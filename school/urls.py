@@ -1,4 +1,4 @@
-from django.conf.urls import include, url, patterns
+from django.conf.urls import url
 import student, managementview, teacher
 
 urlpatterns = [

@@ -1,5 +1,5 @@
 from school.function import getCurrentSchoolYearTerm, getTermDate, datetoTermdate, getClassTime
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 import json, time
 from django.db.models import Q
 from django.http import HttpResponse
@@ -8,6 +8,7 @@ from models import Studentcourse, Lesson, Course
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from django.core.urlresolvers import reverse
+
 
 def schedule(request):
     tdata = {}
@@ -32,7 +33,7 @@ def schedule(request):
         tdata['day'] = request.GET.get('day')
     if request.GET.get('view', default=False):
         tdata['view'] = request.GET.get('view')
-    return render_to_response('schedule.html', tdata, context_instance=RequestContext(request))
+    return render(request, 'schedule.html', tdata)
 
 
 def schedule_data(request):
@@ -54,12 +55,12 @@ def schedule_data(request):
     plessonlist = Lesson.objects.select_related('course').select_related('classroom') \
         .filter(term=term, course__in=courses)
     if startinf['week'] == endinf['week']:
-        plessonlist = plessonlist.filter(week=startinf['week'],day__gte=startinf['day'],day__lte=endinf['day'])
+        plessonlist = plessonlist.filter(week=startinf['week'], day__gte=startinf['day'], day__lte=endinf['day'])
     else:
         plessonlist = plessonlist.filter(
-                Q(Q(Q(week=startinf['week'], day__gte=startinf['day']) | Q(week=endinf['week'],
-                                                                           day__lte=endinf['day'])) |
-                  Q(week__gt=startinf['week'], week__lt=endinf['week']))).all()
+            Q(Q(Q(week=startinf['week'], day__gte=startinf['day']) | Q(week=endinf['week'],
+                                                                       day__lte=endinf['day'])) |
+              Q(week__gt=startinf['week'], week__lt=endinf['week']))).all()
     data = []
     colordata = {}
     lastcolorid = 0

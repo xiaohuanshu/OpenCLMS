@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from functools import wraps
-from django.shortcuts import render_to_response, RequestContext
-from models import Role
+from django.shortcuts import render
 from django.http import HttpResponse
 import json
 
@@ -17,9 +16,7 @@ def permission_required(func=None, permission=None):
                 if request.is_ajax():
                     return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
                 else:
-                    return render_to_response('error.html',
-                                              {'message': '没有权限'},
-                                              context_instance=RequestContext(request))
+                    return render(request, 'error.html', {'message': '没有权限'})
 
         return returned_wrapper
 

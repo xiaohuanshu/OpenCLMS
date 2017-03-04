@@ -10,7 +10,10 @@ from django.db.models import ObjectDoesNotExist
 
 
 class UserMiddleware(object):
-    def process_request(self, request):
+    def __init__(self, get_response):
+        self.get_response = get_response
+
+    def __call__(self, request):
         agent = request.META.get('HTTP_USER_AGENT', None)
         urlname = resolve(request.path)
         urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
@@ -32,15 +35,15 @@ class UserMiddleware(object):
                         if urlname != 'user:logout':
                             return redirect(reverse('user:logout'))
                         else:
-                            return None
+                            return self.get_response(request)
                     request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
                     if (not request.user.verify) and urlname != 'user:authentication':
                         return redirect(reverse('user:authentication'))
-                    return None
+                    return self.get_response(request)
             if agent and "MicroMessenger" in agent:
                 if urlname in wechat_allow_url:
-                    return None
+                    return self.get_response(request)
                 if not request.session.get('openid', default=False):
                     return getuserinfo(state=request.get_full_path())
 
@@ -54,7 +57,7 @@ class UserMiddleware(object):
                 if urlname != 'user:logout':
                     return redirect(reverse('user:logout'))
                 else:
-                    return None
+                    return self.get_response(request)
             if (not request.user.verify) and urlname != 'user:authentication' and urlname != 'user:logout':
                 return redirect(reverse('user:authentication'))
-        return None
+        return self.get_response(request)

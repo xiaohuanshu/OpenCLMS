@@ -5,7 +5,7 @@ from models import Checkin, Checkinrecord, Ask, Scoreregulation
 from school.models import Student, Teacher
 from school.function import getCurrentSchoolYearTerm
 from constant import *
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from course.constant import *
 from django.db.models import ObjectDoesNotExist
@@ -20,17 +20,14 @@ from django.db.models import Count, Case, When, Q
 def checkin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     if not (
                         lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_AGAIN or lesson.status == LESSON_STATUS_CHECKIN_ADD):
-        return render_to_response('error.html',
-                                  {'message': '签到还未开始',
-                                   'submessage': lesson.course.title,
-                                   'jumpurl': str(
-                                       reverse('course:information', args=[lesson.course.id]))},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html',
+                      {'message': '签到还未开始',
+                       'submessage': lesson.course.title,
+                       'jumpurl': str(
+                           reverse('course:information', args=[lesson.course.id]))})
 
     studentlist = Studentcourse.objects.filter(course=lesson.course).select_related('student').order_by(
         'student__studentid').all()
@@ -40,25 +37,21 @@ def checkin(request, lessonid):
     elif lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         data['checkintype'] = u'再签'
     data['firstqrstr'] = generateqrstr(lessonid)
-    return render_to_response('checkin.html', data,
-                              context_instance=RequestContext(request))
+    return render(request, 'checkin.html', data)
 
 
 def lesson_data(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not (has_course_permission(request.user, lesson.course) or request.user.has_perm('checkin_view')):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     t = {'lessondata': lesson, 'coursedata': lesson.course,
          'courseperms': has_course_permission(request.user, lesson.course)}
     if lesson.ischeckinnow():
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
     if not (lesson.isnow() or lesson.isend()):
-        return render_to_response('error.html',
-                                  {'message': '课程还未开启',
-                                   'jumpurl': reverse('course:information', args=[lesson.course_id])},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html',
+                      {'message': '课程还未开启',
+                       'jumpurl': reverse('course:information', args=[lesson.course_id])})
     checkinrecord = Checkinrecord.objects.filter(lesson=lesson)
     checkincount = checkinrecord.count()
 
@@ -97,7 +90,7 @@ def lesson_data(request, lessonid):
         'student__classid__major').all()
     t['askdata'] = askdata
 
-    return render_to_response('lesson_data.html', t, context_instance=RequestContext(request))
+    return render(request, 'lesson_data.html', t)
 
 
 def course_data(request, courseid):
@@ -109,9 +102,7 @@ def course_data(request, courseid):
         modify = True
     course = Course.objects.get(id=courseid)
     if not (has_course_permission(request.user, course) or request.user.has_perm('checkin_view')):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     alllesson = Lesson.objects.filter(course=course).exclude(status=LESSON_STATUS_AWAIT).order_by(
         'week',
         'day',
@@ -175,17 +166,14 @@ def course_data(request, courseid):
         studentcheckindata['score'] = '%d' % (score)
         lessoncheckindata.append(studentcheckindata)
     data = {'header': json.dumps(columns), 'newrows': json.dumps(lessoncheckindata)}
-    return render_to_response('course_data.html', {'coursedata': course, 'data': data,
-                                                   'courseperms': has_course_permission(request.user, course)},
-                              context_instance=RequestContext(request))
+    return render(request, 'course_data.html', {'coursedata': course, 'data': data,
+                                                'courseperms': has_course_permission(request.user, course)})
 
 
 def student_data(request, studentid):
     student = Student.objects.get(studentid=studentid)
     if not (student.user == request.user or request.user.has_perm('checkin_view')):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     studentcourse = Studentcourse.objects.filter(student=student).all()
     coursecount = studentcourse.count()
     course = {}
@@ -252,16 +240,13 @@ def student_data(request, studentid):
             {'field': 'lesson%d' % i, 'title': i + 1, 'cellStyle': 'cellStyle', 'formatter': 'identifierFormatter',
              'align': 'center'})
     data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
-    return render_to_response('student_data.html', {'student': student, 'data': data},
-                              context_instance=RequestContext(request))
+    return render(request, 'student_data.html', {'student': student, 'data': data})
 
 
 def teacher_data(request, teacherid):
     teacher = Teacher.objects.get(teacherid=teacherid)
     if not (teacher.user == request.user or request.user.has_perm('checkin_view')):
-        return render_to_response('error.html',
-                                  {'message': '没有权限'},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html', {'message': '没有权限'})
     teachercourse = Course.objects.filter(teacher=teacher).all()
     coursecount = teachercourse.count()
     course = {}
@@ -304,8 +289,7 @@ def teacher_data(request, teacherid):
         columns[1].append(
             {'field': 'lesson%d' % i, 'title': i + 1, 'align': 'center'})
     data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
-    return render_to_response('teacher_data.html', {'teacher': teacher, 'data': data},
-                              context_instance=RequestContext(request))
+    return render(request, 'teacher_data.html', {'teacher': teacher, 'data': data})
 
 
 def personaldata(request):
@@ -319,8 +303,7 @@ def personaldata(request):
 
 
 def askmanager(request):
-    return render_to_response('askmanager.html',
-                              context_instance=RequestContext(request))
+    return render(request, 'askmanager.html')
 
 
 def askdata(request):
@@ -390,8 +373,7 @@ def scoreregulationsetting(request, courseid):
             'coursedata': course,
             'courseperms': has_course_permission(request.user, course)
             }
-    return render_to_response('scoreregulation.html', data,
-                              context_instance=RequestContext(request))
+    return render(request, 'scoreregulation.html', data)
 
 
 def jumptolesson_data(request, courseid):
@@ -402,9 +384,8 @@ def jumptolesson_data(request, courseid):
                                                    LESSON_STATUS_CHECKIN_AGAIN]).get()
         return HttpResponseRedirect(reverse('checkin:lesson_data', args=[lesson.id]))
     except ObjectDoesNotExist:
-        return render_to_response('error.html',
-                                  {'message': '没有课程开启',
-                                   'submessage': '请在课程详情中开启课程',
-                                   'jumpurl': str(
-                                       reverse('course:information', args=[courseid]))},
-                                  context_instance=RequestContext(request))
+        return render(request, 'error.html',
+                      {'message': '没有课程开启',
+                       'submessage': '请在课程详情中开启课程',
+                       'jumpurl': str(
+                           reverse('course:information', args=[courseid]))})

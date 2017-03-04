@@ -6,7 +6,7 @@ from django.db.models import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.core import signing
 from django.core.cache import cache
-from django.shortcuts import HttpResponseRedirect, render_to_response, RequestContext, redirect
+from django.shortcuts import HttpResponseRedirect, render, redirect
 from user.models import User
 from django.conf import settings
 import logging
@@ -49,18 +49,17 @@ def wxauth(request):
 
             if user is not None:
                 if user.openid is not None and user.openid != userid:
-                    return render_to_response('error.html',
-                                              {'message': '认证失败', 'submessage': '此帐号已绑定其他微信号',
-                                               'wechatclose': True}, context_instance=RequestContext(request))
+                    return render(request, 'error.html',
+                                  {'message': '认证失败', 'submessage': '此帐号已绑定其他微信号',
+                                   'wechatclose': True})
                 else:
                     wechat_client.user.verify(userid)
                     user.openid = userid
                     user.save()
                     logger.info('wechat user %s bind to user %s successful' % (userid, user.username))
-                    return render_to_response('success.html',
-                                              {'message': u'认证成功',
-                                               'wechatclose': True},
-                                              context_instance=RequestContext(request))
+                    return render(request, 'success.html',
+                                  {'message': u'认证成功',
+                                   'wechatclose': True})
             else:
                 data = {'usertype': usertype, 'workid': thisuserworkid, 'userid': userid}
                 return HttpResponseRedirect(reverse('user:register', args=[]) + '?wxauth=%s' % signing.dumps(data))

@@ -1,4 +1,4 @@
-from django.conf.urls import include, url, patterns
+from django.conf.urls import url
 import control, views
 
 urlpatterns = [
@@ -18,13 +18,10 @@ urlpatterns = [
     url(r'^data/personal_data$', views.personaldata, name='personal_data'),
     url(r'^data/lesson_data/(\d+)$', views.lesson_data, name='lesson_data'),
 
-
     url(r'^askmanager$', views.askmanager, name='askmanager'),
     url(r'^ajax/getaskdata$', views.askdata, name='getaskdata'),
     url(r'^ajax/addask$', control.addask, name='addask'),
     url(r'^ajax/delask$', control.delask, name='delask'),
-
-
 
     url(r'^settings/scoreregulation/(\d+)', views.scoreregulationsetting, name='scoreregulation'),
     url(r'^jumptolesson_data/(\d+)', views.jumptolesson_data, name='jumptolesson_data'),

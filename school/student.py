@@ -3,7 +3,7 @@ import json
 
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 
 from models import Student
 from user.auth import permission_required
@@ -11,7 +11,7 @@ from user.auth import permission_required
 
 @permission_required(permission='school_student_view')
 def studentlist(request):
-    return render_to_response('student_list.html', {}, context_instance=RequestContext(request))
+    return render(request, 'student_list.html')
 
 
 @permission_required(permission='school_student_view')
@@ -80,12 +80,12 @@ def selectdata(request):
     # lessondata = Lesson.objects.all()[offset: (offset + limit)]
     studentdata = Student.objects.order_by('studentid')
     count = studentdata.filter(
-                (Q(name__icontains=wd) | Q(studentid__startswith=wd))
-            ).count()
+        (Q(name__icontains=wd) | Q(studentid__startswith=wd))
+    ).count()
     studentdata = studentdata.select_related('classid').select_related('major').select_related(
-                'department').filter(
-                (Q(name__icontains=wd) | Q(studentid__startswith=wd))
-            )[offset: (offset + limit)]
+        'department').filter(
+        (Q(name__icontains=wd) | Q(studentid__startswith=wd))
+    )[offset: (offset + limit)]
 
     rows = []
     for p in studentdata:

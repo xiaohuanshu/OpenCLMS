@@ -2,7 +2,7 @@
 import json
 
 from django.http import HttpResponse
-from django.shortcuts import render_to_response, RequestContext
+from django.shortcuts import render
 
 from models import Teacher
 from user.auth import permission_required
@@ -10,7 +10,7 @@ from user.auth import permission_required
 
 @permission_required(permission='school_teacher_view')
 def teacherlist(request):
-    return render_to_response('teacher_list.html', {}, context_instance=RequestContext(request))
+    return render(request, 'teacher_list.html')
 
 
 @permission_required(permission='school_teacher_view')

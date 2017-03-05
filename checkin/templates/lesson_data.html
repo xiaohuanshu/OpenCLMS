@@ -93,10 +93,12 @@
                     <a class="btn btn-app" href="{% url 'checkin:startcheckin' lessondata.id %}?mode=again">
                         <i class="fa fa-circle-o-notch"></i> 再签
                     </a>
-                    <a class="btn btn-app">
-                        <i class="fa fa-repeat"></i> 撤回上次数据
-                    </a>
-                    <a class="btn btn-app">
+                    {% if canclearlastdata %}
+                        <a class="btn btn-app" data-toggle="modal" href="#clearthisdata">
+                            <i class="fa fa-repeat"></i> 撤回上次数据
+                        </a>
+                    {% endif %}
+                    <a class="btn btn-app" data-toggle="modal" href="#clearalldata">
                         <i class="fa fa-trash"></i> 清除全部数据
                     </a>
                 {% endif %}
@@ -106,81 +108,6 @@
             </div>
         </div>
     {% endif %}
-    {% comment %}
-    <div class="box">
-        <div class="box-header">
-            <h3 class="box-title">{{ lessondata.course.title }}</h3>
-            <span class="pull-right">
-                          <button type="button" id="loading-btn" class="btn btn-warning btn-xs"><i
-                                  class="fa fa-refresh"></i> 刷新
-                          </button>
-                      </span>
-        </div>
-        <div class="box-body">
-
-            {% if not lessondata.checkinnow and not lessondata.isend %}
-                {% if lessondata.isnow %}
-                    {% if checkincount == 0 %}
-                        <div class="row">
-                            <div class="col-sm-6">
-                                <button type="button" class="btn btn-success btn-lg btn-block"
-                                        onclick="window.location.href = ''">
-                                    开始签到
-                                </button>
-                            </div>
-                            <div class="col-sm-6">
-                                <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal"
-                                        href="#LessonCloseModal">
-                                    结束课程
-                                </button>
-                            </div>
-                        </div>
-                    {% else %}
-                        <div class="row">
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-success btn-lg btn-block popovers"
-                                        onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}?mode=add'"
-                                        data-original-title="补签说明" data-content="当有同学迟到后,进入补签模式,所有新签入的同学会视为迟到"
-                                        data-placement="bottom" data-trigger="hover">
-                                    补签
-                                </button>
-                            </div>
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-success btn-lg btn-block popovers"
-                                        onclick="window.location.href = '{% url 'checkin:startcheckin' lessondata.id %}?mode=again'"
-                                        data-original-title="再签说明" data-content="再次进行一次签到,所有没有签到的人会视为早退"
-                                        data-placement="bottom" data-trigger="hover">
-                                    再签
-                                </button>
-                            </div>
-                            <div class="col-sm-4">
-                                <button type="button" class="btn btn-danger btn-lg btn-block" data-toggle="modal"
-                                        href="#LessonCloseModal">
-                                    结束课程
-                                </button>
-                            </div>
-                        </div>
-                    {% endif %}
-                {% else %}
-                    <div class="row">
-                        <div class="col-sm-6">
-                            <button type="button" class="btn btn-success btn-lg btn-block"
-                                    onclick="window.location.href = '{% url 'course:control.startlesson' %}?lessonid={{ lessondata.id }}'">
-                                开始上课
-                            </button>
-                        </div>
-                        <div class="col-sm-6">
-                            <button type="button" class="btn btn-success btn-lg btn-block"
-                                    onclick="window.location.href = '{% url 'course:control.startlesson' %}?lessonid={{ lessondata.id }}&jumptocheckin=1'">
-                                开始上课/签到
-                            </button>
-                        </div>
-                    </div>
-                {% endif %}
-            {% endif %}
-        </div>
-    </div>
-{% endcomment %}
 
 
     {% if lessondata.isnow or lessondata.isend %}
@@ -354,6 +281,54 @@
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
                         <a href="{% url 'course:control.stoplesson' %}?lessonid={{ lessondata.id }}">
+                            <button class="btn btn-warning" type="button"> 确认</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modal-dialog-center top-modal-with-space" id="clearthisdata" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">操作提示</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        确认撤回上次数据？所有人将回滚到上次签到前的状态
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <a href="{% url 'checkin:clearcheckin' lessondata.id %}?deletethis=1">
+                            <button class="btn btn-warning" type="button"> 确认</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modal-dialog-center top-modal-with-space" id="clearalldata" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">操作提示</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        确认清除全部数据？所有人状态会初试化为“正常”状态
+
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <a href="{% url 'checkin:clearcheckin' lessondata.id %}?deleteall=1">
                             <button class="btn btn-warning" type="button"> 确认</button>
                         </a>
                     </div>

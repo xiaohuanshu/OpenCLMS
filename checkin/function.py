@@ -41,7 +41,7 @@ def startcheckin(lessonid, mode='first'):
         lesson.status = LESSON_STATUS_CHECKIN
         checkin_record.status = CHECKIN_RECORD_FIRST
         Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(laststatus=F('status'))
-        Checkin.objects.filter(lesson=lesson,status=CHECKIN_STATUS_SUCCESS).update(status=CHECKIN_STATUS_NORMAL)
+        Checkin.objects.filter(lesson=lesson, status=CHECKIN_STATUS_SUCCESS).update(status=CHECKIN_STATUS_NORMAL)
         '''
         nowstudent = Checkin.objects.filter(lesson=lesson).values_list('student', flat=True)
         studentcourse = Studentcourse.objects.filter(course=lesson.course).exclude(student__in=nowstudent)
@@ -67,7 +67,7 @@ def startcheckin(lessonid, mode='first'):
         checkin_record.status = CHECKIN_RECORD_AGAIN
         Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(
             laststatus=F('status'), status=CHECKIN_STATUS_NORMAL)
-
+    cache.set('lesson_%d_clear_flag' % lesson.id, True, 10800)
     checkin_record.lesson = lesson
     checkin_record.starttime = nowtime
     checkin_record.time = lesson.checkincount
@@ -118,23 +118,20 @@ def endcheckin(lessonid):
 
 
 def clear_checkin(lesson):
-    if not (lesson.isnow or lesson.isend()):
-        return {'error': 101, 'message': '课程还未开始'}
     Checkinrecord.objects.filter(lesson=lesson).all().delete()
     Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(status=CHECKIN_STATUS_SUCCESS)
-    lesson.status = LESSON_STATUS_NOW
+    if lesson.ischeckinnow():
+        lesson.status = LESSON_STATUS_NOW
     lesson.checkincount = 0
     lesson.save()
 
 
 def clear_last_checkin(lesson):
-    #TODO judge is there last checkin
-    if not lesson.status == LESSON_STATUS_CHECKIN and not lesson.status == LESSON_STATUS_CHECKIN_ADD and not lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
-        return {'error': 101, 'message': '课程未开始签到'}
     Checkinrecord.objects.filter(lesson=lesson).order_by('-time').first().delete()
     Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(status=F('laststatus'))
     lesson.checkincount -= 1
-    lesson.status = LESSON_STATUS_NOW
+    if lesson.ischeckinnow():
+        lesson.status = LESSON_STATUS_NOW
     lesson.save()
 
 

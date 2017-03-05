@@ -15,6 +15,7 @@ from course.auth import has_course_permission
 from function import generateqrstr
 import datetime
 from django.db.models import Count, Case, When, Q
+from django.core.cache import cache
 
 
 def checkin(request, lessonid):
@@ -89,7 +90,7 @@ def lesson_data(request, lessonid):
         'student__classid').select_related('student__classid__department').select_related(
         'student__classid__major').all()
     t['askdata'] = askdata
-
+    t['canclearlastdata'] = cache.get('lesson_%d_clear_flag' % lesson.id, default=False)
     return render(request, 'lesson_data.html', t)
 
 

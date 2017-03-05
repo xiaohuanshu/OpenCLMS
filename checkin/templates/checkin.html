@@ -235,13 +235,6 @@
                                         </a>
                                     </div>
                                 </div>
-                                <div class="row">
-                                    <div class="col-sm-12 text-center">
-                                        <a href="{% url 'checkin:clearcheckin' lessondata.id %}?deleteall=1">
-                                            <button type="button" class="btn btn-danger btn-block">删除所有签到数据</button>
-                                        </a>
-                                    </div>
-                                </div>
 
                             </section>
                         </div>
@@ -344,12 +337,12 @@
         }
         function loading1() {
             var canvas = $qrcode.children('canvas').get(0),
-                    ctx = canvas.getContext("2d"),
-                    w = canvas.width,
-                    h = canvas.height,
-                    x = w / 2,
-                    y = h / 2,
-                    radius = 30;
+                ctx = canvas.getContext("2d"),
+                w = canvas.width,
+                h = canvas.height,
+                x = w / 2,
+                y = h / 2,
+                radius = 30;
             ctx.fillStyle = "#FFF";
             ctx.fillRect(0, 0, w, h);
             var r = [3, 4, 4.5, 5, 6, 7];
@@ -403,8 +396,8 @@
 
         function statushtml(status) {
             return "    <button data-toggle='dropdown' class='btn bg-" + checkin_status_style_json[status] + " dropdown-toggle btn-xs' type='button'" +
-                    "            aria-expanded='false'>" + checkin_status_json[status] +
-                    "    </button>";
+                "            aria-expanded='false'>" + checkin_status_json[status] +
+                "    </button>";
 
         }
         function changestudentstatus(studentid, status, toast) {

@@ -108,8 +108,8 @@
                             </thead>
                             <tbody>
                             {% for lesson in lessondata %}
-                                <tr class="lessontr" data-lessonid="{{ lesson.id }}"
-                                    data-lessonstatus="{{ lesson.status }}">
+                                <tr class="lessontr {% if lesson.id|floatformat == request.GET.lessonid %}info{% endif %}"
+                                    data-lessonid="{{ lesson.id }}" data-lessonstatus="{{ lesson.status }}">
                                     <td>
                                         {{ forloop.counter }}
                                     </td>

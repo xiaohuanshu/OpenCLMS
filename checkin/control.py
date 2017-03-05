@@ -208,7 +208,12 @@ def clearcheckin(request, lessonid):
         return render(request, 'error.html', {'message': '没有权限'})
     if request.GET.get('deleteall', 0):
         clear_checkin(lesson)
-        return redirect(reverse('checkin:lesson_data', args=[lesson.id]))
-    if request.GET.get('deletethis', 0):
-        clear_last_checkin(lesson)
-        return redirect(reverse('checkin:lesson_data', args=[lesson.id]))
+    elif request.GET.get('deletethis', 0):
+        if lesson.ischeckinnow():
+            clear_last_checkin(lesson)
+        elif cache.get('lesson_%d_clear_flag' % lesson.id, default=False):
+            clear_last_checkin(lesson)
+            cache.delete('lesson_%d_clear_flag' % lesson.id)
+        else:
+            return render(request, 'error.html', {'message': '无法清除', 'submessage': '间隔时间太久'})
+    return redirect(reverse('checkin:lesson_data', args=[lesson.id]))

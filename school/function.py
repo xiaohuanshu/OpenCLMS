@@ -94,7 +94,7 @@ def getnowlessontime():
         week = week + 1
     week += 1
     try:
-        nowlessontime = Classtime.objects.get(starttime__gte=nowtime.time(), endtime__lte=nowtime.time()).id
+        nowlessontime = Classtime.objects.get(starttime__lte=nowtime.time(), endtime__gte=nowtime.time()).id
     except ObjectDoesNotExist:
         nowlessontime = 0
     return {'week': week, 'day': day, 'time': nowlessontime, 'term': term}

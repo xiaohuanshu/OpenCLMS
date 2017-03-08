@@ -1,10 +1,183 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% load checkin_extra %}
+{% block title %}课程资源 - {{ coursedata.title }}{% endblock %}
+{% block page_js %}
+    {% if request.GET.manage == '1' %}
+        <script src="{% static 'plugins/bootstrap-fileinput/js/fileinput.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-fileinput/js/locales/zh.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-fileinput/themes/explorer/theme.js' %}"></script>
+        <script src="{% static 'js/csrf.js' %}"></script>
+    {% endif %}
+{% endblock %}
+{% block page_css %}
+    {% if not request.GET.manage == '1' %}
+        <style>
+            .file-box {
+                float: left;
+                width: 300px;
+            }
+
+            .file {
+                border: 1px solid #e7eaec;
+                padding: 0;
+                background-color: #ffffff;
+                position: relative;
+                margin-bottom: 20px;
+                margin-right: 20px;
+            }
+
+            .file .icon,
+            .file .image {
+                height: 100px;
+                overflow: hidden;
+            }
+
+            .file .icon {
+                padding: 15px 10px;
+                text-align: center;
+            }
+
+            .file .icon i {
+                font-size: 70px;
+                color: #dadada;
+            }
+
+            .file .file-name {
+                padding: 10px;
+                background-color: #f8f8f8;
+                border-top: 1px solid #e7eaec;
+                width: 280px;
+                overflow: hidden;
+                white-space: nowrap;
+                text-overflow: ellipsis;
+            }
+
+            .file-name small {
+                color: #676a6c;
+            }
+
+            .corner {
+                position: absolute;
+                display: inline-block;
+                width: 0;
+                height: 0;
+                line-height: 0;
+                border: 0.6em solid transparent;
+                border-right: 0.6em solid #f1f1f1;
+                border-bottom: 0.6em solid #f1f1f1;
+                right: 0em;
+                bottom: 0em;
+            }
+        </style>
+    {% else %}
+        <link href="{% static 'plugins/bootstrap-fileinput/css/fileinput.min.css' %}" media="all" rel="stylesheet"
+              type="text/css"/>
+        <link href="{% static 'plugins/bootstrap-fileinput/themes/explorer/theme.css' %}" media="all" rel="stylesheet"
+              type="text/css"/>
+    {% endif %}
+{% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+        </h1>
+    </section>
+{% endblock %}
+{% block content %}
+    {% include 'coursenav.html' %}
+    {% if not request.GET.manage == '1' %}
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title">课程资源文件</h3>
+                <div class="pull-right box-tools">
+                    <a class="btn btn-primary btn-sm" href="?manage=1">上传/管理</a>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        {% if resources %}
+                            {% for resource in resources %}
+                                <div class="file-box">
+                                    <div class="file">
+                                        <a href="{{ resource.file.url }}" download="{{ resource.title }}">
+                                            <span class="corner"></span>
+
+                                            <div class="icon">
+                                                <i class="fa fa-file"></i>
+                                            </div>
+                                            <div class="file-name">
+                                                {{ resource.title }}
+                                                <br>
+                                                <small>添加日期: {{ resource.uploadtime|date:'Y-m-d' }}</small>
+                                            </div>
+                                        </a>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        {% else %}
+                            <h5>没有资源</h5>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% else %}
+        <div class="box box-primary">
+            <div class="box-header">
+                <h3 class="box-title">课程资源文件上传/管理</h3>
+                <div class="pull-right box-tools">
+                    <a class="btn btn-primary btn-sm" href="?manage=0">返回</a>
+                </div>
+            </div>
+            <div class="box-body">
+                <div class="row">
+                    <div class="col-lg-12">
+                        <input id="fileupload" type="file" multiple>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block page_script %}
+    <script>
+        $fileupload = $("#fileupload");
+        $fileupload.fileinput({
+            language: "zh",
+            theme: "explorer",
+            showUpload: true,
+            //previewFileType: 'any',
+            uploadUrl: "{% url 'course:resourceupload' %}",
+            //maxFileCount: 100,
+            validateInitialCount: true,
+            overwriteInitial: false,
+            //uploadAsync: true,
+            showRemove: false,
+            uploadExtraData: {'courseid':{{ coursedata.id }}},
+            initialPreview: [
+                {% for resource in resources %}
+                    "<h2><i class='glyphicon glyphicon-file'></i></h2>",
+                {% endfor %}
+            ],
+            initialPreviewConfig: [
+                {% for resource in resources %}
+                    {
+                        caption: '{{ resource.title }}',
+                        url: '{% url 'course:resourcedelete' %}',
+                        key: {{ resource.id }}
+                    },
+                {% endfor %}
+            ]
+        });
+        $fileupload.on("filepredelete", function (jqXHR) {
+            var abort = true;
+            if (confirm("确认删除?")) {
+                abort = false;
+            }
+            return abort;
+        });
+    </script>
+{% endblock %}

@@ -8,8 +8,8 @@
             <a href="{% url 'checkin:jumptolesson_data' coursedata.id %}">课堂考勤</a>
         </li>
     {% endif %}
-    <li role="presentation">
-        <a href="#">课程资源</a>
+    <li role="presentation" class="{% nav_active request.path 'resource' %}">
+        <a href="{% url 'course:resource' coursedata.id %}">课程资源</a>
     </li>
     {% if courseperms or perms.checkin_view %}
         <li role="presentation" class="{% nav_active request.path 'course_data' %}">

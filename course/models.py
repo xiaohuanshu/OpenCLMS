@@ -265,9 +265,16 @@ class Studentcourse(models.Model):
         index_together = ["student", "course"]
 
 
+def get_courseresource_path(instance, filename):
+    return 'courseresource/%d/%s' % (instance.course.id, filename)
+
+
 class Courseresource(models.Model):
     course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     uploadtime = models.DateTimeField(blank=True, null=True)
     # downloadcount = models.SmallIntegerField(default=0)
-    file = models.FileField(upload_to='courseresource')
+    file = models.FileField(upload_to=get_courseresource_path)
+
+    class Meta:
+        db_table = 'CourseResource'

@@ -11,5 +11,8 @@ urlpatterns = [
     url(r'^information/(\d+)$', views.information, name='information'),
     url(r'^control/startlesson/$', control.startLesson, name='control.startlesson'),
     url(r'^control/stoplesson/$', control.stopLesson, name='control.stoplesson'),
+    url(r'^resource/(\d+)$', views.resource, name='resource'),
+    url(r'^resource/upload$', views.resourceupload, name='resourceupload'),
+    url(r'^resource/delete$', views.resourcedelete, name='resourcedelete'),
 
 ]

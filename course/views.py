@@ -1,14 +1,15 @@
-# Create your views here.
+# -*- coding: utf-8 -*-
 import json
 
 from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
-
+from django.core.urlresolvers import reverse
 from course.auth import has_course_permission
-from models import Course, Lesson, Studentcourse
+from models import Course, Lesson, Studentcourse, Courseresource
 from user.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
+import time
 
 
 def information(request, courseid):
@@ -79,3 +80,44 @@ def studentcourse(request, courseid):
     return render(request, 'studentcourse.html',
                   {'coursedata': coursedata, 'students': students,
                    'courseperms': has_course_permission(request.user, coursedata)})
+
+
+def resource(request, courseid):
+    coursedata = Course.objects.get(id=courseid)
+    resources = Courseresource.objects.filter(course=coursedata).all()
+    resources.order_by('uploadtime')
+    return render(request, 'resource.html',
+                  {'coursedata': coursedata, 'courseperms': has_course_permission(request.user, coursedata),
+                   'resources': resources})
+
+
+def resourceupload(request):
+    coursedata = Course.objects.get(id=request.POST.get('courseid'))
+    if not has_course_permission(request.user, coursedata):
+        return HttpResponse(json.dumps({'error':u'没有权限上传到此课程'}), content_type="application/json")
+    res = Courseresource(course=coursedata, uploadtime=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
+    res.file = request.FILES['file_data']
+    res.title = res.file.name
+    res.save()
+    deleteurl = reverse('course:resourcedelete', args=[])
+    data = {
+        'initialPreview': ["<h2><i class='glyphicon glyphicon-file'></i></h2>"],
+        'initialPreviewConfig': [
+            {
+                'caption': res.title,
+                'url': deleteurl,
+                'key': res.id
+            },
+        ]
+    }
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def resourcedelete(request):
+    key = request.POST.get('key')
+    res = Courseresource.objects.get(id=key)
+    if not has_course_permission(request.user, res.course):
+        return HttpResponse(json.dumps({'error':u'没有权限删除此课程文件'}), content_type="application/json")
+    res.file.delete()
+    res.delete()
+    return HttpResponse(json.dumps([]), content_type="application/json")

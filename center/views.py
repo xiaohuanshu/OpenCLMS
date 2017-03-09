@@ -25,7 +25,7 @@ def home(request):
     return render(request, 'home.html',
                   {'term': getCurrentSchoolYearTerm(), 'alreadycount': 0,
                    'termcourse': termcourse.all(),
-                   'weeklesson': lesson.select_related('course').all(),
+                   'weeklesson': lesson.select_related('course').select_related('classroom').all(),
                    })
 
 

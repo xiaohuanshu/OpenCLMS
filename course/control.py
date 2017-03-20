@@ -1,5 +1,5 @@
 # coding=utf-8
-from models import Lesson
+from models import Lesson, Homeworkcommit
 from constant import *
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
@@ -53,3 +53,13 @@ def stopLesson(request):
                                reverse('course:information', args=[lessondata.course.id]))})
         else:
             return redirect(reverse('course:information', args=[lessondata.course.id]))
+
+
+def sethomeworkscore(request):
+    homeworkcommit = Homeworkcommit.objects.select_related('coursehomework').get(id=request.GET.get('homeworkcommitid'))
+    score = request.GET.get('score')
+    if not has_course_permission(request.user, homeworkcommit.coursehomework.course):
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+    homeworkcommit.score = score
+    homeworkcommit.save()
+    return HttpResponse(json.dumps({'error': 0, 'score': score, 'message': '评分成功'}), content_type="application/json")

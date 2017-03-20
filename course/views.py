@@ -3,10 +3,11 @@ import json
 
 from django.db.models import Q
 from django.http import HttpResponse
-from django.shortcuts import render
+from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
-from course.auth import has_course_permission
-from models import Course, Lesson, Studentcourse, Courseresource
+from course.auth import has_course_permission, is_course_student
+from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit
+from constant import *
 from user.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
@@ -94,7 +95,7 @@ def resource(request, courseid):
 def resourceupload(request):
     coursedata = Course.objects.get(id=request.POST.get('courseid'))
     if not has_course_permission(request.user, coursedata):
-        return HttpResponse(json.dumps({'error':u'没有权限上传到此课程'}), content_type="application/json")
+        return HttpResponse(json.dumps({'error': u'没有权限上传到此课程'}), content_type="application/json")
     res = Courseresource(course=coursedata, uploadtime=time.strftime('%Y-%m-%d %H:%M:%S', time.localtime()))
     res.file = request.FILES['file_data']
     res.title = res.file.name
@@ -117,7 +118,115 @@ def resourcedelete(request):
     key = request.POST.get('key')
     res = Courseresource.objects.get(id=key)
     if not has_course_permission(request.user, res.course):
-        return HttpResponse(json.dumps({'error':u'没有权限删除此课程文件'}), content_type="application/json")
+        return HttpResponse(json.dumps({'error': u'没有权限删除此课程文件'}), content_type="application/json")
     res.file.delete()
     res.delete()
     return HttpResponse(json.dumps([]), content_type="application/json")
+
+
+def homework(request, courseid):
+    coursedata = Course.objects.get(id=courseid)
+    courseperms = has_course_permission(request.user, coursedata)
+    coursestudent = is_course_student(coursedata, request.user)
+    if request.GET.get('newhomework'):
+        if request.META['REQUEST_METHOD'] == 'POST':
+            if not courseperms:
+                return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+            title = request.POST.get('title')
+            deadline = request.POST.get('deadline')
+            type = request.POST.get('type')
+            if type == 'onlinesubmit':
+                type = COURSE_HOMEWORK_TYPE_ONLINESUBMIT
+            elif type == 'nosubmit':
+                type = COURSE_HOMEWORK_TYPE_NOSUBMIT
+            instruction = request.POST.get('instruction')
+            attachments = request.FILES.getlist('attachment')
+            weight = request.POST.get('weight')
+            homework = Coursehomework(title=title, deadline=deadline, type=type, instruction=instruction,
+                                      weight=weight, course=coursedata)
+            homework.save()
+            for file in attachments:
+                homework.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
+            return redirect(reverse('course:homework', args=[courseid]) + '?homeworkid=%d' % homework.id)
+        else:
+            return render(request, 'newhomework.html',
+                          {'coursedata': coursedata, 'courseperms': courseperms})
+    elif request.GET.get('homeworkid'):
+        homeworkdata = Coursehomework.objects.get(id=request.GET.get('homeworkid'))
+        data = {'coursedata': coursedata, 'courseperms': courseperms,
+                'homework': homeworkdata, 'coursestudent': coursestudent}
+        if request.META['REQUEST_METHOD'] == 'POST' and COURSE_HOMEWORK_TYPE_ONLINESUBMIT == homeworkdata.type:
+            if not coursestudent:
+                return HttpResponse(json.dumps({'error': 101, 'message': '上课名单里没有你'}), content_type="application/json")
+            text = request.POST.get('text')
+            attachments = request.FILES.getlist('attachment')
+            commitdata, created = Homeworkcommit.objects.get_or_create(student=coursestudent,
+                                                                       coursehomework=homeworkdata)
+            if commitdata.score:
+                pass  # 已经判完分数
+            commitdata.text = text
+            commitdata.submittime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            if not created:
+                for ca in commitdata.attachment.all():
+                    ca.file.delete()
+                    ca.delete()
+            for file in attachments:
+                commitdata.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
+            commitdata.save()
+            data['commitdata'] = commitdata
+        else:
+            if coursestudent:
+                try:
+                    commitdata = Homeworkcommit.objects.get(student=coursestudent, coursehomework=homeworkdata)
+                    data['commitdata'] = commitdata
+                except:
+                    pass
+            if courseperms:
+                allcommit = Homeworkcommit.objects.filter(coursehomework=homeworkdata).all()
+                data['allcommit'] = allcommit
+        return render(request, 'homeworkinformation.html', data)
+    elif request.GET.get('delhomeworkid'):
+        if not courseperms:
+            return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+        homeworkdata = Coursehomework.objects.get(id=request.GET.get('delhomeworkid'))
+        for ca in homeworkdata.attachment.all():
+            ca.file.delete()
+            ca.delete()
+        for hc in Homeworkcommit.objects.filter(coursehomework=homeworkdata).all():
+            for ca in hc.attachment.all():
+                ca.file.delete()
+                ca.delete()
+            hc.delete()
+        homeworkdata.delete()
+        return redirect(reverse('course:homework', args=[courseid]))
+    elif request.GET.get('edithomeworkid'):
+        homeworkdata = Coursehomework.objects.get(id=request.GET.get('edithomeworkid'))
+        if request.META['REQUEST_METHOD'] == 'POST':
+            if not courseperms:
+                return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+            homeworkdata.title = request.POST.get('title')
+            homeworkdata.deadline = request.POST.get('deadline')
+            type = request.POST.get('type')
+            if type == 'onlinesubmit':
+                type = COURSE_HOMEWORK_TYPE_ONLINESUBMIT
+            elif type == 'nosubmit':
+                type = COURSE_HOMEWORK_TYPE_NOSUBMIT
+            homeworkdata.type = type
+            homeworkdata.instruction = request.POST.get('instruction')
+            attachments = request.FILES.getlist('attachment')
+            homeworkdata.weight = request.POST.get('weight')
+            homeworkdata.save()
+            for ca in homeworkdata.attachment.all():
+                ca.file.delete()
+                ca.delete()
+            for file in attachments:
+                homeworkdata.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
+            return redirect(reverse('course:homework', args=[courseid]) + '?homeworkid=%d' % homeworkdata.id)
+        else:
+            return render(request, 'newhomework.html',
+                          {'coursedata': coursedata, 'courseperms': courseperms, 'homework': homeworkdata})
+    else:
+        homeworks = Coursehomework.objects.filter(course=coursedata).only('title', 'deadline').all()
+        return render(request, 'homeworklist.html',
+                      {'coursedata': coursedata, 'courseperms': courseperms,
+                       'homeworks': homeworks, 'coursestudent': coursestudent})

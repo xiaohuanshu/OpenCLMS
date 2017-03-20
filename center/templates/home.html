@@ -19,8 +19,8 @@
                 <span class="info-box-icon bg-aqua"><i class="fa fa-tags"></i></span>
 
                 <div class="info-box-content">
-                    <span class="info-box-text">已上课程</span>
-                    <span class="info-box-number">{{ alreadycount }}</span>
+                    <span class="info-box-text">未交作业</span>
+                    <span class="info-box-number">{{ uncommithomework|length }}</span>
                 </div>
                 <!-- /.info-box-content -->
             </div>
@@ -80,13 +80,42 @@
             <!-- Custom Tabs (Pulled to the right) -->
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
-                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期</a></li>
-                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周</a></li>
-                    <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日</a></li>
+                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期课程</a></li>
+                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周课程</a></li>
+                    {% if uncommithomework %}
+                        <li><a href="#tab_1-1" data-toggle="tab" aria-expanded="false">今日课程</a></li>
+                        <li class="active"><a href="#tab_0-0" data-toggle="tab" aria-expanded="true">未交作业</a></li>
+                    {% else %}
+                        <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日课程</a></li>
+                    {% endif %}
                     <li class="pull-left header"><i class="fa fa-th"></i> 课程信息</li>
                 </ul>
                 <div class="tab-content">
-                    <div class="tab-pane active" id="tab_1-1">
+                    <div class="tab-pane {% if uncommithomework %}active{% endif %}" id="tab_0-0">
+                        {% if uncommithomework %}
+                            <table class="table">
+                                <tbody>
+                                {% for uch in uncommithomework %}
+                                    <tr>
+                                        <td>{{ forloop.counter }}</td>
+                                        <td>
+                                            <a href="{% url 'course:homework' uch.course.id %}?homeworkid={{ uch.id }}">{{ uch.title }}</a>
+                                        </td>
+                                        <td>
+                                            <a href="{% url 'course:information' uch.course.id %}">{{ uch.course.title }}</a>
+                                        </td>
+                                        <td>{{ uch.type|COURSE_HOMEWORK_TYPE }}</td>
+                                        <td>{{ uch.deadline|date:'Y-m-d H:i' }}{% if uch.isend %}
+                                    <span class="badge bg-red">已过期</span>{% endif %}</td>
+                                    </tr>
+                                {% endfor %}
+                                </tbody>
+                            </table>
+                        {% else %}
+                            <div class="text-center">没有未完成作业</div>
+                        {% endif %}
+                    </div>
+                    <div class="tab-pane {% if not uncommithomework %}active{% endif %}" id="tab_1-1">
                         {% if todaylesson %}
                             <table class="table">
                                 <tbody>

@@ -11,6 +11,9 @@
     <li role="presentation" class="{% nav_active request.path 'resource' %}">
         <a href="{% url 'course:resource' coursedata.id %}">课程资源</a>
     </li>
+    <li role="presentation" class="{% nav_active request.path 'homework' %}">
+        <a href="{% url 'course:homework' coursedata.id %}">课程作业</a>
+    </li>
     {% if courseperms or perms.checkin_view %}
         <li role="presentation" class="{% nav_active request.path 'course_data' %}">
             <a href="{% url 'checkin:course_data' coursedata.id %}">考勤数据</a>

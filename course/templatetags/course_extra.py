@@ -3,6 +3,7 @@ from django import template
 
 register = template.Library()
 from course.constant import *
+from course.models import Homeworkcommit
 import json
 
 
@@ -47,6 +48,16 @@ def LESSON_STATUS(status):
 
 
 @register.filter
+def COURSE_HOMEWORK_TYPE(status):
+    if status == COURSE_HOMEWORK_TYPE_NOSUBMIT:
+        return u'无需提交'
+    elif status == COURSE_HOMEWORK_TYPE_ONLINESUBMIT:
+        return u'在线提交'
+    elif status == COURSE_HOMEWORK_TYPE_ONLINEANSWER:
+        return u'在线作答'
+
+
+@register.filter
 def LESSON_STATUS_STYLE(status):
     if status == LESSON_STATUS_AWAIT:
         return 'default'
@@ -86,3 +97,11 @@ def LESSON_STATUS_STYLE_JSON():
             LESSON_STATUS_WRONG: "warning",
             LESSON_STATUS_END: "danger", LESSON_STATUS_END_EARLY: "danger", LESSON_STATUS_START_LATE: "warning"}
     return json.dumps(data)
+
+
+@register.assignment_tag
+def student_submit_homework(student, homework):
+    try:
+        return Homeworkcommit.objects.filter(coursehomework=homework, student=student).get()
+    except:
+        return None

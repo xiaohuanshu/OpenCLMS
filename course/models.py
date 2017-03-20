@@ -10,6 +10,7 @@ from django.db.models import ObjectDoesNotExist, Q, F
 import time
 from function import getweek, gettime, getday, t, splitlesson, simplifytime
 from center.functional import classmethod_cache
+from django.contrib.postgres.fields import ArrayField
 import logging
 
 logger = logging.getLogger(__name__)
@@ -278,3 +279,48 @@ class Courseresource(models.Model):
 
     class Meta:
         db_table = 'CourseResource'
+
+
+class Homeworkfile(models.Model):
+    title = models.CharField(max_length=100, blank=True, null=True)
+    file = models.FileField(upload_to='homeworkfile')
+
+    class Meta:
+        db_table = 'HomeworkFile'
+
+
+class Coursehomework(models.Model):
+    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    title = models.CharField(max_length=100, blank=True, null=True)
+    instruction = models.TextField(blank=True, null=True)
+    type = models.SmallIntegerField(blank=True, null=True)
+    deadline = models.DateTimeField(blank=True, null=True)
+    weight = models.SmallIntegerField(blank=True, null=True)
+    attachment = models.ManyToManyField(Homeworkfile, blank=True, null=True)
+
+    def commitnumber(self):
+        return Homeworkcommit.objects.filter(coursehomework=self).count()
+
+    def commitprogress(self):
+        coursenumber = Studentcourse.objects.filter(course=self.course).count()
+        return 100.0 * self.commitnumber() / coursenumber
+
+    def isend(self):
+        return self.deadline < datetime.datetime.now()
+
+    class Meta:
+        db_table = 'CourseHomework'
+
+
+class Homeworkcommit(models.Model):
+    coursehomework = models.ForeignKey(Coursehomework, models.DO_NOTHING, db_column='coursehomeworkid', blank=True,
+                                       null=True)
+    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
+    submittime = models.DateTimeField(blank=True, null=True)
+    text = models.TextField(blank=True, null=True)
+    attachment = models.ManyToManyField(Homeworkfile, blank=True, null=True)
+    score = models.SmallIntegerField(blank=True, null=True)
+
+    class Meta:
+        index_together = ["coursehomework", "student"]
+        db_table = 'HomeworkCommit'

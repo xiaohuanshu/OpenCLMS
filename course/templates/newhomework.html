@@ -1,0 +1,252 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load course_extra %}
+{% block title %}编辑作业{% endblock %}
+{% block page_css %}
+    <!-- bootstrap wysihtml5 - text editor -->
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-wysiwyg/css/style.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/bootstrap-datetimepicker/css/bootstrap-datetimepicker.min.css' %}">
+    <link href="{% static 'plugins/bootstrap-fileinput/css/fileinput.min.css' %}" media="all" rel="stylesheet"
+          type="text/css"/>
+    <link href="{% static 'plugins/bootstrap-fileinput/themes/explorer/theme.css' %}" media="all" rel="stylesheet"
+          type="text/css"/>
+{% endblock %}
+{% block page_js %}
+    <!-- Bootstrap WYSIHTML5 -->
+    <script src="{% static 'js/jquery.hotkeys.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-wysiwyg/js/bootstrap-wysiwyg.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-datetimepicker/js/bootstrap-datetimepicker.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-datetimepicker/js/locales/bootstrap-datetimepicker.zh-CN.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-fileinput/js/fileinput.min.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-fileinput/js/locales/zh.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-fileinput/themes/explorer/theme.js' %}"></script>
+    <script src="{% static 'js/csrf.js' %}"></script>
+{% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+        </h1>
+    </section>
+{% endblock %}
+{% block content %}
+    <!-- page start-->
+    {% include 'coursenav.html' %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <i class="fa fa-edit"></i>
+                    {% if homework %}
+                        <h3 class="box-title">编辑作业</h3>
+                    {% else %}
+                        <h3 class="box-title">新作业</h3>
+                    {% endif %}
+                    <div class="box-tools pull-right">
+                        <a class="btn btn-block btn-info btn-sm" href="?">返回</a>
+                    </div>
+                </div>
+                <div class="box-body">
+                    <form role="form" class="form-horizontal" id="form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">作业标题</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" name="title"
+                                           value="{{ homework.title }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">截止时间</label>
+                                <div class="col-lg-10">
+                                    <input type="text" class="form-control" name="deadline" id="deadline"
+                                           value="{{ homework.deadline|date:'Y-m-d H:i' }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">类型</label>
+                                <div class="col-lg-10">
+                                    <div class="radio">
+                                        <label>
+                                            {% if homework and homework.type|COURSE_HOMEWORK_TYPE != '在线提交' %}
+                                                <input type="radio" name="type" id="type1" value="onlinesubmit">
+                                            {% else %}
+                                                <input type="radio" name="type" id="type1" value="onlinesubmit" checked>
+                                            {% endif %}
+                                            在线提交
+                                        </label>
+                                    </div>
+                                    <div class="radio">
+                                        <label>
+                                            {% if homework.type|COURSE_HOMEWORK_TYPE == '无需提交' %}
+                                                <input type="radio" name="type" id="type2" value="nosubmit" checked>
+                                            {% else %}
+                                                <input type="radio" name="type" id="type2" value="nosubmit">
+                                            {% endif %}
+                                            无需提交
+                                        </label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">说明</label>
+                                <div class="col-lg-10">
+                                    <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor">
+                                        <div class="btn-group">
+                                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                               title="文字大小"><i class="fa fa-text-height"></i>&nbsp;<b
+                                                    class="caret"></b></a>
+                                            <ul class="dropdown-menu">
+                                                <li><a data-edit="fontSize 5" class="fs-Five">大</a></li>
+                                                <li><a data-edit="fontSize 3" class="fs-Three">中</a></li>
+                                                <li><a data-edit="fontSize 1" class="fs-One">小</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                               title="文字背景颜色"><i class="fa fa-paint-brush"></i>&nbsp;<b
+                                                    class="caret"></b></a>
+                                            <ul class="dropdown-menu">
+                                                <p>&nbsp;&nbsp;&nbsp;文字背景颜色:</p>
+                                                <li><a data-edit="backColor #00FFFF">蓝色</a></li>
+                                                <li><a data-edit="backColor #00FF00">绿色</a></li>
+                                                <li><a data-edit="backColor #FF7F00">橙色</a></li>
+                                                <li><a data-edit="backColor #FF0000">红色</a></li>
+                                                <li><a data-edit="backColor #FFFF00">黄色</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                               title="文字颜色"><i class="fa fa-font"></i>&nbsp;<b class="caret"></b></a>
+                                            <ul class="dropdown-menu">
+                                                <p>&nbsp;&nbsp;&nbsp;文字颜色:</p>
+                                                <li><a data-edit="foreColor #000000">黑色</a></li>
+                                                <li><a data-edit="foreColor #0000FF">蓝色</a></li>
+                                                <li><a data-edit="foreColor #30AD23">绿色</a></li>
+                                                <li><a data-edit="foreColor #FF7F00">橙色</a></li>
+                                                <li><a data-edit="foreColor #FF0000">红色</a></li>
+                                                <li><a data-edit="foreColor #FFFF00">黄色</a></li>
+                                            </ul>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default" data-edit="bold" title="加粗 (Ctrl/Cmd+B)"><i
+                                                    class="fa fa-bold"></i></a>
+                                            <a class="btn btn-default" data-edit="italic" title="倾斜 (Ctrl/Cmd+I)"><i
+                                                    class="fa fa-italic"></i></a>
+                                            <a class="btn btn-default" data-edit="strikethrough"
+                                               title="删除线"><i class="fa fa-strikethrough"></i></a>
+                                            <a class="btn btn-default" data-edit="underline"
+                                               title="下划线 (Ctrl/Cmd+U)"><i class="fa fa-underline"></i></a>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default" data-edit="insertunorderedlist"
+                                               title="列表"><i class="fa fa-list-ul"></i></a>
+                                            <a class="btn btn-default" data-edit="insertorderedlist"
+                                               title="数字列表"><i class="fa fa-list-ol"></i></a>
+                                            <a class="btn btn-default" data-edit="outdent"
+                                               title="减少缩进 (Shift+Tab)"><i class="fa fa-outdent"></i></a>
+                                            <a class="btn btn-default" data-edit="indent" title="增加缩进 (Tab)"><i
+                                                    class="fa fa-indent"></i></a>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default" data-edit="justifyleft"
+                                               title="左对齐 (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
+                                            <a class="btn btn-default" data-edit="justifycenter"
+                                               title="居中对齐 (Ctrl/Cmd+E)"><i class="fa fa-align-center"></i></a>
+                                            <a class="btn btn-default" data-edit="justifyright"
+                                               title="右对齐 (Ctrl/Cmd+R)"><i class="fa fa-align-right"></i></a>
+                                            <a class="btn btn-default" data-edit="justifyfull"
+                                               title="自适应 (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
+                                               title="超链接"><i class="fa fa-link"></i></a>
+                                            <div class="dropdown-menu input-append">
+                                                <input placeholder="URL" type="text" data-edit="createLink"/>
+                                                <button class="btn" type="button">添加</button>
+                                            </div>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default" data-edit="unlink" title="移除链接"><i
+                                                    class="fa fa-unlink"></i></a>
+                                            <span class="btn btn-default" title="插入图片 (可直接拖拽)"
+                                                  id="pictureBtn"> <i class="fa fa-picture-o"></i>
+							<input class="imgUpload" type="file" data-role="magic-overlay" data-target="#pictureBtn"
+                                   data-edit="insertImage"/>
+						</span>
+                                        </div>
+                                        <div class="btn-group">
+                                            <a class="btn btn-default" data-edit="undo" title="撤销 (Ctrl/Cmd+Z)"><i
+                                                    class="fa fa-undo"></i></a>
+                                            <a class="btn btn-default" data-edit="redo" title="重做 (Ctrl/Cmd+Y)"><i
+                                                    class="fa fa-repeat"></i></a>
+                                        </div>
+                                    </div>
+                                    <div id="editor" class="lead"
+                                         style="overflow:scroll;height:200px;">{{ homework.instruction|safe }}</div>
+                                    <input type='hidden' name='instruction' id='instruction'/>
+                                    <div id="editorPreview"></div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">附件</label>
+                                <div class="col-lg-10">
+                                    {% with resources=homework.attachment.all %}
+                                        {% if resources %}
+                                            <p class="text-red">(重新上传文件会删除所有已存在的文件)</p>
+                                            <label>已提交文件：</label>
+                                            <ul class="list-inline">
+                                                {% for a in resources %}
+                                                    <li><a href="{{ a.file.url }}" download="{{ a.title }}"><i
+                                                            class="fa fa-file"></i> {{ a.title }}</a></li>
+                                                {% endfor %}
+                                            </ul>
+                                        {% endif %}
+                                    {% endwith %}
+                                    <input id="fileupload" class="form-control" name="attachment" type="file" multiple>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="control-label col-lg-2">权重</label>
+                                <div class="col-lg-10">
+                                    <input type="number" class="form-control" name="weight"
+                                           value="{{ homework.weight|default:100 }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">保存</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_script %}
+    <script>
+        $(function () {
+            $('[data-role=magic-overlay]').each(function () {
+                var overlay = $(this), target = $(overlay.data('target'));
+                overlay.css('opacity', 0).css('position', 'absolute').offset(target.offset()).width(target.outerWidth()).height(target.outerHeight());
+            });
+            $("#editor").wysiwyg();
+            $('#form').submit(function () {
+                $('#instruction').val($('#editor').html())
+            });
+            $fileupload = $("#fileupload");
+            $fileupload.fileinput({
+                language: "zh",
+                theme: "explorer"
+            });
+            $("#deadline").datetimepicker({
+                language: 'zh-CN',
+                autoclose: true,
+                todayBtn: true,
+            });
+        });
+    </script>
+{% endblock %}

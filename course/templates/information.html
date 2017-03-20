@@ -5,10 +5,14 @@
 {% load center_extra %}
 {% block title %}课程信息{% endblock %}
 {% block page_css %}
-    <link href="{% static 'plugins/toastr-master/toastr.css' %}" rel="stylesheet" type="text/css"/>
+    {% if courseperms %}
+        <link href="{% static 'plugins/toastr-master/toastr.css' %}" rel="stylesheet" type="text/css"/>
+    {% endif %}
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
+    {% if courseperms %}
+        <script src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
+    {% endif %}
 {% endblock %}
 
 {% block beforecontent %}

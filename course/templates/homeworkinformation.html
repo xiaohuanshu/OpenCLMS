@@ -308,6 +308,10 @@
                                                 {% for a in resources %}
                                                     <li><a href="{{ a.file.url }}" download="{{ a.title }}"><i
                                                             class="fa fa-file"></i> {{ a.title }}</a></li>
+                                                    {% if a.preview %}
+                                                        <i class="fa fa-fw fa-eye previewbutton"
+                                                           data-previewurl="{{ a.preview }}"></i>
+                                                    {% endif %}
                                                 {% endfor %}
                                             </ul>
                                         {% endif %}
@@ -341,29 +345,49 @@
              role="dialog"
              aria-hidden="true">
             <div class="modal-dialog">
-                <div class="">
-                    <div class="modal-content">
-                        <div class="modal-header">
-                            <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                            <h4 class="modal-title">操作提示</h4>
-                        </div>
-                        <div class="modal-body">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">操作提示</h4>
+                    </div>
+                    <div class="modal-body">
 
-                            确认删除此作业?
+                        确认删除此作业?
 
-                        </div>
-                        <div class="modal-footer">
-                            <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
-                            <a href="{% url 'course:homework' homework.course_id %}?delhomeworkid={{ homework.id }}">
-                                <button class="btn btn-warning" type="button"> 确认</button>
-                            </a>
-                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <a href="{% url 'course:homework' homework.course_id %}?delhomeworkid={{ homework.id }}">
+                            <button class="btn btn-warning" type="button"> 确认</button>
+                        </a>
                     </div>
                 </div>
             </div>
         </div>
     {% endif %}
 
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" id="filepreview">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">文件预览</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item"
+                                src=''>
+                            这是嵌入 <a target='_blank' href='https://office.com'>Microsoft Office</a> 文档，由 <a
+                                target='_blank'
+                                href='https://office.com/webapps'>Office
+                            Online</a> 支持。
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 {% block page_script %}
     {% if coursestudent %}
@@ -444,6 +468,13 @@
                     });
                 });
             });
+            $(".previewbutton").click(function () {
+                $('#filepreview').modal('show');
+                previewurl = $(this).data('previewurl');
+                $('#filepreview').on('shown.bs.modal', function () {
+                    $('iframe').attr("src", previewurl);
+                });
+            })
         </script>
     {% endif %}
 {% endblock %}

@@ -13,6 +13,7 @@ from center.functional import classmethod_cache
 from django.conf import settings
 import os.path
 from django.utils.http import urlquote
+from center.models import Filemodel
 import logging
 
 logger = logging.getLogger(__name__)
@@ -272,7 +273,7 @@ def get_courseresource_path(instance, filename):
     return 'courseresource/%d/%s' % (instance.course.id, filename)
 
 
-class Courseresource(models.Model):
+class Courseresource(Filemodel):
     course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     uploadtime = models.DateTimeField(blank=True, null=True)
@@ -283,20 +284,9 @@ class Courseresource(models.Model):
         db_table = 'CourseResource'
 
 
-class Homeworkfile(models.Model):
+class Homeworkfile(Filemodel):
     title = models.CharField(max_length=100, blank=True, null=True)
     file = models.FileField(upload_to='homeworkfile')
-
-    def preview(self):
-        file_extension = os.path.splitext(self.file.name)[1]
-        office_extension = ['.docx', '.docm', '.dotm', '.dotx', '.xlsx', '.xlsb', '.xls', '.xlsm', '.pptx', '.ppsx',
-                            '.ppt', '.pps', '.pptm', '.potm', '.ppam', '.potx', '.ppsm']
-        if file_extension in office_extension:
-            url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % (
-                urlquote("%s%s" % (settings.DOMAIN, self.file.url), safe=None))
-            return url
-        else:
-            return None
 
     class Meta:
         db_table = 'HomeworkFile'

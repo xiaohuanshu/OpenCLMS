@@ -101,8 +101,9 @@ def resourceupload(request):
     res.title = res.file.name
     res.save()
     deleteurl = reverse('course:resourcedelete', args=[])
+    initialpreviewdata = res.initialPreview()
     data = {
-        'initialPreview': ["<h2><i class='glyphicon glyphicon-file'></i></h2>"],
+        'initialPreview': [initialpreviewdata['data']],
         'initialPreviewConfig': [
             {
                 'caption': res.title,
@@ -111,6 +112,10 @@ def resourceupload(request):
             },
         ]
     }
+    if initialpreviewdata.has_key('type'):
+        data['initialPreviewConfig'][0]['type'] = initialpreviewdata['type']
+    if initialpreviewdata.has_key('filetype'):
+        data['initialPreviewConfig'][0]['filetype'] = initialpreviewdata['filetype']
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 

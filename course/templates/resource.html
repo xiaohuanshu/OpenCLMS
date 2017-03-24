@@ -40,7 +40,6 @@
 
             .file .icon i {
                 font-size: 70px;
-                color: #dadada;
             }
 
             .file .file-name {
@@ -101,18 +100,36 @@
                             {% for resource in resources %}
                                 <div class="file-box">
                                     <div class="file">
-                                        <a href="{{ resource.file.url }}" download="{{ resource.title }}">
-                                            <span class="corner"></span>
 
-                                            <div class="icon">
-                                                <i class="fa fa-file"></i>
+                                        <span class="corner"></span>
+                                        {% if resource.isimage %}
+                                            <div class="image">
+                                                <img alt="image" class="img-responsive"
+                                                     src="{{ resource.file.url }}">
                                             </div>
-                                            <div class="file-name">
+                                        {% else %}
+
+                                            {% if resource.preview %}
+                                                <div class="icon previewbutton" style="cursor:pointer"
+                                                     data-previewurl="{{ resource.preview }}">
+                                                    {{ resource.icon|safe }}
+                                                </div>
+                                            {% else %}
+                                                <a href="{{ resource.file.url }}" download="{{ resource.title }}">
+                                                    <div class="icon">
+                                                        {{ resource.icon|safe }}
+                                                    </div>
+                                                </a>
+                                            {% endif %}
+                                        {% endif %}
+                                        <div class="file-name">
+                                            <a href="{{ resource.file.url }}" download="{{ resource.title }}">
                                                 {{ resource.title }}
-                                                <br>
-                                                <small>添加日期: {{ resource.uploadtime|date:'Y-m-d' }}</small>
-                                            </div>
-                                        </a>
+                                            </a>
+                                            <br>
+                                            <small>添加日期: {{ resource.uploadtime|date:'Y-m-d' }}</small>
+                                        </div>
+
                                     </div>
                                 </div>
                             {% endfor %}
@@ -140,44 +157,119 @@
             </div>
         </div>
     {% endif %}
+    <div class="modal fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" id="filepreview">
+        <div class="modal-dialog modal-lg" role="document">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span
+                            aria-hidden="true">&times;</span></button>
+                    <h4 class="modal-title" id="myModalLabel">文件预览</h4>
+                </div>
+                <div class="modal-body">
+                    <div class="embed-responsive embed-responsive-16by9">
+                        <iframe class="embed-responsive-item"
+                                src=''>
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
 {% endblock %}
 
 {% block page_script %}
-    <script>
-        $fileupload = $("#fileupload");
-        $fileupload.fileinput({
-            language: "zh",
-            theme: "explorer",
-            showUpload: true,
-            //previewFileType: 'any',
-            uploadUrl: "{% url 'course:resourceupload' %}",
-            //maxFileCount: 100,
-            validateInitialCount: true,
-            overwriteInitial: false,
-            //uploadAsync: true,
-            showRemove: false,
-            uploadExtraData: {'courseid':{{ coursedata.id }}},
-            initialPreview: [
-                {% for resource in resources %}
-                    "<h2><i class='glyphicon glyphicon-file'></i></h2>",
-                {% endfor %}
-            ],
-            initialPreviewConfig: [
-                {% for resource in resources %}
-                    {
-                        caption: '{{ resource.title }}',
-                        url: '{% url 'course:resourcedelete' %}',
-                        key: {{ resource.id }}
+    {% if request.GET.manage == '1' %}
+        <script>
+            $fileupload = $("#fileupload");
+            $fileupload.fileinput({
+                language: "zh",
+                theme: "explorer",
+                showUpload: true,
+                //previewFileType: 'any',
+                uploadUrl: "{% url 'course:resourceupload' %}",
+                //maxFileCount: 100,
+                validateInitialCount: true,
+                overwriteInitial: false,
+                //uploadAsync: true,
+                showRemove: false,
+                uploadExtraData: {'courseid':{{ coursedata.id }}},
+                initialPreview: [
+                    {% for resource in resources %}
+                        "{{ resource.initialPreview.data|safe }}",
+                    {% endfor %}
+                ],
+                initialPreviewAsData: true,
+                initialPreviewConfig: [
+                    {% for resource in resources %}
+                        {
+                            caption: '{{ resource.title }}',
+                            url: '{% url 'course:resourcedelete' %}',
+                            key: {{ resource.id }},
+                            {% if resource.initialPreview.type %}
+                                type: '{{ resource.initialPreview.type }}',
+                            {% endif %}
+                            {% if resource.initialPreview.filetype %}
+                                filetype: '{{ resource.initialPreview.filetype }}',
+                            {% endif %}
+
+                        },
+                    {% endfor %}
+                ],
+                preferIconicPreview: true, // this will force thumbnails to display icons for following file extensions
+                previewFileIconSettings: { // configure your icon file extensions
+                    'doc': '<i class="fa fa-file-word-o text-primary"></i>',
+                    'xls': '<i class="fa fa-file-excel-o text-success"></i>',
+                    'ppt': '<i class="fa fa-file-powerpoint-o text-danger"></i>',
+                    'pdf': '<i class="fa fa-file-pdf-o text-danger"></i>',
+                    'zip': '<i class="fa fa-file-archive-o text-muted"></i>',
+                    'htm': '<i class="fa fa-file-code-o text-info"></i>',
+                    'txt': '<i class="fa fa-file-text-o text-info"></i>',
+                    'mov': '<i class="fa fa-file-movie-o text-warning"></i>',
+                    'mp3': '<i class="fa fa-file-audio-o text-warning"></i>',
+                },
+                previewFileExtSettings: { // configure the logic for determining icon file extensions
+                    'doc': function (ext) {
+                        return ext.match(/(doc|docx)$/i);
                     },
-                {% endfor %}
-            ]
-        });
-        $fileupload.on("filepredelete", function (jqXHR) {
-            var abort = true;
-            if (confirm("确认删除?")) {
-                abort = false;
-            }
-            return abort;
-        });
+                    'xls': function (ext) {
+                        return ext.match(/(xls|xlsx)$/i);
+                    },
+                    'ppt': function (ext) {
+                        return ext.match(/(ppt|pptx)$/i);
+                    },
+                    'zip': function (ext) {
+                        return ext.match(/(zip|rar|tar|gzip|gz|7z)$/i);
+                    },
+                    'htm': function (ext) {
+                        return ext.match(/(htm|html)$/i);
+                    },
+                    'txt': function (ext) {
+                        return ext.match(/(txt|ini|csv|java|php|js|css)$/i);
+                    },
+                    'mov': function (ext) {
+                        return ext.match(/(avi|mpg|mkv|mov|mp4|3gp|webm|wmv)$/i);
+                    },
+                    'mp3': function (ext) {
+                        return ext.match(/(mp3|wav)$/i);
+                    }
+                }
+            });
+            $fileupload.on("filepredelete", function (jqXHR) {
+                var abort = true;
+                if (confirm("确认删除?")) {
+                    abort = false;
+                }
+                return abort;
+            });
+        </script>
+    {% endif %}
+    <script>
+        $(".previewbutton").click(function () {
+            $('#filepreview').modal('show');
+            previewurl = $(this).data('previewurl');
+            $('#filepreview').on('shown.bs.modal', function () {
+                $('iframe').attr("src", previewurl);
+            });
+        })
     </script>
 {% endblock %}

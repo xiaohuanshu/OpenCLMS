@@ -2,6 +2,7 @@ from django.db import models
 import os
 from django.utils.http import urlquote
 from django.conf import settings
+from django.core.urlresolvers import reverse
 
 
 # Create your models here.
@@ -12,13 +13,26 @@ class Filemodel(models.Model):
         return os.path.splitext(self.file.name)[1].lower()
 
     def preview(self):
-
+        extension = self.file_extension()
         office_extension = ['.docx', '.docm', '.dotm', '.dotx', '.xlsx', '.xlsb', '.xls', '.xlsm', '.pptx', '.ppsx',
-                            '.ppt', '.pps', '.pptm', '.potm', '.ppam', '.potx', '.ppsm']
-        if self.file_extension() in office_extension:
+                            '.ppt', '.pps', '.pptm', '.potm', '.ppam', '.potx', '.ppsm', 'doc']
+        image_extension = ['.bmp', '.jpg', '.jpeg', '.png', '.gif']
+        if extension in office_extension:
             url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % (
                 urlquote("%s%s" % (settings.DOMAIN, self.file.url), safe=None))
             return url
+        elif extension in image_extension:
+            return "%s%s" % (settings.DOMAIN, self.file.url)
+        elif extension in [".bsh", ".c", ".cc", ".cpp", ".cs", ".csh", ".cyc", ".cv", ".htm", ".html", ".java", ".js",
+                           ".m", ".mxml", ".perl", ".pl", ".pm", ".py", ".rb", ".sh", ".xhtml", ".xml", ".xsl"]:
+            url = "%s?url=%s" % (reverse('course:codeview', args=[]), urlquote(self.file.url, safe=None))
+            return url
+        elif extension == '.pdf':
+            return self.file.url
+        elif extension == '.mp4':
+            return self.file.url
+        elif extension == '.txt':
+            return self.file.url
         else:
             return None
 
@@ -65,7 +79,7 @@ class Filemodel(models.Model):
             return icon['zip']
         elif extension in ['.htm', '.html']:
             return icon['htm']
-        elif extension in ['.txt', '.ini', '.csv', '.java', '.php', '.js', '.css']:
+        elif extension in ['.txt', '.ini', '.csv', '.java', '.php', '.js', '.css', '.c', '.cpp', '.py']:
             return icon['txt']
         elif extension in ['.avi', '.mpg', '.mkv', '.mov', '.mp4', '.3gp', '.webm', '.wmv']:
             return icon['mov']

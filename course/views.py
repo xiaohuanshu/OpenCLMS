@@ -3,6 +3,7 @@ import json
 
 from django.db.models import Q
 from django.http import HttpResponse
+from django.utils.http import urlunquote
 from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
@@ -235,3 +236,9 @@ def homework(request, courseid):
         return render(request, 'homeworklist.html',
                       {'coursedata': coursedata, 'courseperms': courseperms,
                        'homeworks': homeworks, 'coursestudent': coursestudent})
+
+
+def codeview(request):
+    url = request.GET.get('url')
+    url = urlunquote(url)
+    return render(request, 'codeview.html', {'url': url})

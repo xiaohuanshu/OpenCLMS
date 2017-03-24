@@ -17,4 +17,6 @@ urlpatterns = [
     url(r'^resource/delete$', views.resourcedelete, name='resourcedelete'),
     url(r'^homework/(\d+)$', views.homework, name='homework'),
 
+    url(r'^codeview', views.codeview, name='codeview'),
+
 ]

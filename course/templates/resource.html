@@ -270,6 +270,9 @@
             $('#filepreview').on('shown.bs.modal', function () {
                 $('iframe').attr("src", previewurl);
             });
+            $('#filepreview').on('hide.bs.modal', function () {
+                $('iframe').attr("src", '');
+            });
         })
     </script>
 {% endblock %}

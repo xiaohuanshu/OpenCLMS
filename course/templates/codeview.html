@@ -1,0 +1,21 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Code view</title>
+    <link href="{% static 'plugins/google-code-prettify/prettify.css' %}" type="text/css" rel="stylesheet"/>
+</head>
+<body>
+<pre class="prettyprint linenums"></pre>
+</body>
+<script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
+<script src="{% static 'plugins/google-code-prettify/prettify.js' %}"></script>
+<script>
+    $(window).load(function () {
+        $('pre').load("{{ url }}", undefined, function () {
+            prettyPrint()
+        });
+    });
+</script>
+</html>

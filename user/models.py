@@ -23,14 +23,13 @@ class Role(models.Model):
 
 class User(models.Model):
     username = models.CharField(max_length=20, blank=True, null=True, unique=True)
+    academiccode = models.CharField(max_length=20, blank=True, null=True, unique=True)
     openid = models.CharField(max_length=28, blank=True, null=True, unique=True)
     password = models.CharField(max_length=32, blank=True, null=True)
     sex = models.IntegerField(blank=True, null=True, default=1)
     ip = models.GenericIPAddressField(protocol='IPv4', blank=True, null=True)
-    registertime = models.DateTimeField(blank=True, null=True)
     lastlogintime = models.DateTimeField(blank=True, null=True)
     email = models.CharField(max_length=40, blank=True, null=True, unique=True)
-    verify = models.NullBooleanField()
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
     avatar = models.ImageField(upload_to='avatar', default='avatar/default.png')
 

@@ -4,7 +4,7 @@ except ImportError:  # django < 1.4
     from django.conf.urls.defaults import *
 
 # place app url patterns here
-import views, management, control
+import views, control
 
 urlpatterns = [
     url(r'^login$', views.login, name='login'),
@@ -15,8 +15,8 @@ urlpatterns = [
     url(r'^check_email$', views.check_email, name='check_email'),
     url(r'^registerProcess$', views.registerProcess, name='registerProcess'),
     url(r'^authentication$', views.authentication, name='authentication'),
-    url(r'^userlist$', management.userlist, name='userlist'),
-    url(r'^ajax/userdata$', management.userdata, name='getuserdata'),
+    url(r'^userlist$', views.userlist, name='userlist'),
+    url(r'^ajax/userdata$', views.userdata, name='getuserdata'),
     url(r'^forgetpassword$', views.forgetpassword, name='forgetpassword'),
     url(r'^resetpassword/([^/]+)$', views.resetpassword, name='resetpassword'),
 

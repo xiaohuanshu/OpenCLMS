@@ -1,6 +1,6 @@
 {% extends 'base-body.html' %}
 {% load staticfiles %}
-{% block title %}注册{% endblock %}
+{% block title %}信息注册{% endblock %}
 {% block body %}
 
     <body class="hold-transition register-page">
@@ -10,11 +10,11 @@
         </div>
 
         <div class="register-box-body">
-            <p class="login-box-msg">注册</p>
+            <p class="login-box-msg">信息注册</p>
             {% if request.GET.error %}
                 <label class="text-danger">{{ request.GET.error }}</label>
             {% endif %}
-            <form action="{% url 'user:registerProcess' %}?wxauth={{ request.GET.wxauth }}" method="post"
+            <form action="{% url 'user:registerProcess' %}" method="post"
                   id="signupForm">
                 {% csrf_token %}
                 <div class="form-group has-feedback">
@@ -35,25 +35,14 @@
                 </div>
                 <div class="row">
                     <div class="col-xs-8">
-                        <div class="checkbox icheck">
-                            <label>
-                                <input type="checkbox" value="agree this condition" for="agree" name="agree" id="agree">
-                                我同意 <a href="#">网站服务条款</a>
-                            </label>
-                        </div>
                     </div>
                     <!-- /.col -->
                     <div class="col-xs-4">
-                        <button type="submit" class="btn btn-primary btn-block btn-flat" disabled>注册</button>
+                        <button type="submit" class="btn btn-primary btn-block btn-flat" disabled>保存</button>
                     </div>
                     <!-- /.col -->
                 </div>
             </form>
-            {% if request.GET.wxauth %}
-                <a href="{% url 'user:registerProcess' %}?wxauth={{ request.GET.wxauth }}&quick=yes"
-                   class="text-center text-red">快速注册(用户名密码均为学工号)</a><br/>
-            {% endif %}
-            <a href="{% url 'user:login' %}" class="text-center">已有帐号?点击登录</a>
         </div>
         <!-- /.form-box -->
     </div>
@@ -65,11 +54,8 @@
 {% endblock %}
 {% block page_css %}
     <link href="{% static 'plugins/bootstrapValidator/css/bootstrapValidator.min.css' %}" rel="stylesheet">
-    <!-- iCheck -->
-    <link rel="stylesheet" href="{% static 'plugins/iCheck/square/blue.css' %}">
 {% endblock %}
 {% block page_js %}
-    <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
     <script type="text/javascript"
             src="{% static 'plugins/bootstrapValidator/js/bootstrapValidator.min.js' %}"></script>
 {% endblock %}
@@ -158,30 +144,8 @@
                             message: '两次输入的密码不一致'
                         }
                     }
-                }/*,
-                 agree: {
-                 validators: {
-                 choice: {
-                 max:1,
-                 min:1,
-                 message: ' '
-                 }
-                 }
-                 }*/
+                }
             }
         });
-        /*var bootstrapValidator = $('#signupForm').data('bootstrapValidator');
-         $('#agree').on('ifChanged', function (event) {
-         $('#agree').iCheck('update');
-         bootstrapValidator.updateStatus('agree', 'NOT_VALIDATED', null);
-         bootstrapValidator.validateField('agree');
-         if(console.log($('#agree').is(':checked'))){
-         bootstrapValidator.updateStatus('agree', 'INVALID', null)
-         }else{
-         bootstrapValidator.updateStatus('agree', 'VALID', null)
-         }
-         //bootstrapValidator.validateField('agree');
-         });*/
-        //TODO add bootstrapvalidator agree balidator(something error happen)
     </script>
 {% endblock %}

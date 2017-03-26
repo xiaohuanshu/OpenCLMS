@@ -17,17 +17,17 @@ class UserMiddleware(object):
         agent = request.META.get('HTTP_USER_AGENT', None)
         urlname = resolve(request.path)
         urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
-        allow_url = ['user:login', 'user:loginProcess', 'user:register', 'user:logout',
-                     'user:check_username', 'user:check_email', 'user:registerProcess',
+        allow_url = ['user:login', 'user:loginProcess', 'user:logout',
+                     'user:check_username', 'user:check_email',
                      'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword',
                      'wechat:wxauth', 'wechat:wechatlogin']
         wechat_allow_url = ['wechat:oauth', 'wechat:wxauth', 'user:register', 'user:check_username', 'user:check_email',
                             'user:registerProcess']
-        if request.session.get('username', '') == '':
-            if request.COOKIES.has_key('username'):
+        if request.session.get('userid', '') == '':
+            if request.COOKIES.has_key('userid'):
                 remembercode = request.COOKIES['remembercode']
-                if check_password("%s%s%s" % (
-                        request.COOKIES['userid'], settings.SECRET_KEY, request.COOKIES['username']),
+                if check_password("%s%s" % (
+                        request.COOKIES['userid'], settings.SECRET_KEY),
                                   remembercode):
                     try:
                         request.user = User.objects.get(id=request.COOKIES['userid'])
@@ -36,10 +36,7 @@ class UserMiddleware(object):
                             return redirect(reverse('user:logout'))
                         else:
                             return self.get_response(request)
-                    request.session['username'] = request.COOKIES['username']
                     request.session['userid'] = request.COOKIES['userid']
-                    if (not request.user.verify) and urlname != 'user:authentication':
-                        return redirect(reverse('user:authentication'))
                     return self.get_response(request)
             if agent and "MicroMessenger" in agent:
                 if urlname in wechat_allow_url:
@@ -58,6 +55,4 @@ class UserMiddleware(object):
                     return redirect(reverse('user:logout'))
                 else:
                     return self.get_response(request)
-            if (not request.user.verify) and urlname != 'user:authentication' and urlname != 'user:logout':
-                return redirect(reverse('user:authentication'))
         return self.get_response(request)

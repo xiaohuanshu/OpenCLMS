@@ -20,7 +20,7 @@
             <form action="{% url 'user:loginProcess' %}" method="post">
                 {% csrf_token %}
                 <div class="form-group has-feedback">
-                    <input type="text" class="form-control" placeholder="用户名" name="username">
+                    <input type="text" class="form-control" placeholder="学工号/Email/用户名" name="username">
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
@@ -50,7 +50,6 @@
                 </div>
             {% endif %}
             <a data-toggle="modal" href="#myModal">忘记密码?</a><br>
-            <a href="{% url 'user:register' %}" class="text-center">注册一个新的帐号</a>
 
         </div>
         <!-- /.login-box-body -->

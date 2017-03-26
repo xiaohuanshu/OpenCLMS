@@ -28,7 +28,7 @@ logger = logging.getLogger(__name__)
 
 
 def login(request):
-    if request.session.get('username', '') != '':
+    if request.session.get('userid'):
         return redirect(reverse('home', args=[]))
     data = {}
     if not "MicroMessenger" in request.META.get('HTTP_USER_AGENT', ''):
@@ -39,8 +39,6 @@ def login(request):
 
 
 def register(request):
-    if request.session.get('username', '') != '':
-        return redirect(reverse('home', args=[]))
     return render(request, 'register.html', {})
 
 
@@ -73,67 +71,37 @@ def registerProcess(request):
     f.write("%s %s\n" % (username, password))
     f.close()
 
-    sex = request.POST.get('sex')
-    wxauth = request.GET.get('wxauth', default=None)
-    if wxauth:
-        wxauth = signing.loads(wxauth)
-    if wxauth and request.GET.get('quick'):
-        username = wxauth['workid']
-        password = wxauth['workid']
-        email = '%s@%s' % (wxauth['workid'], settings.SCHOOLEMAIL)
-    elif username == '' or not re.search('^\w*[a-zA-Z]+\w*$', username) or email == '' or not re.search(
+    if username == '' or not re.search('^\w*[a-zA-Z]+\w*$', username) or email == '' or not re.search(
             "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
-            email) or password == '' or sex == '' or User.objects.filter(
+            email) or password == '' or User.objects.filter(
                 Q(email=email) | Q(username=username)).exists():
         return redirect(
-            reverse('user:register', args=[]) + u"?error=用户名或邮箱错误&wxauth=%s" % request.GET.get('wxauth', default=''))
+            reverse('user:register', args=[]) + u"?error=用户名或邮箱错误")
 
     m = hashlib.md5()
     m.update(password)
     password = m.hexdigest()
     nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-    user = User(username=username, password=password, email=email, sex=sex, registertime=nowtime,
-                lastlogintime=nowtime, ip=request.META['REMOTE_ADDR'])
-    if wxauth:
-        user.openid = wxauth['userid']
-        user.verify = True
-    else:
-        user.openid = None
+    user = request.user
+    user.username = username
+    user.password = password
+    user.email = email
+    user.lastlogintime = nowtime
+    user.ip = request.META['REMOTE_ADDR']
+
     user.save()
-    request.session['username'] = username
     request.session['userid'] = user.id
-    if wxauth:
-        if wxauth['usertype'] == 'student':
-            student = Student.objects.get(studentid=wxauth['workid'])
-            student.user = user
-            student.save()
-            studentrole = Role.objects.get(name='学生')
-            Usertorole(user=user, role=studentrole).save()
-        elif wxauth['usertype'] == 'teacher':
-            teacher = Teacher.objects.get(teacherid=wxauth['workid'])
-            teacher.user = user
-            teacher.save()
-            teacherrole = Role.objects.get(name='教师')
-            Usertorole(user=user, role=teacherrole).save()
-        wechat_client.user.verify(wxauth['userid'])
-        return render(request, 'success.html',
-                      {'message': u'认证成功',
-                       'wechatclose': True})
+    origin = request.session.get('origin', '')
+    if origin != '':
+        del request.session['origin']
+        return HttpResponseRedirect(origin)
     else:
-        '''
-        origin = request.session.get('origin', '')
-        if origin != '':
-            del request.session['origin']
-            return HttpResponseRedirect(origin)
-        else:
-            return redirect(reverse('home', args=[]))'''
-        return redirect(reverse('user:authentication', args=[]))
+        return redirect(reverse('home', args=[]))
 
 
 def loginProcess(request):
     username = request.POST.get('username', '')
     password = request.POST.get('password', '')
-    openid = request.session.get('openid', default=False)
     if username == '' or password == '':
         return redirect(reverse('user:login', args=[]))
     else:
@@ -141,36 +109,27 @@ def loginProcess(request):
         m.update(password)
         password = m.hexdigest()
         try:
-            user = User.objects.get(username=username, password=password)
-            if user.openid == None and openid:
-                user.openid = openid
-                user.save()
-            elif user.openid != openid and openid:
-                return redirect(reverse('user:login', args=[]) + u"?error=此账户已经绑定其他微信")
-            request.session['username'] = username
+            user = User.objects.get(Q(username=username) | Q(academiccode=username) | Q(email=username),
+                                    password=password)
             request.session['userid'] = user.id
-            if not user.verify:
-                response = redirect(reverse('user:authentication', args=[]))
+            origin = request.session.get('origin', '')
+            if not user.username:
+                return redirect(reverse('user:register', args=[]))
+            if origin != '':
+                del request.session['origin']
+                response = HttpResponseRedirect(origin)
             else:
-                origin = request.session.get('origin', '')
-                if origin != '':
-                    del request.session['origin']
-                    response = HttpResponseRedirect(origin)
-                else:
-                    response = redirect(reverse('home', args=[]))
+                response = redirect(reverse('home', args=[]))
             if request.POST.get('remember', default=False) == "remember-me":
-                remembercode = make_password("%d%s%s" % (user.id, settings.SECRET_KEY, username), None, 'pbkdf2_sha256')
+                remembercode = make_password("%d%s" % (user.id, settings.SECRET_KEY), None, 'pbkdf2_sha256')
                 response.set_cookie('remembercode', remembercode, None, datetime.now() + timedelta(days=365))
                 response.set_cookie('userid', user.id, None, datetime.now() + timedelta(days=365))
-                response.set_cookie('username', username, None, datetime.now() + timedelta(days=365))
             return response
         except ObjectDoesNotExist:
             return redirect(reverse('user:login', args=[]) + u"?error=用户名或密码错误")
 
 
 def logout(request):
-    if request.session.get('username', default=False):
-        del request.session['username']
     if request.session.get('userid', default=False):
         del request.session['userid']
     if request.session.get('openid', default=False):
@@ -179,7 +138,6 @@ def logout(request):
     if request.COOKIES.has_key('remembercode'):
         response.delete_cookie('remembercode')
         response.delete_cookie('userid')
-        response.delete_cookie('username')
     return response
 
 
@@ -335,3 +293,34 @@ def resetpassword(request, uuidstr):
                                                     'jumpurl': reverse('user:login', args=[])})
         else:
             return render(request, 'resetpassword.html', {})
+
+
+@permission_required(permission='user_viewlist')
+def userlist(request):
+    return render(request, 'user.html')
+
+
+@permission_required(permission='user_viewlist')
+def userdata(request):
+    limit = int(request.GET['limit'])
+    offset = int(request.GET['offset'])
+    userdata = User.objects.order_by('id')
+    search = request.GET.get('search', '')
+    if not search == '':
+        count = userdata.filter(username__icontains=search).count()
+        userdata = userdata.filter(username__icontains=search)[offset: (offset + limit)]
+    else:
+        count = userdata.count()
+        userdata = userdata.all()[offset: (offset + limit)]
+
+    rows = []
+    for p in userdata:
+        ld = {'id': p.id, 'username': p.username, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0], 'ip': p.ip,
+              'registertime': p.registertime.strftime('%Y-%m-%d %H:%M:%S'),
+              'iswechat': (p.openid and [u'是'] or [u'否'])[0],
+              'lastlogintime': p.lastlogintime.strftime('%Y-%m-%d %H:%M:%S'),
+              'verify': (p.verify and [u'是'] or [u'否'])[0],
+              'role': ", ".join(role.name for role in p.role.all())}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")

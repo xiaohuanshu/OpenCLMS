@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 from django.core.exceptions import ObjectDoesNotExist
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
@@ -27,17 +28,19 @@ def oauth(request):
                 try:
                     user = User.objects.get(openid=userid)
                 except ObjectDoesNotExist:
-                    return HttpResponseRedirect(reverse('wechat:wxauth', args=[]) + '?code=%s' % code)
-                if not user.verify:
-                    request.session['origin'] = request.GET.get('state')
-                    httpresponse = redirect(reverse('user:authentication', args=[]))
-                request.session['username'] = user.username
+                    userinfo = wechat_client.user.get(userid)
+                    if userinfo['extattr']['attrs'][0]['name'] == u"学工号":
+                        thisuserworkid = userinfo['extattr']['attrs'][0]['value']
+                    else:
+                        thisuserworkid = userinfo['extattr']['attrs'][1]['value']
+                    user = User.objects.get(academiccode=thisuserworkid)
+                    user.openid = userid
+                    user.save()
                 request.session['userid'] = user.id
-                remembercode = make_password("%d%s%s" % (user.id, settings.SECRET_KEY, user.username), None,
+                remembercode = make_password("%d%s" % (user.id, settings.SECRET_KEY), None,
                                              'pbkdf2_sha256')
                 httpresponse.set_cookie('remembercode', remembercode, None, datetime.now() + timedelta(days=365))
                 httpresponse.set_cookie('userid', user.id, None, datetime.now() + timedelta(days=365))
-                httpresponse.set_cookie('username', user.username, None, datetime.now() + timedelta(days=365))
                 return httpresponse
             else:
                 return HttpResponseRedirect(settings.WECHATQRCODEURL)

@@ -78,7 +78,7 @@ class Command(BaseCommand):
                 else:
                     thiswechatuserid = 'S%s' % s.studentid
                 taguserlist.append(thiswechatuserid)
-            update(m.wechattagid, taguserlist)
+            update(tagname_to_id[m.name], taguserlist)
         logger.info("[updatetaguser] Successful update tag user for major")
         # for administration
         administrations = Administration.objects.all()
@@ -94,7 +94,7 @@ class Command(BaseCommand):
                 else:
                     thiswechatuserid = 'T%s' % t.teacherid
                 taguserlist.append(thiswechatuserid)
-            update(a.wechattagtid, taguserlist)
+            update(tagname_to_id[a.name], taguserlist)
         logger.info("[updatetaguser] Successful update tag user for administration")
         # for school year
         schoolyears = Class.objects.distinct('schoolyear').only('schoolyear')

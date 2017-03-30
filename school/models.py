@@ -8,7 +8,6 @@ from center.functional import classmethod_cache
 
 class Administration(models.Model):
     name = models.CharField(max_length=50, blank=True, null=True)
-    wechattagtid = models.SmallIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -77,7 +76,6 @@ class Department(models.Model):
 class Major(models.Model):
     department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
     name = models.CharField(max_length=50, blank=True, null=True)
-    wechattagid = models.SmallIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)

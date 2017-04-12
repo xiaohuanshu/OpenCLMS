@@ -15,6 +15,8 @@ DOMAIN = 'http://DOMAIN'
 CHECKINURL = 'http://DOMAIN/checkin/ck'
 SCHOOLEMAIL = ''
 
+#BROWSER_DOWNLOAD_URL = "" # html5 browser download url
+
 # Super admin password
 SAFENUMBER = ''
 
@@ -41,11 +43,11 @@ DATABASES = {
 CACHES = {
     'default': {
         'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '', #example: "127.0.0.1:11211"
+        'LOCATION': '',  # example: "127.0.0.1:11211"
     }
 }
 
-#if use redis
+# if use redis
 '''
 CACHES = {
     "default": {
@@ -69,4 +71,3 @@ EMAIL_SUBJECT_PREFIX = '[CheckinSystem]'  # subject-line prefix
 EMAIL_USE_TLS = True
 # admin email
 SERVER_EMAIL = ''  # The email address that error messages come from, such as those sent to ADMINS and MANAGERS.
-

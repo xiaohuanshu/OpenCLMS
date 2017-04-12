@@ -20,8 +20,6 @@ from auth import permission_required
 from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
 import uuid
-from django.core import signing
-from wechat.client import wechat_client
 import logging
 
 logger = logging.getLogger(__name__)
@@ -35,6 +33,8 @@ def login(request):
         wechatloginurl = 'https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=%s&redirect_uri=%s%s&state=xxxx&usertype=member' % (
             settings.CORPID, settings.DOMAIN, reverse('wechat:wechatlogin', args=[]))
         data['wechatloginurl'] = wechatloginurl
+    if hasattr(settings, "BROWSER_DOWNLOAD_URL"):
+        data['browserdownload'] = settings.BROWSER_DOWNLOAD_URL
     return render(request, 'login.html', data)
 
 

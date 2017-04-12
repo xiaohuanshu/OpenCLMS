@@ -31,7 +31,7 @@
                     <div class="col-xs-8">
                         <div class="checkbox icheck">
                             <label>
-                                <input type="checkbox" value="remember-me" name="remember"> 记住我
+                                <input type="checkbox" value="remember-me" name="remember"> 记住我(请勿在教室勾选)
                             </label>
                         </div>
                     </div>
@@ -49,7 +49,11 @@
                         通过微信扫一扫登录(测试中)</a>
                 </div>
             {% endif %}
-            <a data-toggle="modal" href="#myModal">忘记密码?</a><br>
+            <a data-toggle="modal" href="#myModal">忘记密码?</a>
+            {% if browserdownload %}
+                <a style="float:right;display:none;" id="browserdownload" href="{{ browserdownload }}"
+                   download="browser.exe">下载浏览器</a><br>
+            {% endif %}
 
         </div>
         <!-- /.login-box-body -->
@@ -97,5 +101,8 @@
                 increaseArea: '20%' // optional
             });
         });
+        if (!window.applicationCache) {
+            $('#browserdownload').show();
+        }
     </script>
 {% endblock %}

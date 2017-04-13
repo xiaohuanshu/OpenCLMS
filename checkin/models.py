@@ -24,7 +24,7 @@ class Checkin(models.Model):
 
     class Meta:
         db_table = 'Checkin'
-        unique_together = ["lesson", "student"]
+        #unique_together = ["lesson", "student"]
 
 
 class Checkinrecord(models.Model):

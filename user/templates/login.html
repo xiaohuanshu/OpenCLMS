@@ -51,7 +51,7 @@
             {% endif %}
             <a data-toggle="modal" href="#myModal">忘记密码?</a>
             {% if browserdownload %}
-                <a style="float:right;display:none;" id="browserdownload" href="{{ browserdownload }}"
+                <a style="float:right;" id="browserdownload" href="{{ browserdownload }}"
                    download="browser.exe">下载浏览器</a><br>
             {% endif %}
 
@@ -101,8 +101,8 @@
                 increaseArea: '20%' // optional
             });
         });
-        if (!window.applicationCache) {
-            $('#browserdownload').show();
+        if (window.applicationCache) {
+            $('#browserdownload').hide();
         }
     </script>
 {% endblock %}

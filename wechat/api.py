@@ -76,8 +76,8 @@ def api(request):
                 # wechatuser.province = userinfo['province']
                 # wechatuser.country = userinfo['country']
                 # wechatuser.headimgurl = userinfo['headimgurl']
-                wechatuser.subscribe_time = time.strftime('%Y-%m-%d %H:%M:%S',
-                                                          time.localtime(userinfo['subscribe_time']))
+                # wechatuser.subscribe_time = time.strftime('%Y-%m-%d %H:%M:%S',
+                #                                         time.localtime(userinfo['subscribe_time']))
                 wechatuser.unsubscribe = False
             else:
                 wechatuser.unsubscribe = False

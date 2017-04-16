@@ -16,6 +16,7 @@ from function import generateqrstr
 import datetime
 from django.db.models import Count, Case, When, Q
 from django.core.cache import cache
+from django.conf import settings
 
 
 def checkin(request, lessonid):
@@ -38,6 +39,7 @@ def checkin(request, lessonid):
     elif lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         data['checkintype'] = u'再签'
     data['firstqrstr'] = generateqrstr(lessonid)
+    data['refreshtime'] = settings.QRCODEREFRESHTIME
     return render(request, 'checkin.html', data)
 
 

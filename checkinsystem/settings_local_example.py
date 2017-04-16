@@ -14,6 +14,7 @@ ALLOWED_HOSTS = ['*']
 DOMAIN = 'http://DOMAIN'
 CHECKINURL = 'http://DOMAIN/checkin/ck'
 SCHOOLEMAIL = ''
+QRCODEREFRESHTIME = 5 # MORE THAN 3
 
 #BROWSER_DOWNLOAD_URL = "" # html5 browser download url
 

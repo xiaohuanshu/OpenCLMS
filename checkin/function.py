@@ -9,6 +9,7 @@ import time, os
 from django.core.cache import cache
 from school.function import timetoclasstime, datetoTermdate
 import datetime
+from django.conf import settings
 
 
 def startcheckin(lessonid, mode='first'):
@@ -170,7 +171,8 @@ def student_checkin(student, lesson):
 
 def generateqrstr(lessonid):
     qrstr = str(lessonid).join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(2)))
-    cache.set("qr%s" % (qrstr), lessonid, 20)
+    refreshtime = settings.QRCODEREFRESHTIME
+    cache.set("qr%s" % (qrstr), lessonid, refreshtime + 3)
     return qrstr
 
 

@@ -375,7 +375,7 @@
             }
             if (time <= 0) {
                 if (qrstr != '') {
-                    time = 15;
+                    time = {{ refreshtime }};
                     generateqr();
                     countdown(time);
                     clearInterval(loadingtimeid);

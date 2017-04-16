@@ -1,0 +1,54 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load course_extra %}
+{% block title %}群发消息{% endblock %}
+{% block page_css %}
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'js/csrf.js' %}"></script>
+{% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+        </h1>
+    </section>
+{% endblock %}
+{% block content %}
+    <!-- page start-->
+    {% include 'coursenav.html' %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <i class="fa fa-edit"></i>
+                    <h3 class="box-title">群发消息</h3>
+                </div>
+                <div class="box-body">
+                    {% if send %}
+                        <div class="alert alert-success alert-dismissible">
+                            <button type="button" class="close" data-dismiss="alert" aria-hidden="true">×</button>
+                            <h4><i class="icon fa fa-check"></i> 群发成功!</h4>
+                            {% if errorsendstudentnames %}注意：{{ errorsendstudentnames|join:'、' }}：因为未关注无法收到消息{% endif %}
+                        </div>
+                    {% endif %}
+                    <form role="form" class="form-horizontal" id="form" method="post" enctype="multipart/form-data">
+                        {% csrf_token %}
+                        <div class="box-body">
+                            <div class="form-group">
+                                <textarea class="form-control" rows="5" placeholder="消息内容" name="message"></textarea>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">发送</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_script %}
+{% endblock %}

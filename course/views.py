@@ -12,6 +12,7 @@ from constant import *
 from user.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
+from message import sendmessagetocoursestudent
 
 
 def information(request, courseid):
@@ -91,6 +92,17 @@ def resource(request, courseid):
     return render(request, 'resource.html',
                   {'coursedata': coursedata, 'courseperms': has_course_permission(request.user, coursedata),
                    'resources': resources})
+
+
+def sendmessage(request, courseid):
+    coursedata = Course.objects.get(id=courseid)
+    data = {'coursedata': coursedata, 'courseperms': has_course_permission(request.user, coursedata)}
+    if request.META['REQUEST_METHOD'] == 'POST':
+        message = request.POST.get('message')
+        errorsendstudentnames = sendmessagetocoursestudent(coursedata, message)
+        data['send'] = True
+        data['errorsendstudentnames'] = errorsendstudentnames
+    return render(request, 'sendmessage.html', data)
 
 
 def resourceupload(request):

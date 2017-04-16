@@ -23,6 +23,9 @@
         </li>
     {% endif %}
     {% if courseperms %}
+        <li role="presentation" class="{% nav_active request.path 'sendmessage' %}">
+            <a href="{% url 'course:sendmessage' coursedata.id %}">群发消息</a>
+        </li>
         <li role="presentation" class="{% nav_active request.path 'scoreregulation' %}">
             <a href="{% url 'checkin:scoreregulation' coursedata.id %}">考勤评分规则设置</a>
         </li>

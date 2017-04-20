@@ -19,8 +19,10 @@
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
     <script src="{% static 'plugins/x-editable/js/bootstrap-editable.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/extensions/editable/bootstrap-table-editable.min.js' %}"></script>
-    <script src="{% static 'plugins/tableExport/tableExport.js' %}"></script>
-    <script src="{% static 'plugins/tableExport/jquery.base64.js' %}"></script>
+    <script src="{% static 'plugins/tableExport/libs/FileSaver/FileSaver.min.js' %}"></script>
+    <script src="{% static 'plugins/tableExport/libs/js-xlsx/xlsx.core.min.js' %}"></script>
+    <script src="{% static 'plugins/tableExport/libs/html2canvas/html2canvas.min.js' %}"></script>
+    <script src="{% static 'plugins/tableExport/tableExport.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/csrf.js' %}"></script>
@@ -62,13 +64,7 @@
                                data-side-pagination="client"
                                data-toolbar="#custom-toolbar"
                                data-striped="true"
-                               data-export-types="['csv']"
-                               data-exportDataType="all"
-                               data-export-options='{
-         "fileName": "考勤数据-{{ coursedata.title }}",
-         "worksheetName": "考勤数据-{{ coursedata.title }}",
-         "escape": "false",
-         }'>
+                               data-export-types="['excel','doc','png']">
                         </table>
                     </div>
                 </div>
@@ -124,6 +120,16 @@
                 $(this).html("<button class='btn btn-xs bg-" + checkin_status_style_json[value] + "'>" + checkin_status_json[value] + "</button>");
             }
         };
-        $table.bootstrapTable({columns:{{ data.header|safe }}, data:{{ data.newrows|safe }}, idField: 'studentid'});
+        $table.bootstrapTable({
+            columns:{{ data.header|safe }},
+            data:{{ data.newrows|safe }},
+            idField: 'studentid',
+            exportDataType: 'all',
+            exportOptions: {
+                "fileName": "考勤数据-{{ coursedata.title }}",
+                "worksheetName": "考勤数据-{{ coursedata.title }}",
+                "escape": "false"
+            }
+        });
     </script>
 {% endblock %}

@@ -111,6 +111,8 @@ def loginProcess(request):
         try:
             user = User.objects.get(Q(username=username) | Q(academiccode=username) | Q(email=username),
                                     password=password)
+            user.lastlogintime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+            user.save()
             request.session['userid'] = user.id
             origin = request.session.get('origin', '')
             if not user.username:
@@ -315,12 +317,15 @@ def userdata(request):
 
     rows = []
     for p in userdata:
-        ld = {'id': p.id, 'username': p.username, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0], 'ip': p.ip,
-              'registertime': p.registertime.strftime('%Y-%m-%d %H:%M:%S'),
-              'iswechat': (p.openid and [u'是'] or [u'否'])[0],
-              'lastlogintime': p.lastlogintime.strftime('%Y-%m-%d %H:%M:%S'),
-              'verify': (p.verify and [u'是'] or [u'否'])[0],
-              'role': ", ".join(role.name for role in p.role.all())}
+        ld = {
+            'id': p.id,
+            'username': p.username,
+            'sex': (p.sex - 1 and [u'女'] or [u'男'])[0] if p.sex else '',
+            'ip': p.ip,
+            'iswechat': (p.openid and [u'是'] or [u'否'])[0],
+            'lastlogintime': p.lastlogintime.strftime('%Y-%m-%d %H:%M:%S') if p.lastlogintime else '',
+            'role': ", ".join(role.name for role in p.role.all())
+        }
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

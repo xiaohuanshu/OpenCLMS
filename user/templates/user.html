@@ -92,20 +92,14 @@
             field: 'ip',
             title: 'ip'
         }, {
-            field: 'registertime',
-            title: '注册时间'
-        }, {
             field: 'lastlogintime',
             title: '上次登录'
         }, {
             field: 'role',
             title: '角色'
         }, {
-            field: 'verify',
-            title: '认证状态'
-        }, {
             field: 'iswechat',
-            title: '微信绑定'
+            title: '微信关注'
         }];
         {% if perms.user_modify%}
             function operateFormatter(value, row, index) {

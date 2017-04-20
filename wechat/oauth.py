@@ -19,7 +19,7 @@ def oauth(request):
         try:
             user_info = wechat_client.oauth.get_user_info(code)
         except Exception as e:
-            return HttpResponseBadRequest(e.errmsg)
+            return HttpResponseBadRequest('Error')
         else:
             httpresponse = HttpResponseRedirect(request.GET.get('state'))
             request.session['userinfo'] = user_info

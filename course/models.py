@@ -299,7 +299,7 @@ class Coursehomework(models.Model):
     type = models.SmallIntegerField(blank=True, null=True)
     deadline = models.DateTimeField(blank=True, null=True)
     weight = models.SmallIntegerField(blank=True, null=True)
-    attachment = models.ManyToManyField(Homeworkfile, blank=True, null=True)
+    attachment = models.ManyToManyField(Homeworkfile)
 
     def commitnumber(self):
         return Homeworkcommit.objects.filter(coursehomework=self).count()
@@ -321,7 +321,7 @@ class Homeworkcommit(models.Model):
     student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
     submittime = models.DateTimeField(blank=True, null=True)
     text = models.TextField(blank=True, null=True)
-    attachment = models.ManyToManyField(Homeworkfile, blank=True, null=True)
+    attachment = models.ManyToManyField(Homeworkfile)
     score = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:

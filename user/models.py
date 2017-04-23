@@ -25,6 +25,7 @@ class User(models.Model):
     username = models.CharField(max_length=20, blank=True, null=True, unique=True)
     academiccode = models.CharField(max_length=20, blank=True, null=True, unique=True)
     openid = models.CharField(max_length=28, blank=True, null=True, unique=True)
+    wechatdeviceid = models.CharField(max_length=32, blank=True, null=True)
     password = models.CharField(max_length=32, blank=True, null=True)
     sex = models.IntegerField(blank=True, null=True, default=1)
     ip = models.GenericIPAddressField(protocol='IPv4', blank=True, null=True)
@@ -32,6 +33,11 @@ class User(models.Model):
     email = models.CharField(max_length=40, blank=True, null=True, unique=True)
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
     avatar = models.ImageField(upload_to='avatar', default='avatar/default.png')
+    checkinaccountabnormal = models.BooleanField(default=False)
+    latitude = models.FloatField(blank=True, null=True)
+    longitude = models.FloatField(blank=True, null=True)
+    accuracy = models.FloatField(blank=True, null=True)
+    lastpositiontime = models.DateTimeField(blank=True, null=True)
 
     @classmethod_cache
     def isteacher(self):

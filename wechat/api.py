@@ -5,7 +5,7 @@ from django.conf import settings
 import time
 from django.views.decorators.csrf import csrf_exempt
 from user.models import User
-from models import Wechatkeyword, Wechatuser
+from models import Wechatkeyword
 
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException
@@ -63,40 +63,21 @@ def api(request):
     elif msg.type == 'event':
         if msg.event == 'subscribe':  # 关注事件
             response = EmptyReply()
-            # response = TextReply(content=u'欢迎关注', message=msg)
-            wechatuser, isfirst = Wechatuser.objects.get_or_create(openid=msg.source)
-
-            if isfirst:
-                userinfo = wechat_client.user.get(msg.source)
-                logger.info('wechat user %s subscribe' % msg.source)
-                wechatuser.openid = msg.source
-                # wechatuser.nickname = userinfo['nickname']
-                wechatuser.sex = userinfo['gender']
-                # wechatuser.city = userinfo['city']
-                # wechatuser.province = userinfo['province']
-                # wechatuser.country = userinfo['country']
-                # wechatuser.headimgurl = userinfo['headimgurl']
-                # wechatuser.subscribe_time = time.strftime('%Y-%m-%d %H:%M:%S',
-                #                                         time.localtime(userinfo['subscribe_time']))
-                wechatuser.unsubscribe = False
-            else:
-                wechatuser.unsubscribe = False
-            wechatuser.save()
 
         elif msg.type == 'unsubscribe':
             logger.info('wechat user %s unsubscribe' % msg.source)
-            wechatuser = Wechatuser.objects.get(openid=msg.source)
-            wechatuser.unsubscribe = True
-            wechatuser.save()
+            user = User.objects.get(openid=msg.source)
+            user.checkinaccountabnormal = True
+            user.save()
 
         elif msg.type == 'location':
             nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-            wechatuser = Wechatuser.objects.get(openid=msg.source)
-            wechatuser.latitude = msg.latitude
-            wechatuser.longitude = msg.longitude
-            wechatuser.accuracy = msg.precision
-            wechatuser.lastpositiontime = nowtime
-            wechatuser.save()
+            user = User.objects.get(openid=msg.source)
+            user.latitude = msg.latitude
+            user.longitude = msg.longitude
+            user.accuracy = msg.precision
+            user.lastpositiontime = nowtime
+            user.save()
 
     xml = response.render()
     encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)

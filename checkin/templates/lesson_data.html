@@ -221,6 +221,11 @@
                                                     </ul>
                                                 {% endif %}
                                             </div>
+                                            {% if s.abnormal %}
+                                                <span class="badge bg-red" data-toggle="tooltip"
+                                                      title="{{ s.abnormal|CHECKIN_ABNORMAL }}"><i
+                                                        class="fa fa-fw fa-exclamation"></i></span>
+                                            {% endif %}
                                         </td>
                                     </tr>
                                 {% endfor %}

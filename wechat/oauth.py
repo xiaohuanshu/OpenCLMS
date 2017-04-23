@@ -25,6 +25,7 @@ def oauth(request):
             request.session['userinfo'] = user_info
             if 'UserId' in user_info:
                 userid = user_info['UserId']
+                deviceid = user_info['DeviceId']
                 try:
                     user = User.objects.get(openid=userid)
                 except ObjectDoesNotExist:
@@ -36,6 +37,15 @@ def oauth(request):
                     user = User.objects.get(academiccode=thisuserworkid)
                     user.openid = userid
                     user.save()
+                if user.wechatdeviceid is None:
+                    print deviceid
+                    user.wechatdeviceid = deviceid
+                    user.save()
+                else:
+                    if not user.wechatdeviceid == deviceid:
+                        user.wechatdeviceid = deviceid
+                        user.checkinaccountabnormal = True
+                        user.save()
                 request.session['userid'] = user.id
                 remembercode = make_password("%d%s" % (user.id, settings.SECRET_KEY), None,
                                              'pbkdf2_sha256')

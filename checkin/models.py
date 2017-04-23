@@ -18,13 +18,14 @@ class Checkin(models.Model):
     positionlatitude = models.FloatField(blank=True, null=True)
     positionlongitude = models.FloatField(blank=True, null=True)
     method = models.SmallIntegerField(blank=True, null=True)
+    abnormal = models.SmallIntegerField(blank=True, null=True)
 
     def __unicode__(self):
         return "%d %d" % (self.id, self.lesson.id)
 
     class Meta:
         db_table = 'Checkin'
-        #unique_together = ["lesson", "student"]
+        # unique_together = ["lesson", "student"]
 
 
 class Checkinrecord(models.Model):

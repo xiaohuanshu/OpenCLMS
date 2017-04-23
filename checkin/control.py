@@ -101,7 +101,13 @@ def ck(request, qr_str):
     if not Studentcourse.objects.filter(course=lesson.course, student=student).exists():
         return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'上课名单中没有你', 'wechatclose': True})
     else:
-        re = student_checkin(student, lesson)
+        if request.user.checkinaccountabnormal:
+            abnormal = CHECKIN_ABNORMAL_ACCOUNT
+            request.user.checkinaccountabnormal = False
+            request.user.save()
+        else:
+            abnormal = None
+        re = student_checkin(student, lesson, abnormal)
         if re['error'] != 0:
             return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title,
                                                   'wechatclose': True})

@@ -6,3 +6,4 @@ manage.py
 migrations
 media
 data
+logs

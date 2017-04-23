@@ -78,3 +78,11 @@ def CHECKIN_STATUS_STYLE(status):
 def CHECKINURL():
     from django.conf import settings
     return settings.CHECKINURL
+
+
+@register.filter
+def CHECKIN_ABNORMAL(status):
+    if status == CHECKIN_ABNORMAL_ACCOUNT:
+        return u'帐号异常'
+    elif status == CHECKIN_ABNORMAL_LOCATION:
+        return u'位置异常'

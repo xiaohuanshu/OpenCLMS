@@ -136,7 +136,7 @@ def clear_last_checkin(lesson):
     lesson.save()
 
 
-def student_checkin(student, lesson):
+def student_checkin(student, lesson, abnormal=None):
     checkin = Checkin.objects.get(lesson=lesson, student=student)
     # checkindata.seatid = seatid
     nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
@@ -165,6 +165,8 @@ def student_checkin(student, lesson):
             checkin.status = CHECKIN_STATUS_LATE
         elif checkin.status == CHECKIN_STATUS_NORMAL:
             checkin.status = CHECKIN_STATUS_SUCCESS
+    if checkin.abnormal is None and abnormal is not None:
+        checkin.abnormal = abnormal
     checkin.save()
     return {'error': 0, 'status': checkin.status}
 

@@ -174,7 +174,7 @@ def student_checkin(student, lesson, abnormal=None):
 def generateqrstr(lessonid):
     qrstr = str(lessonid).join(map(lambda xx: (hex(ord(xx))[2:]), os.urandom(2)))
     refreshtime = settings.QRCODEREFRESHTIME
-    cache.set("qr%s" % (qrstr), lessonid, refreshtime + 3)
+    cache.set("qr%s" % (qrstr), lessonid, refreshtime + 6)
     return qrstr
 
 

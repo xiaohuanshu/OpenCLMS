@@ -25,7 +25,7 @@ class Checkin(models.Model):
 
     class Meta:
         db_table = 'Checkin'
-        # unique_together = ["lesson", "student"]
+        unique_together = ["lesson", "student"]
 
 
 class Checkinrecord(models.Model):
@@ -68,7 +68,7 @@ class Asktostudent(models.Model):
 
     class Meta:
         db_table = 'AsktoStudent'
-        index_together = ["student", "ask"]
+        unique_together = ["student", "ask"]
 
 
 class Scoreregulation(models.Model):

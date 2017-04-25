@@ -174,7 +174,7 @@ class Teachertodepartment(models.Model):
 
     class Meta:
         db_table = 'TeachertoDepartment'
-        index_together = ["teacher", "department"]
+        unique_together = ["teacher", "department"]
 
 
 @receiver(post_save, sender=Schoolterm)

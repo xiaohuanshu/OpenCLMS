@@ -266,7 +266,7 @@ class Studentcourse(models.Model):
 
     class Meta:
         db_table = 'StudentCourse'
-        index_together = ["student", "course"]
+        unique_together = ["student", "course"]
 
 
 def get_courseresource_path(instance, filename):
@@ -325,5 +325,5 @@ class Homeworkcommit(models.Model):
     score = models.SmallIntegerField(blank=True, null=True)
 
     class Meta:
-        index_together = ["coursehomework", "student"]
+        unique_together = ["coursehomework", "student"]
         db_table = 'HomeworkCommit'

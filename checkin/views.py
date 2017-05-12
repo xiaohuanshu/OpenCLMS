@@ -250,7 +250,7 @@ def teacher_data(request, teacherid):
     teacher = Teacher.objects.get(teacherid=teacherid)
     if not (teacher.user == request.user or request.user.has_perm('checkin_view')):
         return render(request, 'error.html', {'message': '没有权限'})
-    teachercourse = Course.objects.filter(teacher=teacher).all()
+    teachercourse = teacher.course_set.all()
     coursecount = teachercourse.count()
     course = {}
     maxlength = 0

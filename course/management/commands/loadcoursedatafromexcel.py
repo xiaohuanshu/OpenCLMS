@@ -33,7 +33,7 @@ class Command(BaseCommand):
                 if rs.cell_type(i, 4) != 0 and rs.cell(i, 4).value != '' and rs.cell(i, 4).value != ' ':
                     data.location = rs.cell(i, 4).value
                 data.department = Department.objects.get(name=rs.cell(i, 5).value)
-                data.teacher = Teacher.objects.get(teacherid=rs.cell(i, 6).value)
+                data.teachers.add(Teacher.objects.get(teacherid=rs.cell(i, 6).value))
                 if rs.cell_type(i, 8) != 0 and rs.cell(i, 8).value != '' and rs.cell(i, 8).value != ' ':
                     teachclass = rs.cell(i, 8).value
                     if not ',' in teachclass:

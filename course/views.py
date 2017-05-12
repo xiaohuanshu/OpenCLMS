@@ -62,13 +62,14 @@ def data(request):
         )[offset: (offset + limit)]
     else:
         count = coursedata.count()
-        coursedata = coursedata.select_related('teacher').select_related('major').select_related(
+        coursedata = coursedata.select_related('major').select_related(
             'department').all()[offset: (offset + limit)]
 
     rows = []
     for p in coursedata:
         ld = {'id': p.id, 'serialnumber': p.serialnumber, 'title': p.title, 'number': p.number,
-              'schoolterm': p.schoolterm, 'time': p.time, 'location': p.location, 'teacher': p.teacher.name,
+              'schoolterm': p.schoolterm, 'time': p.time, 'location': p.location,
+              'teacher': ",".join(p.teachers.values_list('name', flat=True)),
               'major': (p.major and [p.major.name] or [None])[0], 'department': p.department.name}
         rows.append(ld)
     data = {'total': count, 'rows': rows}

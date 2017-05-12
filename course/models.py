@@ -26,7 +26,8 @@ class Course(models.Model):
     serialnumber = models.CharField(max_length=50, blank=True, null=True, unique=True)
     number = models.SmallIntegerField(blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
-    teacher = models.ForeignKey('school.Teacher', models.DO_NOTHING, db_column='teacherid', blank=True, null=True)
+    teacher = models.ForeignKey('school.Teacher', models.DO_NOTHING, db_column='teacherid', blank=True, null=True, related_name='t')
+    teachers = models.ManyToManyField('school.Teacher')
     time = models.CharField(max_length=400, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
     schoolterm = models.CharField(max_length=20, blank=True, null=True)
@@ -99,6 +100,13 @@ class Course(models.Model):
 
     def __unicode__(self):
         return u"%s" % (self.title)
+    """
+    # To upgrade foreignkey teacher to manytomanyfield teachers
+    for c in courses:
+        if c.teacher:
+            c.teachers.add(c.teacher)
+            c.save()
+    """
 
     class Meta:
         db_table = 'Course'
@@ -253,7 +261,7 @@ class Lesson(models.Model):
             return False
 
     def __unicode__(self):
-        return "%d %s-%d-%d-%d-%d" % (self.id, self.term, self.year, self.week, self.day, self.time)
+        return "Lesson:%d" % self.id
 
     class Meta:
         db_table = 'Lesson'

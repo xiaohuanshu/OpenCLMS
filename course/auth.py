@@ -11,7 +11,7 @@ def has_course_permission(user, course):
         teacher = Teacher.objects.get(user=user)
     except ObjectDoesNotExist:
         return False
-    if course.teacher == teacher:
+    if teacher in course.teachers.all():
         return True
     else:
         return False

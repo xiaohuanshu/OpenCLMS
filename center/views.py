@@ -10,7 +10,7 @@ from school.models import Student, Teacher
 def home(request):
     if request.user.isteacher():
         teacher = Teacher.objects.get(user=request.user)
-        termcourse = Course.objects.filter(teacher=teacher, schoolterm=getCurrentSchoolYearTerm()['term'])
+        termcourse = teacher.course_set.filter(schoolterm=getCurrentSchoolYearTerm()['term'])
         uncommithomework = None
     else:
         student = Student.objects.get(user=request.user)

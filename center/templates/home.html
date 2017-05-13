@@ -126,7 +126,7 @@
                                             {% if request.user.isteacher %}
                                                 <a href="{% url 'course:information' lesson.course.id %}?lessonid={{ lesson.id }}">{{ lesson.course.gettitlewithclass }}</a>
                                             {% else %}
-                                                <a href="{% url 'course:information' lesson.course.id %}">{{ lesson.course.title }}</a>
+                                                <a href="{% url 'course:information' lesson.course.id %}?lessonid={{ lesson.id }}">{{ lesson.course.title }}</a>
                                             {% endif %}
                                         </td>
                                         <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>

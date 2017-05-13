@@ -4,7 +4,11 @@
         <a href="{% url 'course:information' coursedata.id %}">课程信息</a>
     </li>
     {% if courseperms or perms.checkin_view %}
-        <li role="presentation" class="{% nav_active request.path 'lesson_data' %}">
+        <li role="presentation" class="{% nav_active request.path 'lesson_data' %}" id="lesson_tag"
+            {% if not coursedata.status %}
+            style="display: none;"
+            {% endif %}
+        >
             <a href="{% url 'checkin:jumptolesson_data' coursedata.id %}">课堂考勤</a>
         </li>
     {% endif %}

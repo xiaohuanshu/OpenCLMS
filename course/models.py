@@ -109,7 +109,7 @@ class Lesson(models.Model):
     classroom = models.ForeignKey('school.Classroom', models.DO_NOTHING, db_column='classroomid', blank=True, null=True)
     length = models.SmallIntegerField(blank=True, null=True)
     status = models.SmallIntegerField(blank=True, null=True)
-    year = models.SmallIntegerField(blank=True, null=True)
+    year = models.SmallIntegerField(blank=True, null=True)  # useless
     term = models.CharField(max_length=20, blank=True, null=True)
     week = models.SmallIntegerField(blank=True, null=True)
     time = models.SmallIntegerField(blank=True, null=True)
@@ -177,7 +177,7 @@ class Lesson(models.Model):
     def startlesson(self):
         if self.course.status() != 0:
             return {'error': 101, 'message': u'课程时间冲突'}
-        if self.status != LESSON_STATUS_AWAIT:
+        if self.status not in (LESSON_STATUS_AWAIT, LESSON_STATUS_NEW_AWAIT):
             return {'error': 101, 'message': u'课程不能开启'}
         nowtime = time.localtime()
         self.starttime = time.strftime('%Y-%m-%d %H:%M:%S', nowtime)
@@ -223,6 +223,28 @@ class Lesson(models.Model):
         return {'error': 0, 'message': u'课程已结束', 'newstatus': self.status,
                 'endtime': time.strftime('%Y-%m-%d %H:%M:%S', nowtime)}
 
+    def transfertime(self, time):  # time is dict {week,day,time}
+        if self.status == LESSON_STATUS_TRANSFERRED:
+            return {'error': 101, 'message': u'该课程已被转移'}
+        if self.isnow() or self.isend():
+            return {'error': 101, 'message': u'已开启课程不能转移'}
+        if Lesson.objects.filter(course=self.course, **time).exclude(status=LESSON_STATUS_TRANSFERRED).exists():
+            return {'error': 101, 'message': u'该课程在该时间段有课'}
+        newlesson = None
+        if self.status == LESSON_STATUS_AWAIT:
+            newlesson = Lesson.objects.create(course=self.course, classroom=self.classroom, length=self.length,
+                                              term=self.term, status=LESSON_STATUS_NEW_AWAIT, **time)
+            self.status = LESSON_STATUS_TRANSFERRED
+            self.save()
+        elif self.status == LESSON_STATUS_NEW_AWAIT:
+            self.time = time['time']
+            self.week = time['week']
+            self.day = time['day']
+            self.save()
+            newlesson = self
+
+        return {'error': 0, 'message': u'时间已转移', 'newlessonid': newlesson.id}
+
     def cleardata(self):
         self.status = LESSON_STATUS_AWAIT
         self.starttime = None
@@ -232,8 +254,7 @@ class Lesson(models.Model):
         return {'error': 0, 'message': u'成功清除', 'newstatus': self.status,
                 'endtime': u'没有数据'}
 
-    @classmethod_cache
-    def isnow(self):
+    def isnow(self):  # include checkin
         if self.status == LESSON_STATUS_NOW or self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
             return True
         else:
@@ -245,7 +266,6 @@ class Lesson(models.Model):
         else:
             return False
 
-    @classmethod_cache
     def ischeckinnow(self):
         if self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
             return True

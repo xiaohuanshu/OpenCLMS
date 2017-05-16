@@ -25,7 +25,7 @@ def COURSE_STATUS_STYLE(status):
 
 @register.filter
 def LESSON_STATUS(status):
-    if status == LESSON_STATUS_AWAIT:
+    if status == LESSON_STATUS_AWAIT or status == LESSON_STATUS_NEW_AWAIT:
         return u'未开始'
     elif status == LESSON_STATUS_AGREE:
         return u'允许开始'
@@ -45,6 +45,8 @@ def LESSON_STATUS(status):
         return u'超前结束'
     elif status == LESSON_STATUS_START_LATE:
         return u'较晚开始'
+    elif status == LESSON_STATUS_CANCLE:
+        return u'课程取消'
 
 
 @register.filter
@@ -59,7 +61,7 @@ def COURSE_HOMEWORK_TYPE(status):
 
 @register.filter
 def LESSON_STATUS_STYLE(status):
-    if status == LESSON_STATUS_AWAIT:
+    if status == LESSON_STATUS_AWAIT or status == LESSON_STATUS_NEW_AWAIT:
         return 'default'
     elif status == LESSON_STATUS_AGREE:
         return 'warning'
@@ -85,7 +87,7 @@ def LESSON_STATUS_STYLE(status):
 def LESSON_STATUS_JSON():
     data = {LESSON_STATUS_AWAIT: u"未开始", LESSON_STATUS_AGREE: u"允许开始", LESSON_STATUS_CHECKIN: u"正在签到",
             LESSON_STATUS_NOW: u"正在上课", LESSON_STATUS_CHECKIN_ADD: u"正在签到", LESSON_STATUS_CHECKIN_AGAIN: u"正在签到",
-            LESSON_STATUS_WRONG: u"课程未正常开始",
+            LESSON_STATUS_WRONG: u"课程未正常开始", LESSON_STATUS_NEW_AWAIT: u'未开始', LESSON_STATUS_CANCLE: u'课程取消',
             LESSON_STATUS_END: u"课程结束", LESSON_STATUS_END_EARLY: u"超前结束", LESSON_STATUS_START_LATE: u"较晚开始"}
     return json.dumps(data)
 
@@ -94,7 +96,7 @@ def LESSON_STATUS_JSON():
 def LESSON_STATUS_STYLE_JSON():
     data = {LESSON_STATUS_AWAIT: "default", LESSON_STATUS_AGREE: "warning", LESSON_STATUS_CHECKIN: "info",
             LESSON_STATUS_NOW: "success", LESSON_STATUS_CHECKIN_ADD: "info", LESSON_STATUS_CHECKIN_AGAIN: "info",
-            LESSON_STATUS_WRONG: "warning",
+            LESSON_STATUS_WRONG: "warning", LESSON_STATUS_NEW_AWAIT: 'default', LESSON_STATUS_CANCLE: 'danger',
             LESSON_STATUS_END: "danger", LESSON_STATUS_END_EARLY: "danger", LESSON_STATUS_START_LATE: "warning"}
     return json.dumps(data)
 

@@ -17,7 +17,9 @@ from message import sendmessagetocoursestudent
 
 def information(request, courseid):
     coursedata = Course.objects.get(id=courseid)
-    lessondata = Lesson.objects.filter(course=coursedata).order_by('week', 'day', 'time').all()
+    lessondata = Lesson.objects.filter(course=coursedata).exclude(status=LESSON_STATUS_TRANSFERRED).order_by('week',
+                                                                                                             'day',
+                                                                                                             'time').all()
     return render(request, 'information.html',
                   {'coursedata': coursedata, 'lessondata': lessondata,
                    'courseperms': has_course_permission(request.user, coursedata)})

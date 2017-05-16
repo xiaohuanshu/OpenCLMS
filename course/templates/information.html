@@ -288,6 +288,11 @@
                 checkindata.hide();
                 stoplesson.hide();
                 startlesson.show();
+            } else if (statustext == '课程取消') {
+                checkindata.hide();
+                stoplesson.hide();
+                startlesson.hide();
+                controlpanel.hide();
             } else if (statustext == '正在签到') {
                 checkindata.show();
                 stoplesson.hide();

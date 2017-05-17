@@ -257,3 +257,9 @@ def codeview(request):
     url = request.GET.get('url')
     url = urlunquote(url)
     return render(request, 'codeview.html', {'url': url})
+
+
+def imgview(request):
+    url = request.GET.get('url')
+    url = urlunquote(url)
+    return render(request, 'imgview.html', {'imgurl': url})

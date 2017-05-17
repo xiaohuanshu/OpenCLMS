@@ -22,7 +22,8 @@ class Filemodel(models.Model):
                 urlquote("%s%s" % (settings.DOMAIN, self.file.url), safe=None))
             return url
         elif extension in image_extension:
-            return "%s%s" % (settings.DOMAIN, self.file.url)
+            url = "%s?url=%s" % (reverse('course:imgview', args=[]), urlquote(self.file.url, safe=None))
+            return url
         elif extension in [".bsh", ".c", ".cc", ".cpp", ".cs", ".csh", ".cyc", ".cv", ".htm", ".html", ".java", ".js",
                            ".m", ".mxml", ".perl", ".pl", ".pm", ".py", ".rb", ".sh", ".xhtml", ".xml", ".xsl"]:
             url = "%s?url=%s" % (reverse('course:codeview', args=[]), urlquote(self.file.url, safe=None))

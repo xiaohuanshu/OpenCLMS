@@ -144,9 +144,11 @@
             args = commandArr.join( " " ) + ( valueArg || "" );
 
         var parts = commandWithArgs.split( "-" );
-
         if ( parts.length === 1 ) {
             document.execCommand( command, false, args );
+            if (commandWithArgs==='insertimage'){
+                editor.find("img").attr( "style" , "max-width:100%" );
+            }
         } else if ( parts[ 0 ] === "format" && parts.length === 2 ) {
             document.execCommand( "formatBlock", false, parts[ 1 ] );
         }
@@ -159,7 +161,7 @@
         var self = this;
         $.each( options.hotKeys, function( hotkey, command ) {
             if(!command) return;
-            
+
             $( editor ).keydown( hotkey, function( e ) {
                 if ( editor.attr( "contenteditable" ) && $( editor ).is( ":visible" ) ) {
                     e.preventDefault();

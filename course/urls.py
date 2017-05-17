@@ -19,5 +19,6 @@ urlpatterns = [
     url(r'^sendmessage/(\d+)$', views.sendmessage, name='sendmessage'),
 
     url(r'^codeview', views.codeview, name='codeview'),
+    url(r'^imgview', views.imgview, name='imgview'),
 
 ]

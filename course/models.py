@@ -13,7 +13,7 @@ from center.functional import classmethod_cache
 from django.conf import settings
 import os.path
 from django.utils.http import urlquote
-from center.models import Filemodel
+from center.models import Filemodel, Dealbase64imgmodel
 import logging
 
 logger = logging.getLogger(__name__)
@@ -312,7 +312,7 @@ class Homeworkfile(Filemodel):
         db_table = 'HomeworkFile'
 
 
-class Coursehomework(models.Model):
+class Coursehomework(Dealbase64imgmodel):
     course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     instruction = models.TextField(blank=True, null=True)
@@ -320,6 +320,8 @@ class Coursehomework(models.Model):
     deadline = models.DateTimeField(blank=True, null=True)
     weight = models.SmallIntegerField(blank=True, null=True)
     attachment = models.ManyToManyField(Homeworkfile)
+
+    base64img_contained_fields = ('instruction',)
 
     def commitnumber(self):
         return Homeworkcommit.objects.filter(coursehomework=self).count()
@@ -335,7 +337,7 @@ class Coursehomework(models.Model):
         db_table = 'CourseHomework'
 
 
-class Homeworkcommit(models.Model):
+class Homeworkcommit(Dealbase64imgmodel):
     coursehomework = models.ForeignKey(Coursehomework, models.DO_NOTHING, db_column='coursehomeworkid', blank=True,
                                        null=True)
     student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
@@ -343,6 +345,8 @@ class Homeworkcommit(models.Model):
     text = models.TextField(blank=True, null=True)
     attachment = models.ManyToManyField(Homeworkfile)
     score = models.SmallIntegerField(blank=True, null=True)
+
+    base64img_contained_fields = ('text',)
 
     class Meta:
         unique_together = ["coursehomework", "student"]

@@ -198,8 +198,9 @@
                                             <label>已提交文件：</label>
                                             <ul class="list-inline">
                                                 {% for a in resources %}
-                                                    <li><a href="{{ a.file.url }}" download="{{ a.title }}"><i
-                                                            class="fa fa-file"></i> {{ a.title }}</a></li>
+                                                    <li><a href="{{ a.file.url }}"
+                                                           download="{{ a.title|default:'' }}"><i
+                                                            class="fa fa-file"></i> {{ a.title|default:'附件' }}</a></li>
                                                 {% endfor %}
                                             </ul>
                                         {% endif %}

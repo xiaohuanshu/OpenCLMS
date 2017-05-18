@@ -80,7 +80,7 @@
                                     <ul class="list-unstyled">
                                         {% for a in resources %}
                                             <li><a href="{{ a.file.url }}"
-                                                   download="{{ a.title }}">{{ a.icon|safe }} {{ a.title }}</a></li>
+                                                   download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a></li>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -223,7 +223,7 @@
                                                 <ul class="list-inline">
                                                     {% for a in resources %}
                                                         <li><a href="{{ a.file.url }}"
-                                                               download="{{ a.title }}">{{ a.icon|safe }} {{ a.title }}</a>
+                                                               download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
                                                         </li>
                                                     {% endfor %}
                                                 </ul>
@@ -251,7 +251,7 @@
                                             <ul class="list-inline">
                                                 {% for a in resources %}
                                                     <li><a href="{{ a.file.url }}"
-                                                           download="{{ a.title }}">{{ a.icon|safe }} {{ a.title }}</a>
+                                                           download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
                                                     </li>
                                                 {% endfor %}
                                             </ul>
@@ -309,7 +309,7 @@
                                             <ul class="list-inline">
                                                 {% for a in resources %}
                                                     <li><a href="{{ a.file.url }}"
-                                                           download="{{ a.title }}">{{ a.icon|safe }} {{ a.title }}</a>
+                                                           download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
                                                     </li>
                                                     {% if a.preview %}
                                                         <i class="fa fa-fw fa-eye previewbutton" style="cursor:pointer"

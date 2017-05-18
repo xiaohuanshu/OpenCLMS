@@ -163,8 +163,10 @@ def homework(request, courseid):
             instruction = request.POST.get('instruction')
             attachments = request.FILES.getlist('attachment')
             weight = request.POST.get('weight')
-            homework = Coursehomework(title=title, deadline=deadline, type=type, instruction=instruction,
-                                      weight=weight, course=coursedata)
+            homework = Coursehomework.objects.create(title=title, deadline=deadline, type=type, weight=weight,
+                                                     course=coursedata)
+            homework.instruction = instruction
+            homework.deal_base64img()
             homework.save()
             for file in attachments:
                 homework.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
@@ -186,9 +188,10 @@ def homework(request, courseid):
             if commitdata.score:
                 pass  # 已经判完分数
             commitdata.text = text
+            commitdata.deal_base64img()
             commitdata.submittime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             if not created:
-                for ca in commitdata.attachment.all():
+                for ca in commitdata.attachment.exclude(title=None).all():
                     ca.file.delete()
                     ca.delete()
             for file in attachments:
@@ -236,8 +239,9 @@ def homework(request, courseid):
             homeworkdata.instruction = request.POST.get('instruction')
             attachments = request.FILES.getlist('attachment')
             homeworkdata.weight = request.POST.get('weight')
+            homeworkdata.deal_base64img()
             homeworkdata.save()
-            for ca in homeworkdata.attachment.all():
+            for ca in homeworkdata.attachment.exclude(title=None).all():
                 ca.file.delete()
                 ca.delete()
             for file in attachments:

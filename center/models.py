@@ -3,6 +3,10 @@ import os
 from django.utils.http import urlquote
 from django.conf import settings
 from django.core.urlresolvers import reverse
+import re
+import uuid
+from base64 import b64decode
+from django.core.files.base import ContentFile
 
 
 # Create your models here.
@@ -90,6 +94,27 @@ class Filemodel(models.Model):
             return icon['pdf']
         else:
             return '<i class="fa fa-file"></i>'
+
+    class Meta:
+        abstract = True
+
+
+class Dealbase64imgmodel(models.Model):
+    base64img_contained_fields = ()
+    attachment = models.ManyToManyField(Filemodel)
+
+    def deal_base64img(self):
+        for field in self.base64img_contained_fields:
+            text = getattr(self, field)
+            for imgsrc in re.findall("(?<=\<img src\=\"data:image\/).*?(?=\")", text, re.DOTALL):
+                imgext, imgbs4data = imgsrc.split(';base64,')
+                imgdata = b64decode(imgbs4data)
+                imgname = 'attachment-' + str(uuid.uuid4()) + "." + imgext
+                imgfile = ContentFile(imgdata, imgname)
+                filemodel = self.attachment.model.objects.create(file=imgfile)
+                self.attachment.add(filemodel)
+                text = text.replace("data:image/" + imgext + ';base64,' + imgbs4data, filemodel.file.url)
+                setattr(self, field, text)
 
     class Meta:
         abstract = True

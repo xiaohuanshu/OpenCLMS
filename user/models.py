@@ -2,7 +2,7 @@
 from django.contrib.postgres.fields import ArrayField
 from django.db import models
 from django.core.cache import cache
-from center.functional import classmethod_cache
+from django.utils.functional import cached_property
 from django.dispatch import receiver
 from django.db.models.signals import post_save
 
@@ -39,11 +39,11 @@ class User(models.Model):
     accuracy = models.FloatField(blank=True, null=True)
     lastpositiontime = models.DateTimeField(blank=True, null=True)
 
-    @classmethod_cache
+    @cached_property
     def isteacher(self):
         return self.role.filter(name='教师').exists()
 
-    @classmethod_cache
+    @cached_property
     def isstudent(self):
         return self.role.filter(name='学生').exists()
 

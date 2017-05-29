@@ -3,7 +3,7 @@ from django.db import models
 from django.db.models.signals import post_save
 from django.dispatch import receiver
 from django.core.cache import cache
-from center.functional import classmethod_cache
+from django.utils.functional import cached_property
 
 
 class Administration(models.Model):
@@ -80,11 +80,11 @@ class Major(models.Model):
     def __unicode__(self):
         return u"%s" % (self.name)
 
-    @classmethod_cache
+    @cached_property
     def studentnumber(self):
         return self.student_set.count()
 
-    @classmethod_cache
+    @cached_property
     def classamount(self):
         return self.class_set.count()
 

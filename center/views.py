@@ -8,7 +8,7 @@ from school.models import Student, Teacher
 # Create your views here.
 # @resourcejurisdiction_view_auth(jurisdiction='school')
 def home(request):
-    if request.user.isteacher():
+    if request.user.isteacher:
         teacher = Teacher.objects.get(user=request.user)
         termcourse = teacher.course_set.filter(schoolterm=getCurrentSchoolYearTerm()['term'])
         uncommithomework = None

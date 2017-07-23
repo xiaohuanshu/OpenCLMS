@@ -9,10 +9,10 @@
     <body class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
-            <a href="{% url 'home' %}"><b>CHECKIN</b>SYSTEM</a>
+            <a href="#"><b>CHECKIN</b>SYSTEM</a>
         </div>
         <!-- /.login-logo -->
-        <div class="login-box-body">
+        <div class="login-box-body" id="normalloginbody">
             <p class="login-box-msg">登录系统</p>
             {% if request.GET.error %}
                 <label class="text-danger">{{ request.GET.error }}</label>
@@ -42,11 +42,11 @@
                     <!-- /.col -->
                 </div>
             </form>
-            {% if wechatloginurl %}
+            {% if wxlogin %}
                 <div class="social-auth-links text-center">
-                    <a href="{{ wechatloginurl }}" class="btn btn-block btn-social btn-linkedin btn-flat"><i
+                    <a id="wxloginbutton" class="btn btn-block btn-social btn-linkedin btn-flat"><i
                             class="fa fa-wechat"></i>
-                        通过微信扫一扫登录(测试中)</a>
+                        通过企业微信扫一扫登录</a>
                 </div>
             {% endif %}
             <a data-toggle="modal" href="#myModal">忘记密码?</a>
@@ -57,6 +57,18 @@
 
         </div>
         <!-- /.login-box-body -->
+
+
+        <div class="login-box-body" style="display: none" id="wxloginbody">
+            <div id="wxqrcode" class="text-center">
+
+            </div>
+            <a data-toggle="modal" id="returnnormalloginbutton" href="#">&lt;返回帐号密码登录</a>
+
+        </div>
+        <!-- /.wxlogin-box-body -->
+
+
     </div>
     <!-- /.login-box -->
 
@@ -90,7 +102,7 @@
 
 {% block page_js %}
     <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
-
+    <script src="//rescdn.qqmail.com/node/ww/wwopenmng/js/sso/wwLogin-1.0.0.js"></script>
 {% endblock %}
 {% block page_script %}
     <script>
@@ -99,6 +111,22 @@
                 checkboxClass: 'icheckbox_square-blue',
                 radioClass: 'iradio_square-blue',
                 increaseArea: '20%' // optional
+            });
+            $('#wxloginbutton').click(function () {
+                $('#normalloginbody').hide();
+                $('#wxloginbody').show();
+                window.WwLogin({
+                    "id": "wxqrcode",
+                    "appid": "{{ wxlogin.appid }}",
+                    "agentid": "{{ wxlogin.agentid }}",
+                    "redirect_uri": "{{ wxlogin.redirect_uri }}",
+                    "state": "wxlogin",
+                    "href": ""
+                });
+            });
+            $('#returnnormalloginbutton').click(function () {
+                $('#wxloginbody').hide();
+                $('#normalloginbody').show();
             });
         });
         if (window.applicationCache) {

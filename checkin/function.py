@@ -72,7 +72,7 @@ def startcheckin(lessonid, mode='first'):
     checkin_record.lesson = lesson
     checkin_record.starttime = nowtime
     checkin_record.time = lesson.checkincount
-    checkin_record.shouldnumber = lesson.shouldnumber()
+    checkin_record.shouldnumber = lesson.shouldnumber
     lesson.save()
     checkin_record.save()
 

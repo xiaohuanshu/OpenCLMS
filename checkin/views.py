@@ -58,10 +58,10 @@ def lesson_data(request, lessonid):
     checkinrecord = Checkinrecord.objects.filter(lesson=lesson)
     checkincount = checkinrecord.count()
 
-    shouldnumber = lesson.shouldnumber()
-    actuallynumber = lesson.actuallynumber()
-    asknumber = lesson.asknumber()
-    notreachnumber = lesson.notreachnumber()
+    shouldnumber = lesson.shouldnumber
+    actuallynumber = lesson.actuallynumber
+    asknumber = lesson.asknumber
+    notreachnumber = lesson.notreachnumber
     t['shouldnumber'] = shouldnumber
     t['actuallynumber'] = actuallynumber
     t['asknumber'] = asknumber

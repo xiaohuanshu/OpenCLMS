@@ -139,7 +139,7 @@ class Lesson(models.Model):
     @cached_property
     def shouldnumber(self):
         shouldnumber = Studentcourse.objects.filter(course=self.course).count()
-        leavenumber = self.asknumber()
+        leavenumber = self.asknumber
         return shouldnumber - leavenumber
 
     @cached_property
@@ -175,7 +175,7 @@ class Lesson(models.Model):
         return notreach
 
     def startlesson(self):
-        if self.course.status() != 0:
+        if self.course.status != 0:
             return {'error': 101, 'message': u'课程时间冲突'}
         if self.status not in (LESSON_STATUS_AWAIT, LESSON_STATUS_NEW_AWAIT):
             return {'error': 101, 'message': u'课程不能开启'}
@@ -193,7 +193,7 @@ class Lesson(models.Model):
                 Checkin(lesson=self, status=CHECKIN_STATUS_SUCCESS, student=s.student))
         Checkin.objects.bulk_create(newstudent)
         students = Checkin.objects.filter(lesson=self).values_list('student', flat=True)
-        starttime, endtime = self.getTime()
+        starttime, endtime = self.getTime
         starttime = time.strftime('%Y-%m-%d %H:%M:%S', starttime)
         endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
         askstudents_private = Ask.objects.filter(student__in=students, status=ASK_STATUS_APPROVE,

@@ -34,8 +34,8 @@ def getcheckinnowdata(request, lessonid):
     checkinnowdata = []
     for cnd in checkindata:
         checkinnowdata.append({"studentid": cnd.student_id, "status": cnd.status})
-    shoudnumber = lesson.shouldnumber()
-    actuallynumber = lesson.actuallynumber()
+    shoudnumber = lesson.shouldnumber
+    actuallynumber = lesson.actuallynumber
     data = {'should': shoudnumber, 'actually': actuallynumber, 'rows': checkinnowdata}
     return HttpResponse(json.dumps(data), content_type="application/json")
 

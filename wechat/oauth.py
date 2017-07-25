@@ -25,7 +25,7 @@ def oauth(request):
             request.session['userinfo'] = user_info
             if 'UserId' in user_info:
                 userid = user_info['UserId']
-                deviceid = user_info['DeviceId']
+                deviceid = user_info['DeviceId'].replace('-', '')
                 try:
                     user = User.objects.get(openid=userid)
                 except ObjectDoesNotExist:
@@ -38,12 +38,11 @@ def oauth(request):
                     user.openid = userid
                     user.save()
                 if user.wechatdeviceid is None:
-                    print deviceid
                     user.wechatdeviceid = deviceid
                     user.save()
                 else:
                     if not user.wechatdeviceid == deviceid:
-                        user.wechatdeviceid = deviceid
+                        user.wechatdeviceid = deviceid #TODO juge wx and wxwork
                         user.checkinaccountabnormal = True
                         user.save()
                 request.session['userid'] = user.id

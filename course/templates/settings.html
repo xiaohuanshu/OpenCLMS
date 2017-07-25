@@ -1,0 +1,255 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}课程设置{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
+{% endblock %}
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <style>
+        .select2-result-student {
+            padding-top: 4px;
+            padding-bottom: 3px;
+        }
+
+        .select2-result-student__name {
+            color: black;
+            font-weight: bold;
+            word-wrap: break-word;
+            line-height: 1.1;
+            margin-bottom: 4px;
+        }
+
+        .select2-result-student__major, .select2-result-student__department {
+            margin-right: 1em;
+        }
+
+        .select2-result-student__major, .select2-result-student__department, .select2-result-student__class {
+            display: inline-block;
+            color: #aaa;
+            font-size: 11px;
+        }
+
+        .select2-results__option--highlighted .select2-result-student__title {
+            color: white;
+        }
+
+        .select2-results__option--highlighted .select2-result-student__major, .select2-results__option--highlighted .select2-result-student__department, .select2-results__option--highlighted .select2-result-student__class {
+            color: #c6dcef;
+        }
+
+    </style>
+{% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            [{{ coursedata.title }}]{% if coursedata.teachclass %}({{ coursedata.teachclass.name }}){% endif %}
+        </h1>
+    </section>
+{% endblock %}
+{% block content %}
+    <!-- page start-->
+    {% include 'coursenav.html' %}
+    <div class="row">
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <i class="fa fa-users"></i>
+
+                    <h3 class="box-title">人员设置</h3>
+                </div>
+                <div class="box-body">
+                    <form role="form" class="form-horizontal" id="authform" method="post" action="?type=people">
+                        {% csrf_token %}
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">添加教师:</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" multiple="multiple" data-placeholder="选择添加的教师"
+                                            id="teacherselecter"
+                                            style="width: 100%;"
+                                            name="addteachers">
+                                        <option></option>
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">添加学生:</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" multiple="multiple" data-placeholder="选择添加的学生"
+                                            id="studentselecter"
+                                            style="width: 100%;"
+                                            name="addstudents">
+                                        <option></option>
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">提交</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+        <div class="col-md-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <i class="fa fa-edit"></i>
+
+                    <h3 class="box-title">考勤评分规则设置</h3>
+                </div>
+                <div class="box-body">
+                    <form role="form" class="form-horizontal" id="authform" method="post" action="?type=checkinscore">
+                        {% csrf_token %}
+                        <div class="box-body">
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">未到:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="normal"
+                                           value="{{ normal }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">正常:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="success"
+                                           value="{{ success }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">早退:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="early"
+                                           value="{{ early }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">迟到:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="late"
+                                           value="{{ late }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">迟到早退:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="lateearly"
+                                           value="{{ lateearly }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">私假:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="private_ask"
+                                           value="{{ private_ask }}">
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">公假:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="public_ask"
+                                           value="{{ public_ask }}">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="box-footer">
+                            <button type="submit" class="btn btn-info pull-right">保存</button>
+                        </div>
+                    </form>
+                </div>
+                <!-- /.box -->
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_script %}
+    <script>
+        function formatRepo(repo) {
+            if (repo.loading) return repo.text;
+
+            var markup = "<div class='select2-result-student clearfix'>" +
+                "<div class='select2-result-student__name'>" + repo.name + "(" + repo.id + ")</div>";
+
+            markup += "<div class='select2-result-student__statistics'>" +
+                "<div class='select2-result-student__major'><i class='fa fa-comment'></i> " + repo.major + "</div>" +
+                "<div class='select2-result-student__department'><i class='fa fa-building'></i> " + repo.department + "</div>" +
+                "<div class='select2-result-student__class'><i class='fa fa-clone'></i> " + repo.class + "</div>" +
+                "</div>" +
+                "</div>";
+
+            return markup;
+        }
+        function TeacherformatRepo(repo) {
+            if (repo.loading) return repo.text;
+
+            var markup = "<div class='select2-result-student clearfix'>" +
+                "<div class='select2-result-student__name'>" + repo.name + "(" + repo.id + ")</div>";
+
+            markup += "<div class='select2-result-student__statistics'>" +
+                "<div class='select2-result-student__department'><i class='fa fa-building'></i> " + repo.department + "</div>" +
+                "</div>" +
+                "</div>";
+
+            return markup;
+        }
+
+        function formatRepoSelection(repo) {
+            return repo.name + "(" + repo.id + ")" || repo.text;
+        }
+        $studentselecter = $("#studentselecter");
+        $studentselecter.select2({
+            ajax: {
+                url: "{% url 'school:getstudentselectdata' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        wd: params.term
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.rows
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+        $teacherselecter = $("#teacherselecter");
+        $teacherselecter.select2({
+            ajax: {
+                url: "{% url 'school:getteacherselectdata' %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        wd: params.term
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.rows
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: TeacherformatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+
+    </script>
+{% endblock %}

@@ -8,6 +8,9 @@ from django.shortcuts import render, redirect
 from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
 from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit
+from school.models import Student, Teacher
+from checkin.models import Scoreregulation
+from django.db.models import ObjectDoesNotExist
 from constant import *
 from user.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
@@ -267,3 +270,43 @@ def imgview(request):
     url = request.GET.get('url')
     url = urlunquote(url)
     return render(request, 'imgview.html', {'imgurl': url})
+
+
+def settings(request, courseid):
+    course = Course.objects.get(id=courseid)
+    try:
+        scoreregulation = Scoreregulation.objects.get(course=course)
+    except ObjectDoesNotExist:
+        scoreregulation = Scoreregulation(course=course)
+    if request.META['REQUEST_METHOD'] == 'POST':
+        type = request.GET.get('type')
+        if type == 'checkinscore':
+            scoreregulation.normal = request.POST.get('normal')
+            scoreregulation.success = request.POST.get('success')
+            scoreregulation.early = request.POST.get('early')
+            scoreregulation.lateearly = request.POST.get('lateearly')
+            scoreregulation.late = request.POST.get('late')
+            scoreregulation.private_ask = request.POST.get('private_ask')
+            scoreregulation.public_ask = request.POST.get('public_ask')
+            scoreregulation.save()
+        elif type == 'people':
+            students = request.POST.getlist('addstudents', default=None)
+            teachers = request.POST.getlist('addteachers', default=None)
+            if students:
+                for s in students:
+                    Studentcourse.objects.create(course=course, student=Student.objects.get(studentid=s))
+            if teachers:
+                for t in teachers:
+                    course.teachers.add(Teacher.objects.get(teacherid=t))
+
+    data = {'normal': scoreregulation.normal,
+            'success': scoreregulation.success,
+            'early': scoreregulation.early,
+            'lateearly': scoreregulation.lateearly,
+            'late': scoreregulation.late,
+            'private_ask': scoreregulation.private_ask,
+            'public_ask': scoreregulation.public_ask,
+            'coursedata': course,
+            'courseperms': has_course_permission(request.user, course)
+            }
+    return render(request, 'settings.html', data)

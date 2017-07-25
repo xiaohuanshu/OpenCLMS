@@ -6,6 +6,7 @@ from django.shortcuts import render
 
 from models import Teacher
 from user.auth import permission_required
+from django.db.models import Q
 
 
 @permission_required(permission='school_teacher_view')
@@ -51,6 +52,29 @@ def data(request):
               'idnumber': p.idnumber, 'department': ", ".join(department.name for department in p.department.all()),
               'administration': ", ".join(administration.name for administration in p.administration.all()),
               'username': (p.user and [p.user.username] or [None])[0]}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@permission_required(permission='school_teacher_view')
+def selectdata(request):
+    wd = request.GET['wd']
+    limit = 5
+    offset = 0
+    teacherdata = Teacher.objects.order_by('teacherid')
+    count = teacherdata.filter(
+        (Q(name__icontains=wd) | Q(teacherid__startswith=wd))
+    ).count()
+    teacherdata = teacherdata.prefetch_related('department').prefetch_related('administration').filter(
+        (Q(name__icontains=wd) | Q(teacherid__startswith=wd))
+    )[offset: (offset + limit)]
+
+    rows = []
+    for p in teacherdata:
+        ld = {'id': p.teacherid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
+              'department': ", ".join(department.name for department in p.department.all()),
+              'administration': ", ".join(administration.name for administration in p.administration.all())}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

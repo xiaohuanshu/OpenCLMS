@@ -351,34 +351,6 @@ def askdata(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-def scoreregulationsetting(request, courseid):
-    course = Course.objects.get(id=courseid)
-    try:
-        scoreregulation = Scoreregulation.objects.get(course=course)
-    except ObjectDoesNotExist:
-        scoreregulation = Scoreregulation(course=course)
-    if request.META['REQUEST_METHOD'] == 'POST':
-        scoreregulation.normal = request.POST.get('normal')
-        scoreregulation.success = request.POST.get('success')
-        scoreregulation.early = request.POST.get('early')
-        scoreregulation.lateearly = request.POST.get('lateearly')
-        scoreregulation.late = request.POST.get('late')
-        scoreregulation.private_ask = request.POST.get('private_ask')
-        scoreregulation.public_ask = request.POST.get('public_ask')
-        scoreregulation.save()
-    data = {'normal': scoreregulation.normal,
-            'success': scoreregulation.success,
-            'early': scoreregulation.early,
-            'lateearly': scoreregulation.lateearly,
-            'late': scoreregulation.late,
-            'private_ask': scoreregulation.private_ask,
-            'public_ask': scoreregulation.public_ask,
-            'coursedata': course,
-            'courseperms': has_course_permission(request.user, course)
-            }
-    return render(request, 'scoreregulation.html', data)
-
-
 def jumptolesson_data(request, courseid):
     course = Course.objects.get(id=courseid)
     try:

@@ -1,7 +1,7 @@
 {% load center_extra %}
-<ul class="nav nav-pills">
+<ul class="nav nav-tabs">
     <li role="presentation" class="{% nav_active request.path 'information' %}">
-        <a href="{% url 'course:information' coursedata.id %}">课程信息</a>
+        <a href="{% url 'course:information' coursedata.id %}">信息</a>
     </li>
     {% if courseperms or perms.checkin_view %}
         <li role="presentation" class="{% nav_active request.path 'lesson_data' %}" id="lesson_tag"
@@ -9,29 +9,29 @@
             style="display: none;"
             {% endif %}
         >
-            <a href="{% url 'checkin:jumptolesson_data' coursedata.id %}">课堂考勤</a>
+            <a href="{% url 'checkin:jumptolesson_data' coursedata.id %}">考勤</a>
         </li>
     {% endif %}
     <li role="presentation" class="{% nav_active request.path 'resource' %}">
-        <a href="{% url 'course:resource' coursedata.id %}">课程资源</a>
+        <a href="{% url 'course:resource' coursedata.id %}">资源</a>
     </li>
     <li role="presentation" class="{% nav_active request.path 'homework' %}">
-        <a href="{% url 'course:homework' coursedata.id %}">课程作业</a>
+        <a href="{% url 'course:homework' coursedata.id %}">作业</a>
     </li>
     {% if courseperms or perms.checkin_view %}
         <li role="presentation" class="{% nav_active request.path 'course_data' %}">
-            <a href="{% url 'checkin:course_data' coursedata.id %}">考勤数据</a>
+            <a href="{% url 'checkin:course_data' coursedata.id %}">数据</a>
         </li>
         <li role="presentation" class="{% nav_active request.path 'studentcourse' %}">
-            <a href="{% url 'course:studentcourse' coursedata.id %}">学生列表</a>
+            <a href="{% url 'course:studentcourse' coursedata.id %}">学生</a>
         </li>
     {% endif %}
     {% if courseperms %}
         <li role="presentation" class="{% nav_active request.path 'sendmessage' %}">
-            <a href="{% url 'course:sendmessage' coursedata.id %}">群发消息</a>
+            <a href="{% url 'course:sendmessage' coursedata.id %}">消息</a>
         </li>
-        <li role="presentation" class="{% nav_active request.path 'scoreregulation' %}">
-            <a href="{% url 'checkin:scoreregulation' coursedata.id %}">评分设置</a>
+        <li role="presentation" class="{% nav_active request.path 'settings' %}">
+            <a href="{% url 'course:settings' coursedata.id %}">设置</a>
         </li>
     {% endif %}
 </ul>

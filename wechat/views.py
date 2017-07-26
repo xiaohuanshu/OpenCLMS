@@ -85,17 +85,7 @@ def wechatlogin(request):
 
 
 def toqywechat(request, target):
-    auth_code = request.GET.get('auth_code', default=None)
-    if auth_code:
-        data = wechat_client.service.get_login_info(auth_code=auth_code, provider_access_token=None)
-        login_ticket = data['redirect_login_info']['login_ticket']
-        cache.set('%d_wechat_login_ticket' % request.user.id, login_ticket, 36000)
-    else:
-        login_ticket = cache.get('%d_wechat_login_ticket' % request.user.id)
-        if not login_ticket:
-            wechatloginurl = 'https://qy.weixin.qq.com/cgi-bin/loginpage?corp_id=%s&redirect_uri=%s%s&state=xxxx&usertype=admin' % (
-                settings.CORPID, settings.DOMAIN, reverse('wechat:toqywechat', args=[target]))
-            return HttpResponseRedirect(wechatloginurl)
-    data = wechat_client.service.get_login_url(login_ticket, target, settings.AGENTID)
-    login_url = data['login_url']
+    qyurl = {'contact': 'https://work.weixin.qq.com/wework_admin/frame#contacts',
+             'send_msg': 'https://work.weixin.qq.com/wework_admin/frame#createMessage'}
+    login_url = qyurl[target]
     return HttpResponseRedirect(login_url)

@@ -70,7 +70,7 @@ def wxauth(request):
 
 def wechatlogin(request):
     code = request.GET.get('code')
-    data = wechat_client.user.get_info(code=code)
+    data = wechat_client.user.get_info(code=code, agent_id=None)
     userid = data['UserId']
     user = User.objects.get(openid=userid)
     request.session['username'] = user.username

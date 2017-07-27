@@ -75,7 +75,8 @@ def data(request):
         ld = {'id': p.id, 'serialnumber': p.serialnumber, 'title': p.title, 'number': p.number,
               'schoolterm': p.schoolterm, 'time': p.time, 'location': p.location,
               'teacher': ",".join(p.teachers.values_list('name', flat=True)),
-              'major': (p.major and [p.major.name] or [None])[0], 'department': p.department.name}
+              'major': (p.major and [p.major.name] or [None])[0],
+              'department': (p.department and [p.department.name] or [None])[0]}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

@@ -47,7 +47,7 @@ def schedule_data(request):
     except ObjectDoesNotExist:
         return HttpResponse(json.dumps([]), content_type="application/json")
     term = request.GET.get('term')
-    if request.user.isteacher():
+    if request.user.isteacher:
         courses = request.user.teacher_set.get().course_set.all()
     else:
         student = Student.objects.get(user=request.user)

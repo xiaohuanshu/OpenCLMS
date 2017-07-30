@@ -296,7 +296,7 @@ def teacher_data(request, teacherid):
 
 
 def personaldata(request):
-    if request.user.isteacher():
+    if request.user.isteacher:
         teacher = Teacher.objects.get(user=request.user)
         return teacher_data(request, teacher.teacherid)
     else:

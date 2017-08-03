@@ -14,12 +14,9 @@ ALLOWED_HOSTS = ['*']
 DOMAIN = 'http://DOMAIN'
 CHECKINURL = 'http://DOMAIN/checkin/ck'
 SCHOOLEMAIL = ''
-QRCODEREFRESHTIME = 5 # MORE THAN 3
+QRCODEREFRESHTIME = 5  # MORE THAN 3
 
-#BROWSER_DOWNLOAD_URL = "" # html5 browser download url
-
-# Super admin password
-SAFENUMBER = ''
+# BROWSER_DOWNLOAD_URL = "" # html5 browser download url
 
 # Wechatmanage.py
 TOKEN = ''
@@ -41,25 +38,16 @@ DATABASES = {
     }
 }
 
-CACHES = {
-    'default': {
-        'BACKEND': 'django.core.cache.backends.memcached.MemcachedCache',
-        'LOCATION': '',  # example: "127.0.0.1:11211"
-    }
-}
-
-# if use redis
-'''
+# CACHES
 CACHES = {
     "default": {
         "BACKEND": "django_redis.cache.RedisCache",
-        "LOCATION": "", #example: "redis://127.0.0.1:6379/1"
+        "LOCATION": "",  # example: "redis://127.0.0.1:6379/1"
         "OPTIONS": {
             "CLIENT_CLASS": "django_redis.client.DefaultClient",
         }
     }
 }
-'''
 
 INTERNAL_IPS = ("127.0.0.1")
 

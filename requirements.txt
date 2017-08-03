@@ -4,3 +4,5 @@ wechatpy
 cryptography
 uwsgi
 django_redis
+Pillow
+django-debug-toolbar

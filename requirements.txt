@@ -2,5 +2,7 @@ django==1.11.3
 psycopg2
 wechatpy
 cryptography
-django-memcached
-python-memcached
+uwsgi
+django_redis
+Pillow
+django-debug-toolbar

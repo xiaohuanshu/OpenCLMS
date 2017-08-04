@@ -113,7 +113,7 @@ def timetoclasstime(time, move=0):  # move=   -1:lessontime back 0:lesson time 1
                 return t
         return 999
     elif move == 1:
-        for t in sorted(classtimedata.keys(),reverse=True):
+        for t in sorted(classtimedata.keys(), reverse=True):
             if (time >= classtimedata[t][0] and time <= classtimedata[t][1]) or time >= classtimedata[t][1]:
                 return t
         return 0

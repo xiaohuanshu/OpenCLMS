@@ -5,7 +5,8 @@ from django.core.exceptions import ObjectDoesNotExist
 from models import Checkin, Checkinrecord
 from constant import *
 from django.db.models import F, Q
-import time, os
+import time
+import os
 from django.core.cache import cache
 from school.function import timetoclasstime, datetoTermdate
 import datetime
@@ -21,7 +22,7 @@ def startcheckin(lessonid, mode='first'):
         return {'error': 101, 'message': '课程还未开始'}
     elif lesson.status == LESSON_STATUS_CANCLE:
         return {'error': 101, 'message': '课程被取消'}
-    elif lesson.status == LESSON_STATUS_END or lesson.status == LESSON_STATUS_END_EARLY or lesson.status == LESSON_STATUS_START_LATE:
+    elif lesson.status in (LESSON_STATUS_END, LESSON_STATUS_END_EARLY, LESSON_STATUS_START_LATE):
         return {'error': 101, 'message': '课程已结束'}
     elif lesson.status == LESSON_STATUS_WRONG:
         return {'error': 101, 'message': '课程未正常开启'}
@@ -43,16 +44,6 @@ def startcheckin(lessonid, mode='first'):
         checkin_record.status = CHECKIN_RECORD_FIRST
         Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).update(laststatus=F('status'))
         Checkin.objects.filter(lesson=lesson, status=CHECKIN_STATUS_SUCCESS).update(status=CHECKIN_STATUS_NORMAL)
-        '''
-        nowstudent = Checkin.objects.filter(lesson=lesson).values_list('student', flat=True)
-        studentcourse = Studentcourse.objects.filter(course=lesson.course).exclude(student__in=nowstudent)
-        #Checkin.objects.create(lesson=lesson, status=CHECKIN_STATUS_NORMAL, student__in=studentcourse.values_list('student',flat=True))
-        newstudent = []
-        for s in studentcourse:
-            newstudent.append(
-                Checkin(lesson=lesson, status=CHECKIN_STATUS_NORMAL, student=s.student))
-        Checkin.objects.bulk_create(newstudent)
-        '''
 
     if mode == 'add':
         if lesson.checkincount == 1:
@@ -84,7 +75,7 @@ def endcheckin(lessonid):
         lesson = Lesson.objects.get(id=lessonid)
     except ObjectDoesNotExist:
         return {'error': 101, 'message': '课程不存在'}
-    if not lesson.status == LESSON_STATUS_CHECKIN and not lesson.status == LESSON_STATUS_CHECKIN_ADD and not lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
+    if lesson.status not in (LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN):
         return {'error': 101, 'message': '课程未开始签到'}
     nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
     checkin_record = Checkinrecord.objects.filter(lesson=lesson).order_by('-time').first()

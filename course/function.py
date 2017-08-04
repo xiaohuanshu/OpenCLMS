@@ -1,5 +1,4 @@
 # -*- coding: utf-8 -*-
-__author__ = 'xiaohuanshu'
 import re
 
 weekstring = [u'周日', u'周一', u'周二', u'周三', u'周四', u'周五', u'周六']
@@ -73,13 +72,15 @@ def splitlesson(timestr, classroomstr):
         i = i + 1
         for week in getweek(Sweek):
             for time in gettime(Sweek):
-                data.append({'week': week, 'day': getday(Sweek), 'time': time, 'length': 1, 'location': Sroom[i]})
+                data.append({'week': week, 'day': getday(Sweek),
+                             'time': time, 'length': 1, 'location': Sroom[i]})
     data.sort(cmp=t)
     i = 0
     while i <= len(data) - 2:
-        while (data[i]['week'] == data[i + 1]['week']) and (data[i]['day'] == data[i + 1]['day']) and (
-                    data[i]['time'] == (data[i + 1]['time'] - data[i]['length'])) and (
-                    data[i]['location'] == data[i + 1]['location']):
+        while (data[i]['week'] == data[i + 1]['week']) and \
+                (data[i]['day'] == data[i + 1]['day']) and \
+                (data[i]['time'] == (data[i + 1]['time'] - data[i]['length'])) \
+                and (data[i]['location'] == data[i + 1]['location']):
             data[i].update({'length': data[i]['length'] + 1})
             del data[i + 1]
             if i == len(data) - 1:
@@ -96,14 +97,18 @@ def simplifytime(timestr, classroomstr):
         addflag = False
         for s in simplifydata:
             # print simplifydata
-            if s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == d[
-                'length'] and s['weeklength'] + s['week'] == d['week'] and 'interval' not in s:
+            if ((s['day'] == d['day'] and
+                 s['location'] == s['location'] and
+                 s['time'] == d['time'] and
+                 s['length'] == d['length'] and
+                 s['weeklength'] + s['week'] == d['week'] and
+                 'interval' not in s)):
                 s['weeklength'] += 1
                 addflag = True
                 break
             elif s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == \
-                    d['length'] and s['weeklength'] + s['week'] + 1 == d['week'] and (
-                            'interval' in s or s['weeklength'] == 1):
+                d['length'] and s['weeklength'] + s['week'] + 1 == d['week'] and (
+                    'interval' in s or s['weeklength'] == 1):
                 s['weeklength'] += 2
                 s['interval'] = True
                 addflag = True
@@ -116,6 +121,6 @@ def simplifytime(timestr, classroomstr):
         ','.join([str(e) for e in range(s['time'], s['time'] + s['length'])]),
         s['week'], s['week'] + s['weeklength'] - 1,
         (('interval' in s and s['interval']) and '|' + (s['week'] % 2 == 0 and u'双周' or u'单周') or '')) for s in
-                           simplifydata])
+        simplifydata])
     newclassroomstr = u';'.join(s['location'] for s in simplifydata)
     return newtimestr, newclassroomstr

@@ -1,4 +1,3 @@
-__author__ = 'xiaohuanshu'
 from django.shortcuts import redirect
 from django.core.urlresolvers import reverse
 from django.core.urlresolvers import resolve
@@ -24,7 +23,7 @@ class UserMiddleware(object):
         wechat_allow_url = ['wechat:oauth', 'wechat:wxauth', 'user:register', 'user:check_username', 'user:check_email',
                             'user:registerProcess']
         if request.session.get('userid', '') == '':
-            if request.COOKIES.has_key('userid'):
+            if 'userid' in request.COOKIES:
                 remembercode = request.COOKIES['remembercode']
                 if check_password("%s%s" % (
                         request.COOKIES['userid'], settings.SECRET_KEY),

@@ -42,7 +42,7 @@ class Command(BaseCommand):
                     teachers.remove(teacherid)
                 except ValueError:
                     pass
-            except Exception,e:
+            except Exception, e:
                 logger.error("[loadteacherdatafromexcel]error on teacherid:%s\n%s" % (teacherid, e))
                 count -= 1
         notavailablecount = Teacher.objects.filter(teacherid__in=teachers).update(available=False)

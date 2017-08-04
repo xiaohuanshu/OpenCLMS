@@ -22,7 +22,7 @@ class Command(BaseCommand):
                 data, created = Classroom.objects.get_or_create(location=name)
                 if not created:
                     data.save()
-            except Exception,e:
+            except Exception, e:
                 logger.error("[loadclassroomdatafromexcel]error on classroom:%s\n%s" % (name, e))
                 count -= 1
         logger.info("[loadclassroomdatafromexcel]successful upgrade %d class on %s" % (count, options['excelfile']))

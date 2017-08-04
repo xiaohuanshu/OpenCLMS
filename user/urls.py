@@ -4,7 +4,8 @@ except ImportError:  # django < 1.4
     from django.conf.urls.defaults import *
 
 # place app url patterns here
-import views, control
+import views
+import control
 
 urlpatterns = [
     url(r'^login$', views.login, name='login'),

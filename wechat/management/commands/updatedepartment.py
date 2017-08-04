@@ -22,7 +22,7 @@ class Command(BaseCommand):
                             exist = True
                             break
                     if not exist:
-                        logger.info("[updatedepartment] add department %s"%c.name)
+                        logger.info("[updatedepartment] add department %s" % c.name)
                         wechat_client.department.create(c.name, thisdepartmentid)
 
         logger.info("[updatedepartment] Successful")

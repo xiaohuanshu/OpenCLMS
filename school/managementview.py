@@ -1,11 +1,8 @@
 # -*- coding: utf-8 -*-
-__author__ = 'xiaohuanshu'
 import json
-
 from django.core.urlresolvers import reverse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-
 from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
 from user.auth import permission_required
 import logging
@@ -15,9 +12,9 @@ logger = logging.getLogger(__name__)
 
 @permission_required(permission='school_schoolterm_view')
 def schoolterm(request):
-    if request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('termname', default=False) and request.POST.get(
-            'termyear', default=False) and request.POST.get('termstartdate', default=False) and request.POST.get(
-        'termenddate', default=False):
+    if (request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('termname', default=False) and
+            request.POST.get('termyear', default=False) and request.POST.get('termstartdate', default=False) and
+            request.POST.get('termenddate', default=False)):
         if not request.user.has_perm('school_schoolterm_modify'):
             HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
         if request.POST.get('termid', default=False):
@@ -53,9 +50,10 @@ def schoolterm(request):
 
 @permission_required(permission='school_classtime_view')
 def classtime(request):
-    if request.META['REQUEST_METHOD'] == 'POST' and request.POST.get('pk', default=False) and request.POST.get('name',
-                                                                                                               default=False) and request.POST.get(
-        'value', default=False):
+    if (request.META['REQUEST_METHOD'] == 'POST' and
+            request.POST.get('pk', default=False) and
+            request.POST.get('name', default=False) and
+            request.POST.get('value', default=False)):
         if not request.user.has_perm('school_classtime_modify'):
             HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
         data = Classtime.objects.get(id=request.POST.get('pk'))

@@ -23,8 +23,7 @@ def checkin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
         return render(request, 'error.html', {'message': '没有权限'})
-    if not (
-                        lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_AGAIN or lesson.status == LESSON_STATUS_CHECKIN_ADD):
+    if lesson.status not in (LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_AGAIN, LESSON_STATUS_CHECKIN_ADD):
         return render(request, 'error.html',
                       {'message': '签到还未开始',
                        'submessage': lesson.course.title,
@@ -112,8 +111,8 @@ def course_data(request, courseid):
         'time').all()
     columns = [
         [{'field': 'name', 'title': u'学生', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
-         {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True,
-          'sortable': True},
+         {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center',
+          'valign': 'middle', 'searchable': True, 'sortable': True},
          {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
          {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
          {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'}], []]
@@ -204,7 +203,7 @@ def student_data(request, studentid):
             scoreregulation = Scoreregulation(course=v['course'])
         len = 0
         for (key, item) in v['checkindata'].items():
-            if item['status'] != None:
+            if item['status'] is not None:
                 len += 1
                 if item['status'] != 0:
                     ratio = ratio + 1
@@ -233,10 +232,14 @@ def student_data(request, studentid):
     '''
 
     columns = [
-        [{'field': 'name', 'title': u'课程名称', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
-         {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
-         {'field': 'score', 'title': u'考勤成绩', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
-         {'title': u'签到数据', 'colspan': maxlength, 'align': 'center'}], []]
+        [
+            {'field': 'name', 'title': u'课程名称', 'rowspan': 2, 'align': 'center', 'valign': 'middle',
+             'searchable': True},
+            {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+            {'field': 'score', 'title': u'考勤成绩', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+            {'title': u'签到数据', 'colspan': maxlength, 'align': 'center'}
+        ], []
+    ]
 
     for i in range(0, maxlength):
         columns[1].append(

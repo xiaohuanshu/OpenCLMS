@@ -3,7 +3,6 @@
 *.log
 .idea
 manage.py
-migrations
 media
 data
 logs

@@ -70,8 +70,8 @@ def schedule_data(request):
             colordata.update({m.course.id: eventClass(lastcolorid)})
             lastcolorid += 1
         data.append({'id': m.course.id, 'title': m.course.title,
-                     'start': time.mktime(m.getTime()[0]),
-                     'end': time.mktime(m.getTime()[1]),
+                     'start': time.mktime(m.getTime[0]),
+                     'end': time.mktime(m.getTime[1]),
                      'classtime_time': m.time,
                      'classtime_length': m.length,
                      'location': m.classroom.location,

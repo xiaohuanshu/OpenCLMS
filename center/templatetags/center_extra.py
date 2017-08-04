@@ -1,9 +1,6 @@
 # coding:utf-8
-__author__ = 'xiaohuanshu'
 from django import template
 from django.core.urlresolvers import resolve
-# from lessonmodel.constant import *
-import json
 
 register = template.Library()
 

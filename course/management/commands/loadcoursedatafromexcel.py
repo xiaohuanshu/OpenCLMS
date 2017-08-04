@@ -36,7 +36,7 @@ class Command(BaseCommand):
                 data.teachers.add(Teacher.objects.get(teacherid=rs.cell(i, 6).value))
                 if rs.cell_type(i, 8) != 0 and rs.cell(i, 8).value != '' and rs.cell(i, 8).value != ' ':
                     teachclass = rs.cell(i, 8).value
-                    if not ',' in teachclass:
+                    if ',' not in teachclass:
                         try:
                             data.teachclass = Class.objects.get(name=teachclass.strip())
                         except:

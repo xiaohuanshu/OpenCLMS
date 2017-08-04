@@ -5,6 +5,7 @@ import json
 from user.auth import permission_required
 import hashlib
 
+
 @permission_required(permission=['school_student_modify', 'user_modify'])
 def unbindwechat(request):
     userid = request.GET.get('userid')
@@ -23,4 +24,3 @@ def resetpassword(request):
     user.password = m.hexdigest()
     user.save()
     return HttpResponse(json.dumps({'error': 0, 'message': '已重置为123456'}), content_type="application/json")
-

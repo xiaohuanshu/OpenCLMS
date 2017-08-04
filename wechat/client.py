@@ -32,4 +32,3 @@ wechat_client = WeChatClient(
     settings.APPSECRET,
     session=CustomStorage()
 )
-

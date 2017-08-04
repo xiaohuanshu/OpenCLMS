@@ -1,12 +1,10 @@
 # -*- coding: utf-8 -*-
-__author__ = 'xiaohuanshu'
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
 import time
 from django.views.decorators.csrf import csrf_exempt
 from user.models import User
 from models import Wechatkeyword
-
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy.enterprise.exceptions import InvalidCorpIdException

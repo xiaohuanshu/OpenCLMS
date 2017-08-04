@@ -1,5 +1,7 @@
 from django.conf.urls import url
-import student, managementview, teacher
+import student
+import managementview
+import teacher
 
 urlpatterns = [
 

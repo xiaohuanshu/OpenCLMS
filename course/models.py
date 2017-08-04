@@ -255,7 +255,8 @@ class Lesson(models.Model):
                 'endtime': u'没有数据'}
 
     def isnow(self):  # include checkin
-        if self.status == LESSON_STATUS_NOW or self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
+        if self.status in (LESSON_STATUS_NOW, LESSON_STATUS_CHECKIN,
+                           LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN):
             return True
         else:
             return False
@@ -267,7 +268,7 @@ class Lesson(models.Model):
             return False
 
     def ischeckinnow(self):
-        if self.status == LESSON_STATUS_CHECKIN or self.status == LESSON_STATUS_CHECKIN_ADD or self.status == LESSON_STATUS_CHECKIN_AGAIN:
+        if self.status in (LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN):
             return True
         else:
             return False

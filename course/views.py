@@ -20,9 +20,9 @@ from message import sendmessagetocoursestudent
 
 def information(request, courseid):
     coursedata = Course.objects.get(id=courseid)
-    lessondata = Lesson.objects.filter(course=coursedata).exclude(status=LESSON_STATUS_TRANSFERRED).order_by('week',
-                                                                                                             'day',
-                                                                                                             'time').all()
+    lessondata = Lesson.objects.filter(course=coursedata) \
+        .exclude(status=LESSON_STATUS_TRANSFERRED) \
+        .order_by('week', 'day', 'time').all()
     return render(request, 'information.html',
                   {'coursedata': coursedata, 'lessondata': lessondata,
                    'courseperms': has_course_permission(request.user, coursedata)})
@@ -132,9 +132,9 @@ def resourceupload(request):
             },
         ]
     }
-    if initialpreviewdata.has_key('type'):
+    if 'type' in initialpreviewdata:
         data['initialPreviewConfig'][0]['type'] = initialpreviewdata['type']
-    if initialpreviewdata.has_key('filetype'):
+    if 'filetype' in initialpreviewdata:
         data['initialPreviewConfig'][0]['filetype'] = initialpreviewdata['filetype']
     return HttpResponse(json.dumps(data), content_type="application/json")
 

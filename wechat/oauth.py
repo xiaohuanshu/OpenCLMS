@@ -42,7 +42,7 @@ def oauth(request):
                     user.save()
                 else:
                     if not user.wechatdeviceid == deviceid:
-                        user.wechatdeviceid = deviceid #TODO juge wx and wxwork
+                        user.wechatdeviceid = deviceid  # TODO juge wx and wxwork
                         user.checkinaccountabnormal = True
                         user.save()
                 request.session['userid'] = user.id

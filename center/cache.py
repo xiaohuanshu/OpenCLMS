@@ -1,6 +1,13 @@
 from django.core.cache import cache
 
-def cache_func(name,time=15):
+
+def cache_func(name, time=15):
+    '''
+    @cache_func('hello',15)
+    def hello(a):
+        return "hello%s"%a
+    '''
+
     def _cache_func(func):
         def __cache_func(*args, **kwargs):
             data = cache.get(name)
@@ -8,12 +15,7 @@ def cache_func(name,time=15):
                 data = func(*args, **kwargs)
                 cache.set(name, data, time)
             return data
-        return __cache_func
-    return _cache_func
 
-# Example
-'''
-@cache_func('hello',15)
-def hello(a):
-    return "hello%s"%a
-'''
+        return __cache_func
+
+    return _cache_func

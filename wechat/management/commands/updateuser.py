@@ -55,8 +55,9 @@ class Command(BaseCommand):
                 createcount += 1
                 wechat_client.user.create('S%s' % s.studentid, s.name, s.classid.wechatdepartmentid, u'学生',
                                           gender=s.sex,
-                                          email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL), extattr={
-                        "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"身份证号", "value": s.idnumber[-6:]}]})
+                                          email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL),
+                                          extattr={"attrs": [{"name": u"学工号", "value": s.studentid},
+                                                             {"name": u"身份证号", "value": s.idnumber[-6:]}]})
 
         # for teacher
         teachers = Teacher.objects.filter(available=True).exclude(name__regex='.*\d+.*').all()
@@ -69,8 +70,9 @@ class Command(BaseCommand):
                 if sorted(userinfo['department']) != sorted(tdeps) or getidnumber(userinfo) != t.idnumber[-6:]:
                     logger.debug("%s update" % t.teacherid)
                     updatecount += 1
-                    wechat_client.user.update(userinfo['userid'], department=tdeps, extattr={
-                        "attrs": [{"name": u"学工号", "value": t.teacherid}, {"name": u"身份证号", "value": t.idnumber[-6:]}]})
+                    wechat_client.user.update(userinfo['userid'], department=tdeps,
+                                              extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
+                                                                 {"name": u"身份证号", "value": t.idnumber[-6:]}]})
                 else:
                     logger.debug("%s exist" % t.teacherid)
                 userlist.remove(userinfo)
@@ -79,8 +81,9 @@ class Command(BaseCommand):
                 createcount += 1
                 wechat_client.user.create('T%s' % t.teacherid, t.name, tdeps, u'教师',
                                           gender=t.sex,
-                                          email='%s@gengdan.edu.cn' % t.teacherid, extattr={
-                        "attrs": [{"name": u"学工号", "value": t.teacherid}, {"name": u"身份证号", "value": t.idnumber[-6:]}]})
+                                          email='%s@gengdan.edu.cn' % t.teacherid,
+                                          extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
+                                                             {"name": u"身份证号", "value": t.idnumber[-6:]}]})
 
         # delete
         for user in userlist:
@@ -88,4 +91,4 @@ class Command(BaseCommand):
             deletecount += 1
             wechat_client.user.delete(user['userid'])
         logger.info("[updateuser] Successful exist:%d update:%d create:%d delete:%d" % (
-        existcount, updatecount, createcount, deletecount))
+            existcount, updatecount, createcount, deletecount))

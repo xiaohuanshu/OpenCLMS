@@ -33,10 +33,11 @@ permission_data = [
                     '批准假单'
                 ]
             },
-        ], 'operator': [
-        'view',
-        'modify'
-    ],
+        ],
+        'operator': [
+            'view',
+            'modify'
+        ],
         'operatordirection': [
             '查看考勤数据',
             '修改考勤数据'

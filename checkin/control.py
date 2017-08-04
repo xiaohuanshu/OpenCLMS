@@ -91,15 +91,18 @@ def ck(request, qr_str):
         return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'请在微信中打开此链接'})
     lessonid = cache.get("qr%s" % (qr_str), default=None)
     if not lessonid:
-        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'二维码失效或不存在', 'wechatclose': True})
+        return render(request, 'error.html',
+                      {'message': u'签到失败', 'submessage': u'二维码失效或不存在', 'wechatclose': True})
     lesson = Lesson.objects.get(id=lessonid)
     user = User.objects.get(id=request.session.get('userid'))
     try:
         student = Student.objects.get(user=user)
     except ObjectDoesNotExist:
-        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'您的身份不是学生', 'wechatclose': True})
+        return render(request, 'error.html',
+                      {'message': u'签到失败', 'submessage': u'您的身份不是学生', 'wechatclose': True})
     if not Studentcourse.objects.filter(course=lesson.course, student=student).exists():
-        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'上课名单中没有你', 'wechatclose': True})
+        return render(request, 'error.html',
+                      {'message': u'签到失败', 'submessage': u'上课名单中没有你', 'wechatclose': True})
     else:
         if request.user.checkinaccountabnormal:
             abnormal = CHECKIN_ABNORMAL_ACCOUNT
@@ -131,7 +134,7 @@ def startCheckin(request, lessonid):
         if re['error'] != 0:
             return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title})
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
-    elif lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_ADD or lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
+    elif lesson.status in (LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN):
         return redirect(reverse('checkin:qrcheckin', args=[lessonid]))
     return render(request, 'error.html',
                   {'message': '开始签到失败',
@@ -144,7 +147,7 @@ def stopCheckin(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     if not has_course_permission(request.user, lesson.course):
         return render(request, 'error.html', {'message': '没有权限'})
-    if lesson.status == LESSON_STATUS_CHECKIN or lesson.status == LESSON_STATUS_CHECKIN_ADD or lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
+    if lesson.status in (LESSON_STATUS_CHECKIN, LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN):
         re = endcheckin(lessonid)
         if re['error'] != 0:
             return render(request, 'error.html',

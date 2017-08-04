@@ -29,7 +29,7 @@ def login(request):
     if request.session.get('userid'):
         return redirect(reverse('home', args=[]))
     data = {}
-    if not "MicroMessenger" in request.META.get('HTTP_USER_AGENT', ''):
+    if "MicroMessenger" not in request.META.get('HTTP_USER_AGENT', ''):
         wxlogin = {'appid': settings.CORPID, 'agentid': settings.AGENTID,
                    'redirect_uri': settings.DOMAIN + reverse('wechat:wechatlogin', args=[])}
         data['wxlogin'] = wxlogin
@@ -133,7 +133,7 @@ def logout(request):
     if request.session.get('openid', default=False):
         del request.session['openid']
     response = redirect(reverse('user:login', args=[]))
-    if request.COOKIES.has_key('remembercode'):
+    if 'remembercode' in request.COOKIES:
         response.delete_cookie('remembercode')
         response.delete_cookie('userid')
     return response
@@ -262,9 +262,11 @@ def forgetpassword(request):
     uuidstr = uuid.uuid1().hex
     cache.set('fp%s' % uuidstr, user.id, 600)
     subject, form_email, to = '【checkinsystem】找回密码邮件', settings.SERVER_EMAIL, email
-    text_content = u'亲爱的%s您好,请点击下面的链接找回密码:\n%s%s\n此链接10分钟内有效,请尽快修改密码。\n如果您没有发起找回密码,请无视此邮件' % (
+    text_content = (u'亲爱的%s您好,请点击下面的链接找回密码:\n%s%s\n此链接10分钟内有效,请尽快修改密码。\n'
+                    u'如果您没有发起找回密码,请无视此邮件') % (
         user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]))
-    html_content = u'亲爱的%s您好,<br>请点击下面的链接找回密码:<br><a href="%s%s">%s%s</a><br>此链接10分钟内有效,请尽快修改密码。<br>如果您没有发起找回密码,请无视此邮件' % (
+    html_content = (u'亲爱的%s您好,<br>请点击下面的链接找回密码:<br><a href="%s%s">%s%s</a><br>',
+                    u'此链接10分钟内有效,请尽快修改密码。<br>如果您没有发起找回密码,请无视此邮件') % (
         user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]), settings.DOMAIN,
         reverse('user:resetpassword', args=[uuidstr]))
     msg = EmailMultiAlternatives(subject, text_content, form_email, [to])

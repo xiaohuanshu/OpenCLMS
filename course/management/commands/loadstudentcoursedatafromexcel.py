@@ -42,5 +42,6 @@ class Command(BaseCommand):
             data = Studentcourse(course=course, student=student)
             data.save()
         logger.info(
-            "[loadstudentcoursedatafromexcel]successful upgrade %d studentcourse with %d course not found and %d student not found on %s" % (
+            ("[loadstudentcoursedatafromexcel]successful upgrade %d studentcourse ",
+             "with %d course not found and %d student not found on %s") % (
                 count, coursenotfound, studentnotfound, options['excelfile']))

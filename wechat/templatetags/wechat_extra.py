@@ -1,7 +1,9 @@
 from django import template
 from wechat.client import wechat_client
 from django.conf import settings
-import uuid, json, time
+import uuid
+import json
+import time
 
 register = template.Library()
 

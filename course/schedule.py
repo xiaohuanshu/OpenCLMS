@@ -1,6 +1,7 @@
 from school.function import getCurrentSchoolYearTerm, getTermDate, datetoTermdate, getClassTime
 from django.shortcuts import render
-import json, time
+import json
+import time
 from django.db.models import Q
 from django.http import HttpResponse
 from school.models import Student
@@ -65,7 +66,7 @@ def schedule_data(request):
     colordata = {}
     lastcolorid = 0
     for m in plessonlist:
-        if not colordata.has_key(m.course.id):
+        if m.course.id not in colordata:
             colordata.update({m.course.id: eventClass(lastcolorid)})
             lastcolorid += 1
         data.append({'id': m.course.id, 'title': m.course.title,
@@ -77,7 +78,8 @@ def schedule_data(request):
                      'class': colordata.get(m.course.id),
                      'url': reverse('course:information', args=[m.course.id])
                      })
-        # print "%s,%s" % (m.lessonid.name, time.strftime('%Y-%m-%dT%H:%M:%S',getlessontime(m.term, m.week, m.day, m.time, m.length)[0]))
+        # print "%s,%s" % (m.lessonid.name, time.strftime('%Y-%m-%dT%H:%M:%S',
+        # getlessontime(m.term, m.week, m.day, m.time, m.length)[0]))
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 

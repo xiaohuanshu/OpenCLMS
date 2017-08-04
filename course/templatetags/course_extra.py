@@ -1,10 +1,10 @@
 # coding:utf-8
 from django import template
-
-register = template.Library()
 from course.constant import *
 from course.models import Homeworkcommit
 import json
+
+register = template.Library()
 
 
 @register.filter

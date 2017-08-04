@@ -1,5 +1,7 @@
 from django.conf.urls import url
-import schedule, views, control
+import schedule
+import views
+import control
 
 urlpatterns = [
 

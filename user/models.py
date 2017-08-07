@@ -11,7 +11,7 @@ from django.db.models.signals import post_save
 
 
 class Role(models.Model):
-    name = models.CharField(max_length=20, blank=True, null=True)
+    name = models.CharField(max_length=20)
     permission = ArrayField(models.CharField(max_length=50), blank=True, default=[])
 
     def __unicode__(self):
@@ -22,22 +22,22 @@ class Role(models.Model):
 
 
 class User(models.Model):
-    username = models.CharField(max_length=20, blank=True, null=True, unique=True)
-    academiccode = models.CharField(max_length=20, blank=True, null=True, unique=True)
-    openid = models.CharField(max_length=28, blank=True, null=True, unique=True)
-    wechatdeviceid = models.CharField(max_length=32, blank=True, null=True)
-    password = models.CharField(max_length=32, blank=True, null=True)
+    username = models.CharField(max_length=20, null=True, unique=True)
+    academiccode = models.CharField(max_length=20, null=True, unique=True)
+    openid = models.CharField(max_length=28, null=True, unique=True)
+    wechatdeviceid = models.CharField(max_length=32, null=True)
+    password = models.CharField(max_length=32)
     sex = models.IntegerField(blank=True, null=True, default=1)
-    ip = models.GenericIPAddressField(protocol='IPv4', blank=True, null=True)
-    lastlogintime = models.DateTimeField(blank=True, null=True)
-    email = models.CharField(max_length=40, blank=True, null=True, unique=True)
+    ip = models.GenericIPAddressField(protocol='IPv4', null=True)
+    lastlogintime = models.DateTimeField(null=True)
+    email = models.CharField(max_length=40, null=True, unique=True)
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
     avatar = models.ImageField(upload_to='avatar', default='avatar/default.png')
     checkinaccountabnormal = models.BooleanField(default=False)
-    latitude = models.FloatField(blank=True, null=True)
-    longitude = models.FloatField(blank=True, null=True)
-    accuracy = models.FloatField(blank=True, null=True)
-    lastpositiontime = models.DateTimeField(blank=True, null=True)
+    latitude = models.FloatField(null=True)
+    longitude = models.FloatField(null=True)
+    accuracy = models.FloatField(null=True)
+    lastpositiontime = models.DateTimeField(null=True)
     mainrole = models.CharField(max_length=40, null=True)
 
     @cached_property
@@ -89,8 +89,8 @@ class User(models.Model):
 
 
 class Usertorole(models.Model):
-    user = models.ForeignKey(User, models.DO_NOTHING, db_column='userid', blank=True, null=True)
-    role = models.ForeignKey(Role, models.DO_NOTHING, db_column='roleid', blank=True, null=True)
+    user = models.ForeignKey(User, models.CASCADE, db_column='userid')
+    role = models.ForeignKey(Role, models.CASCADE, db_column='roleid')
 
     class Meta:
         db_table = 'UsertoRole'
@@ -98,11 +98,11 @@ class Usertorole(models.Model):
 
 
 @receiver(post_save, sender=Role)
-def role_pre_save(sender, **kwargs):
+def role_post_save(sender, **kwargs):
     for user in kwargs['instance'].usertorole_set.values('user'):
         cache.delete('perm_%d_cache' % user['user'])
 
 
 @receiver(post_save, sender=Usertorole)
-def usertorole_pre_save(sender, **kwargs):
+def usertorole_post_save(sender, **kwargs):
     cache.delete('perm_%d_cache' % kwargs['instance'].user.id)

@@ -23,18 +23,16 @@ logger = logging.getLogger(__name__)
 
 
 class Course(models.Model):
-    serialnumber = models.CharField(max_length=50, blank=True, null=True, unique=True)
+    serialnumber = models.CharField(max_length=50, unique=True)
     number = models.SmallIntegerField(blank=True, null=True)
     title = models.CharField(max_length=100, blank=True, null=True)
     teachers = models.ManyToManyField('school.Teacher')
     time = models.CharField(max_length=400, blank=True, null=True)
     location = models.CharField(max_length=255, blank=True, null=True)
-    schoolterm = models.CharField(max_length=20, blank=True, null=True)
-    major = models.ForeignKey('school.Major', models.DO_NOTHING, db_column='majorid', blank=True, null=True)
-    department = models.ForeignKey('school.Department', models.DO_NOTHING, db_column='departmentid', blank=True,
-                                   null=True)
-    teachclass = models.ForeignKey('school.Class', models.DO_NOTHING, db_column='teachclassid', blank=True,
-                                   null=True)
+    schoolterm = models.CharField(max_length=20)
+    major = models.ForeignKey('school.Major', models.SET_NULL, db_column='majorid', null=True)
+    department = models.ForeignKey('school.Department', models.SET_NULL, db_column='departmentid', null=True)
+    teachclass = models.ForeignKey('school.Class', models.SET_NULL, db_column='teachclassid', null=True)
 
     def gettitlewithclass(self):
         if self.teachclass:
@@ -105,19 +103,17 @@ class Course(models.Model):
 
 
 class Lesson(models.Model):
-    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
-    classroom = models.ForeignKey('school.Classroom', models.DO_NOTHING, db_column='classroomid', blank=True, null=True)
-    length = models.SmallIntegerField(blank=True, null=True)
-    status = models.SmallIntegerField(blank=True, null=True)
-    year = models.SmallIntegerField(blank=True, null=True)  # useless
-    term = models.CharField(max_length=20, blank=True, null=True)
-    week = models.SmallIntegerField(blank=True, null=True)
-    time = models.SmallIntegerField(blank=True, null=True)
-    day = models.SmallIntegerField(blank=True, null=True)
-    starttime = models.DateTimeField(blank=True, null=True)
-    endtime = models.DateTimeField(blank=True, null=True)
-    checkincount = models.SmallIntegerField(blank=True, null=True)
-    date = models.DateField(blank=True, null=True)
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid')
+    classroom = models.ForeignKey('school.Classroom', models.SET_NULL, db_column='classroomid', blank=True, null=True)
+    length = models.SmallIntegerField()
+    status = models.SmallIntegerField(default=LESSON_STATUS_AWAIT)
+    term = models.CharField(max_length=20)
+    week = models.SmallIntegerField()
+    time = models.SmallIntegerField()
+    day = models.SmallIntegerField()
+    starttime = models.DateTimeField(null=True)
+    endtime = models.DateTimeField(null=True)
+    checkincount = models.SmallIntegerField(null=True)
 
     @cached_property
     def getTime(self):
@@ -281,9 +277,8 @@ class Lesson(models.Model):
 
 
 class Studentcourse(models.Model):
-    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
-    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True,
-                               related_name='courses')
+    student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid', related_name='courses')
 
     class Meta:
         db_table = 'StudentCourse'
@@ -295,9 +290,9 @@ def get_courseresource_path(instance, filename):
 
 
 class Courseresource(Filemodel):
-    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid')
     title = models.CharField(max_length=100, blank=True, null=True)
-    uploadtime = models.DateTimeField(blank=True, null=True)
+    uploadtime = models.DateTimeField(auto_now=True)
     # downloadcount = models.SmallIntegerField(default=0)
     file = models.FileField(upload_to=get_courseresource_path)
 
@@ -314,12 +309,12 @@ class Homeworkfile(Filemodel):
 
 
 class Coursehomework(Dealbase64imgmodel):
-    course = models.ForeignKey(Course, models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid')
     title = models.CharField(max_length=100, blank=True, null=True)
     instruction = models.TextField(blank=True, null=True)
-    type = models.SmallIntegerField(blank=True, null=True)
+    type = models.SmallIntegerField(blank=True)
     deadline = models.DateTimeField(blank=True, null=True)
-    weight = models.SmallIntegerField(blank=True, null=True)
+    weight = models.SmallIntegerField(blank=True)
     attachment = models.ManyToManyField(Homeworkfile)
 
     base64img_contained_fields = ('instruction',)
@@ -339,10 +334,9 @@ class Coursehomework(Dealbase64imgmodel):
 
 
 class Homeworkcommit(Dealbase64imgmodel):
-    coursehomework = models.ForeignKey(Coursehomework, models.DO_NOTHING, db_column='coursehomeworkid', blank=True,
-                                       null=True)
-    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
-    submittime = models.DateTimeField(blank=True, null=True)
+    coursehomework = models.ForeignKey(Coursehomework, models.CASCADE, db_column='coursehomeworkid')
+    student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
+    submittime = models.DateTimeField(auto_now=True)
     text = models.TextField(blank=True, null=True)
     attachment = models.ManyToManyField(Homeworkfile)
     score = models.SmallIntegerField(blank=True, null=True)

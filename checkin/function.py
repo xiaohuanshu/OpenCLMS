@@ -86,16 +86,16 @@ def endcheckin(lessonid):
     lesson.save()
     # 人员统计计算过程
     if checkin_status == CHECKIN_RECORD_FIRST:
-        checkin_record.actuallynumber = lesson.actuallynumber()
+        checkin_record.actuallynumber = lesson.actuallynumber
         checkin_record.newnumber = checkin_record.actuallynumber
         checkin_record.leavenumber = 0
     elif checkin_status == CHECKIN_RECORD_ADD:
-        checkin_record.actuallynumber = lesson.actuallynumber()
+        checkin_record.actuallynumber = lesson.actuallynumber
         checkin_record.newnumber = Checkin.objects.filter(lesson=lesson, laststatus=CHECKIN_STATUS_NORMAL,
                                                           status=CHECKIN_STATUS_LATE).count()
         checkin_record.leavenumber = 0
     elif checkin_status == CHECKIN_RECORD_AGAIN:
-        checkin_record.actuallynumber = lesson.actuallynumber()
+        checkin_record.actuallynumber = lesson.actuallynumber
         checkin_record.newnumber = Checkin.objects.filter(lesson=lesson, laststatus=CHECKIN_STATUS_NORMAL,
                                                           status=CHECKIN_STATUS_LATE).count()
         checkin_record.leavenumber = Checkin.objects.filter(lesson=lesson, status=CHECKIN_STATUS_NORMAL).filter(

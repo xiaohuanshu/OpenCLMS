@@ -1,9 +1,11 @@
-# Create your models here.
+# -*- coding: utf-8 -*-
 from django.db import models
-from django.db.models.signals import post_save
+from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core.cache import cache
 from django.utils.functional import cached_property
+from user.models import User, Role, Usertorole
+import hashlib
 
 
 class Administration(models.Model):
@@ -132,11 +134,29 @@ class Student(models.Model):
     user = models.ForeignKey('user.User', models.DO_NOTHING, db_column='userid', blank=True, null=True)
     available = models.BooleanField(default=True)
 
+    def generateuser(self, save=True):
+        if self.user is None:
+            studentrole = Role.objects.get(name=u'学生')
+            m = hashlib.md5()
+            m.update(self.idnumber)
+            password = m.hexdigest()
+            self.user = User.objects.create(academiccode=self.studentid, password=password, sex=self.sex,
+                                            mainrole=u'学生')
+            Usertorole.objects.create(user=self.user, role=studentrole)
+            if save:
+                self.save()
+        return self.user
+
     def __unicode__(self):
         return u"%s" % (self.name)
 
     class Meta:
         db_table = 'Student'
+
+
+@receiver(pre_save, sender=Student)
+def student_pre_save(sender, instance, **kwargs):
+    instance.generateuser(save=False)
 
 
 class Teacher(models.Model):
@@ -151,11 +171,29 @@ class Teacher(models.Model):
                                         through_fields=('teacher', 'department'))
     available = models.BooleanField(default=True)
 
+    def generateuser(self, save=True):
+        if self.user is None:
+            teacherrole = Role.objects.get(name=u'教师')
+            m = hashlib.md5()
+            m.update(self.idnumber)
+            password = m.hexdigest()
+            self.user = User.objects.create(academiccode=self.teacherid, password=password, sex=self.sex,
+                                            mainrole=u'教师')
+            Usertorole.objects.create(user=self.user, role=teacherrole)
+            if save:
+                self.save()
+        return self.user
+
     def __unicode__(self):
         return u"%s" % (self.name)
 
     class Meta:
         db_table = 'Teacher'
+
+
+@receiver(pre_save, sender=Teacher)
+def teacher_pre_save(sender, instance, **kwargs):
+    instance.generateuser(save=False)
 
 
 class Teachertoadministration(models.Model):

@@ -38,14 +38,15 @@ class User(models.Model):
     longitude = models.FloatField(blank=True, null=True)
     accuracy = models.FloatField(blank=True, null=True)
     lastpositiontime = models.DateTimeField(blank=True, null=True)
+    mainrole = models.CharField(max_length=40, null=True)
 
     @cached_property
     def isteacher(self):
-        return self.role.filter(name='教师').exists()
+        return self.mainrole == u'教师'
 
     @cached_property
     def isstudent(self):
-        return self.role.filter(name='学生').exists()
+        return self.mainrole == u'学生'
 
     def has_perm(self, permission):
         # permbool = Role.objects.filter(user=self,permission__contains=[permission]).exists()

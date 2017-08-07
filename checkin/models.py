@@ -8,17 +8,17 @@ from constant import *
 
 
 class Checkin(models.Model):
-    lesson = models.ForeignKey('course.Lesson', models.DO_NOTHING, db_column='lessonid', blank=True, null=True)
-    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
+    lesson = models.ForeignKey('course.Lesson', models.CASCADE, db_column='lessonid')
+    student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
     seat = models.IntegerField(blank=True, null=True, db_column='seatid')
-    status = models.SmallIntegerField(blank=True, null=True)
-    laststatus = models.SmallIntegerField(blank=True, null=True)
-    time = models.DateTimeField(blank=True, null=True)
-    positionaccuracy = models.FloatField(blank=True, null=True)
-    positionlatitude = models.FloatField(blank=True, null=True)
-    positionlongitude = models.FloatField(blank=True, null=True)
-    method = models.SmallIntegerField(blank=True, null=True)
-    abnormal = models.SmallIntegerField(blank=True, null=True)
+    status = models.SmallIntegerField(default=CHECKIN_STATUS_NORMAL)
+    laststatus = models.SmallIntegerField(null=True)
+    time = models.DateTimeField(null=True)
+    positionaccuracy = models.FloatField(null=True)
+    positionlatitude = models.FloatField(null=True)
+    positionlongitude = models.FloatField(null=True)
+    method = models.SmallIntegerField(null=True)
+    abnormal = models.SmallIntegerField(null=True)
 
     def __unicode__(self):
         return "%d %d" % (self.id, self.lesson.id)
@@ -29,15 +29,15 @@ class Checkin(models.Model):
 
 
 class Checkinrecord(models.Model):
-    lesson = models.ForeignKey('course.Lesson', models.DO_NOTHING, db_column='lessonid', blank=True, null=True)
-    starttime = models.DateTimeField(blank=True, null=True)
-    endtime = models.DateTimeField(blank=True, null=True)
-    shouldnumber = models.SmallIntegerField(blank=True, null=True)
-    actuallynumber = models.SmallIntegerField(blank=True, null=True)
-    newnumber = models.SmallIntegerField(blank=True, null=True)
-    leavenumber = models.SmallIntegerField(blank=True, null=True)
-    status = models.SmallIntegerField(blank=True, null=True)
-    time = models.SmallIntegerField(blank=True, null=True)
+    lesson = models.ForeignKey('course.Lesson', models.CASCADE, db_column='lessonid')
+    starttime = models.DateTimeField(null=True)
+    endtime = models.DateTimeField(null=True)
+    shouldnumber = models.SmallIntegerField(null=True)
+    actuallynumber = models.SmallIntegerField(null=True)
+    newnumber = models.SmallIntegerField(null=True)
+    leavenumber = models.SmallIntegerField(null=True)
+    status = models.SmallIntegerField(null=True)
+    time = models.SmallIntegerField()
 
     def __unicode__(self):
         return "%d %d" % (self.id, self.lesson.id)
@@ -47,24 +47,22 @@ class Checkinrecord(models.Model):
 
 
 class Ask(models.Model):
-    schoolterm = models.CharField(max_length=20, blank=True, null=True)
-    starttime = models.DateTimeField(blank=True, null=True)
-    endtime = models.DateTimeField(blank=True, null=True)
-    status = models.IntegerField(blank=True, null=True)
+    schoolterm = models.CharField(max_length=20)
+    starttime = models.DateTimeField(null=True)
+    endtime = models.DateTimeField(null=True)
+    status = models.IntegerField(default=ASK_STATUS_WAITING)
     reason = models.CharField(max_length=100, blank=True, null=True)
-    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
-    operater = models.ForeignKey('user.User', models.DO_NOTHING, db_column='operater', blank=True, null=True)
-    type = models.IntegerField(blank=True, null=True)
-    student = models.ManyToManyField('school.Student', through='Asktostudent',
-                                     through_fields=('ask', 'student'))
+    operater = models.ForeignKey('user.User', models.SET_NULL, db_column='operater', null=True)
+    type = models.IntegerField(null=True)
+    student = models.ManyToManyField('school.Student', through='Asktostudent', through_fields=('ask', 'student'))
 
     class Meta:
         db_table = 'Ask'
 
 
 class Asktostudent(models.Model):
-    student = models.ForeignKey('school.Student', models.DO_NOTHING, db_column='studentid', blank=True, null=True)
-    ask = models.ForeignKey(Ask, models.DO_NOTHING, db_column='askid', blank=True, null=True)
+    student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
+    ask = models.ForeignKey(Ask, models.CASCADE, db_column='askid')
 
     class Meta:
         db_table = 'AsktoStudent'
@@ -72,7 +70,7 @@ class Asktostudent(models.Model):
 
 
 class Scoreregulation(models.Model):
-    course = models.ForeignKey('course.Course', models.DO_NOTHING, db_column='courseid', blank=True, null=True)
+    course = models.ForeignKey('course.Course', models.CASCADE, db_column='courseid')
     normal = models.IntegerField(default=0)
     success = models.IntegerField(default=100)
     early = models.IntegerField(default=30)

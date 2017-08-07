@@ -9,7 +9,7 @@ import hashlib
 
 
 class Administration(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=True)
+    name = models.CharField(max_length=50)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -22,11 +22,11 @@ class Administration(models.Model):
 
 
 class Class(models.Model):
-    department = models.ForeignKey('Department', models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
-    schoolyear = models.SmallIntegerField(blank=True, null=True)
-    major = models.ForeignKey('Major', models.DO_NOTHING, db_column='majorid', blank=True, null=True)
-    name = models.CharField(max_length=255, blank=True, null=True)
-    wechatdepartmentid = models.SmallIntegerField(blank=True, null=True)
+    department = models.ForeignKey('Department', models.SET_NULL, db_column='departmentid', null=True)
+    schoolyear = models.SmallIntegerField(null=True)
+    major = models.ForeignKey('Major', models.SET_NULL, db_column='majorid', null=True)
+    name = models.CharField(max_length=255)
+    wechatdepartmentid = models.SmallIntegerField(null=True)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -44,9 +44,14 @@ class Classtime(models.Model):
         db_table = 'ClassTime'
 
 
+@receiver(post_save, sender=Classtime)
+def classtime_post_save(sender, **kwargs):
+    cache.delete('classtimedata')
+
+
 class Classroom(models.Model):
-    location = models.CharField(max_length=50, blank=True, null=True)
-    seattype = models.ForeignKey('Seat', models.DO_NOTHING, db_column='seattype', blank=True, null=True)
+    location = models.CharField(max_length=50)
+    seattype = models.ForeignKey('Seat', models.SET_NULL, db_column='seattype', null=True)
 
     def __unicode__(self):
         return u"%s" % (self.location)
@@ -56,8 +61,8 @@ class Classroom(models.Model):
 
 
 class Department(models.Model):
-    name = models.CharField(max_length=50, blank=True, null=True)
-    wechatdepartmentid = models.SmallIntegerField(blank=True, null=True)
+    name = models.CharField(max_length=50)
+    wechatdepartmentid = models.SmallIntegerField(null=True)
 
     def majoramount(self):
         return self.major_set.count()
@@ -76,8 +81,8 @@ class Department(models.Model):
 
 
 class Major(models.Model):
-    department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
-    name = models.CharField(max_length=50, blank=True, null=True)
+    department = models.ForeignKey(Department, models.SET_NULL, db_column='departmentid', null=True)
+    name = models.CharField(max_length=50)
 
     def __unicode__(self):
         return u"%s" % (self.name)
@@ -95,11 +100,11 @@ class Major(models.Model):
 
 
 class Schoolterm(models.Model):
-    schoolyear = models.IntegerField(blank=True, null=True)
-    description = models.CharField(max_length=20, blank=True, null=True)
+    schoolyear = models.IntegerField()
+    description = models.CharField(max_length=20)
     now = models.NullBooleanField()
-    startdate = models.DateField(blank=True, null=True)
-    enddate = models.DateField(blank=True, null=True)
+    startdate = models.DateField()
+    enddate = models.DateField()
 
     def __unicode__(self):
         return u"%s" % (self.description)
@@ -108,13 +113,18 @@ class Schoolterm(models.Model):
         db_table = 'SchoolTerm'
 
 
+@receiver(post_save, sender=Schoolterm)
+def schoolterm_post_save(sender, **kwargs):
+    cache.delete_many(['currentschoolyearterm', 'termdata', 'schoolyeardata'])
+
+
 class Seat(models.Model):
     seattype = models.AutoField(primary_key=True)
-    maxnumber = models.SmallIntegerField(blank=True, null=True)
-    mapid = models.IntegerField(blank=True, null=True)
+    maxnumber = models.SmallIntegerField(null=True)
+    mapid = models.IntegerField(null=True)
 
     def __unicode__(self):
-        return "%d" % (self.seattype)
+        return "%d" % self.seattype
 
     class Meta:
         db_table = 'Seat'
@@ -122,16 +132,15 @@ class Seat(models.Model):
 
 class Student(models.Model):
     studentid = models.CharField(primary_key=True, max_length=11)
-    idnumber = models.CharField(max_length=18, blank=True, null=True)
-    name = models.CharField(max_length=20, blank=True, null=True)
-    sex = models.SmallIntegerField(blank=True, null=True)
+    idnumber = models.CharField(max_length=18, null=True)
+    name = models.CharField(max_length=20)
+    sex = models.SmallIntegerField(null=True)
 
-    classid = models.ForeignKey(Class, models.DO_NOTHING, db_column='classid', blank=True,
-                                null=True)  # can't name to class
+    classid = models.ForeignKey(Class, models.SET_NULL, db_column='classid', null=True)  # can't name to class
 
-    department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
-    major = models.ForeignKey(Major, models.DO_NOTHING, db_column='majorid', blank=True, null=True)
-    user = models.ForeignKey('user.User', models.DO_NOTHING, db_column='userid', blank=True, null=True)
+    department = models.ForeignKey(Department, models.SET_NULL, db_column='departmentid', null=True)
+    major = models.ForeignKey(Major, models.SET_NULL, db_column='majorid', null=True)
+    user = models.ForeignKey('user.User', models.PROTECT, db_column='userid', null=True)
     available = models.BooleanField(default=True)
 
     def generateuser(self, save=True):
@@ -161,10 +170,10 @@ def student_pre_save(sender, instance, **kwargs):
 
 class Teacher(models.Model):
     teacherid = models.CharField(primary_key=True, max_length=8)
-    name = models.CharField(max_length=20, blank=True, null=True)
-    sex = models.SmallIntegerField(blank=True, null=True)
-    idnumber = models.CharField(max_length=18, blank=True, null=True)
-    user = models.ForeignKey('user.User', models.DO_NOTHING, db_column='userid', blank=True, null=True)
+    name = models.CharField(max_length=20)
+    sex = models.SmallIntegerField(null=True)
+    idnumber = models.CharField(max_length=18, null=True)
+    user = models.ForeignKey('user.User', models.PROTECT, db_column='userid', null=True)
     administration = models.ManyToManyField(Administration, through='Teachertoadministration',
                                             through_fields=('teacher', 'administration'))
     department = models.ManyToManyField(Department, through='Teachertodepartment',
@@ -197,9 +206,8 @@ def teacher_pre_save(sender, instance, **kwargs):
 
 
 class Teachertoadministration(models.Model):
-    teacher = models.ForeignKey(Teacher, models.DO_NOTHING, db_column='teacherid', blank=True, null=True)
-    administration = models.ForeignKey(Administration, models.DO_NOTHING, db_column='administrationid', blank=True,
-                                       null=True)
+    teacher = models.ForeignKey(Teacher, models.CASCADE, db_column='teacherid')
+    administration = models.ForeignKey(Administration, models.CASCADE, db_column='administrationid')
 
     class Meta:
         db_table = 'TeachertoAdministration'
@@ -207,19 +215,9 @@ class Teachertoadministration(models.Model):
 
 
 class Teachertodepartment(models.Model):
-    teacher = models.ForeignKey(Teacher, models.DO_NOTHING, db_column='teacherid', blank=True, null=True)
-    department = models.ForeignKey(Department, models.DO_NOTHING, db_column='departmentid', blank=True, null=True)
+    teacher = models.ForeignKey(Teacher, models.CASCADE, db_column='teacherid')
+    department = models.ForeignKey(Department, models.CASCADE, db_column='departmentid')
 
     class Meta:
         db_table = 'TeachertoDepartment'
         unique_together = ["teacher", "department"]
-
-
-@receiver(post_save, sender=Schoolterm)
-def schoolterm_pre_save(sender, **kwargs):
-    cache.delete_many(['currentschoolyearterm', 'termdata', 'schoolyeardata'])
-
-
-@receiver(post_save, sender=Classtime)
-def classtime_pre_save(sender, **kwargs):
-    cache.delete('classtimedata')

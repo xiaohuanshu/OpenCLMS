@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
 from django.conf import settings
-from wechat.client import wechat_client
+from wechat.contact import contact_helper
 from school.models import Student, Teacher, Class, Major, Administration
 import logging
 
@@ -15,7 +15,7 @@ def splist(l, s):
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        userlist = wechat_client.user.list(1, True)
+        userlist = contact_helper.user.list(1, True)
 
         def getinfomation(id):
             for user in userlist:
@@ -28,15 +28,15 @@ class Command(BaseCommand):
             return None
 
         def update(tagid, newuserlist):
-            oldlist = [user['userid'] for user in wechat_client.tag.get_users(tagid)['userlist']]
+            oldlist = [user['userid'] for user in contact_helper.tag.get_users(tagid)['userlist']]
             deletelist = list(set(oldlist).difference(set(newuserlist)))
             newlist = list(set(newuserlist).difference(set(oldlist)))
             if len(deletelist) > 0:
-                wechat_client.tag.delete_users(tagid, deletelist)
+                contact_helper.tag.delete_users(tagid, deletelist)
             for new in splist(newlist, 100):
-                wechat_client.tag.add_users(tagid, new)
+                contact_helper.tag.add_users(tagid, new)
 
-        taglist = wechat_client.tag.list()
+        taglist = contact_helper.tag.list()
         tagname_to_id = {}
         for t in taglist:
             tagname_to_id[t['tagname']] = t['tagid']

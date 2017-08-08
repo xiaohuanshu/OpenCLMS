@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand
-from wechat.client import wechat_client
+from wechat.contact import contact_helper
 from school.models import Class, Department
 import logging
 
@@ -9,7 +9,7 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        departmentlist = wechat_client.department.get()
+        departmentlist = contact_helper.department.get()
         for dep in departmentlist:
             if dep['parentid'] == 1:
                 thisdepartmentid = dep['id']
@@ -23,6 +23,6 @@ class Command(BaseCommand):
                             break
                     if not exist:
                         logger.info("[updatedepartment] add department %s" % c.name)
-                        wechat_client.department.create(c.name, thisdepartmentid)
+                        contact_helper.department.create(c.name, thisdepartmentid)
 
         logger.info("[updatedepartment] Successful")

@@ -59,14 +59,10 @@ permission_data = [
         'direction': u'用户',
         'children': None,
         'operator': [
-            'viewlist',
-            'modify',
             'addrole',
             'addpermission'
         ],
         'operatordirection': [
-            '查看用户列表',
-            '编辑用户',
             '分配角色',
             '分配权限'
         ]
@@ -93,10 +89,12 @@ permission_data = [
                 'direction': u'教师',
                 'children': None,
                 'operator': [
-                    'view'
+                    'view',
+                    'modify'
                 ],
                 'operatordirection': [
-                    '查看'
+                    '查看',
+                    '修改'
                 ]
             },
             {

@@ -16,8 +16,6 @@ urlpatterns = [
     url(r'^check_email$', views.check_email, name='check_email'),
     url(r'^registerProcess$', views.registerProcess, name='registerProcess'),
     url(r'^authentication$', views.authentication, name='authentication'),
-    url(r'^userlist$', views.userlist, name='userlist'),
-    url(r'^ajax/userdata$', views.userdata, name='getuserdata'),
     url(r'^forgetpassword$', views.forgetpassword, name='forgetpassword'),
     url(r'^resetpassword/([^/]+)$', views.resetpassword, name='resetpassword'),
 

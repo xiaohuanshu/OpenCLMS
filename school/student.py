@@ -40,33 +40,35 @@ def data(request):
     search = request.GET.get('search', '')
     if not search == '':
         if search.isdigit():
-            count = studentdata.filter(
+            studentdata = studentdata.filter(
                 (Q(studentid=search)) | Q(classid__name__icontains=search)
-            ).count()
-            studentdata = studentdata.select_related('classid').select_related('major').select_related(
-                'department').filter(
-                (Q(studentid=search)) | Q(classid__name__icontains=search)
-            )[offset: (offset + limit)]
+            )
         else:
-            count = studentdata.filter(
+            studentdata = studentdata.filter(
                 (Q(name__icontains=search) | Q(studentid__icontains=search)) | Q(classid__name__icontains=search)
-            ).count()
-            studentdata = studentdata.select_related('classid').select_related('major').select_related(
-                'department').filter(
-                (Q(name__icontains=search) | Q(studentid__icontains=search)) | Q(classid__name__icontains=search)
-            )[offset: (offset + limit)]
-    else:
-        count = studentdata.count()
-        studentdata = studentdata.select_related('classid').select_related('major').select_related(
-            'department').all()[offset: (offset + limit)]
+            )
+    count = studentdata.count()
+    studentdata = studentdata.select_related('classid').select_related('major').select_related(
+        'department').select_related('user').order_by('studentid').all()[offset: (offset + limit)]
 
     rows = []
     for p in studentdata:
-        ld = {'studentid': p.studentid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
+        ld = {'studentid': p.studentid,
+              'name': p.name,
+              'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
               'idnumber': p.idnumber,
               'schoolyear': p.classid.schoolyear, 'class': p.classid.name,
-              'username': (p.user and [p.user.username] or [None])[0],
-              'major': (p.major and [p.major.name] or [None])[0], 'department': p.department.name}
+              'major': (p.major and [p.major.name] or [None])[0],
+              'department': p.department.name,
+              }
+        if p.user:
+            ld.update({
+                'user_id': p.user_id,
+                'username': p.user.username,
+                'ip': p.user.ip,
+                'iswechat': (p.user.openid and [u'是'] or [u'否'])[0],
+                'lastlogintime': p.user.lastlogintime.strftime('%Y-%m-%d %H:%M:%S') if p.user.lastlogintime else '',
+            })
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

@@ -22,7 +22,7 @@ def add_default_role_func(apps, schema_editor):
         Role(name="管理员",
              permission=("{course,course_viewlist,course_control,checkin,checkin_ask,checkin_ask_add," +
                          "checkin_ask_modify,checkin_ask_approve,checkin_view,checkin_modify,wechat,wechat_control," +
-                         "user,user_viewlist,user_modify,user_addrole,user_addpermission,school,school_student," +
+                         "user,user_addrole,user_addpermission,school,school_student,school_teacher_modify," +
                          "school_student_view,school_student_modify,school_teacher,school_teacher_view,school_class," +
                          "school_class_view,school_major,school_major_view,school_department,school_department_view," +
                          "school_department,school_department_view,school_classroom,school_classroom_view," +
@@ -36,14 +36,14 @@ def add_default_role_func(apps, schema_editor):
                          "school_classtime_view}")),
         Role(name="教秘",
              permission=("{course,course_viewlist,checkin,checkin_ask,checkin_ask_add,checkin_ask_modify," +
-                         "checkin_ask_approve,checkin_view,user,user_viewlist,school,school_student," +
+                         "checkin_ask_approve,checkin_view,school,school_student,school_teacher_modify," +
                          "school_student_view,school_teacher,school_teacher_view,school_class,school_class_view," +
                          "school_major,school_major_view,school_department,school_department_view,school_department" +
                          ",school_department_view,school_classroom,school_classroom_view,school_schoolterm," +
                          "school_schoolterm_view,school_classtime,school_classtime_view}")),
         Role(name="校长",
              permission=("{course,course_viewlist,checkin,checkin_ask,checkin_ask_add,checkin_ask_modify," +
-                         "checkin_ask_approve,checkin_view,user,user_viewlist,school,school_student," +
+                         "checkin_ask_approve,checkin_view,school,school_student," +
                          "school_student_view,school_teacher,school_teacher_view,school_class,school_class_view," +
                          "school_major,school_major_view,school_department,school_department_view,school_department," +
                          "school_department_view,school_classroom,school_classroom_view,school_schoolterm," +
@@ -51,7 +51,7 @@ def add_default_role_func(apps, schema_editor):
         Role(name="教务处",
              permission=("{course,course_viewlist,course_control,checkin,checkin_ask,checkin_ask_add," +
                          "checkin_ask_modify,checkin_ask_approve,checkin_view,checkin_modify,wechat,wechat_control," +
-                         "user,user_viewlist,user_modify,school,school_student,school_student_view," +
+                         "school,school_student,school_student_view,school_teacher_modify," +
                          "school_student_modify,school_teacher,school_teacher_view,school_class,school_class_view," +
                          "school_major,school_major_view,school_department,school_department_view,school_department," +
                          "school_department_view,school_classroom,school_classroom_view,school_schoolterm," +

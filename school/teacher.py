@@ -36,22 +36,32 @@ def data(request):
     search = request.GET.get('search', '')
     if not search == '':
         if search.isdigit():
-            count = teacherdata.filter(teacherid=search).count()
-            teacherdata = teacherdata.filter(teacherid=search)[offset: (offset + limit)]
+            teacherdata = teacherdata.filter(teacherid=search)
         else:
-            count = teacherdata.filter(name__icontains=search).count()
-            teacherdata = teacherdata.filter(name__icontains=search)[offset: (offset + limit)]
-    else:
-        count = teacherdata.count()
-        teacherdata = teacherdata.prefetch_related('department').prefetch_related('administration').all()[
-                      offset: (offset + limit)]
+            teacherdata = teacherdata.filter(name__icontains=search)
+
+    count = teacherdata.count()
+    teacherdata = teacherdata.prefetch_related('department').prefetch_related('administration').select_related('user') \
+                      .prefetch_related('user__role').all()[offset: (offset + limit)]
 
     rows = []
     for p in teacherdata:
-        ld = {'teacherid': p.teacherid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
-              'idnumber': p.idnumber, 'department': ", ".join(department.name for department in p.department.all()),
+        ld = {'teacherid': p.teacherid,
+              'name': p.name,
+              'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
+              'idnumber': p.idnumber,
+              'department': ", ".join(department.name for department in p.department.all()),
               'administration': ", ".join(administration.name for administration in p.administration.all()),
-              'username': (p.user and [p.user.username] or [None])[0]}
+              }
+        if p.user:
+            ld.update({
+                'user_id': p.user_id,
+                'username': p.user.username,
+                'ip': p.user.ip,
+                'iswechat': (p.user.openid and [u'是'] or [u'否'])[0],
+                'lastlogintime': p.user.lastlogintime.strftime('%Y-%m-%d %H:%M:%S') if p.user.lastlogintime else '',
+                'role': ", ".join(role.name for role in p.user.role.all())
+            })
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

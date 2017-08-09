@@ -6,12 +6,14 @@
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
+    <link href="{% static 'plugins/toastr-master/toastr.css' %}" rel="stylesheet" type="text/css"/>
 {% endblock %}
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
+    <script src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
 {% endblock %}
 {% block content %}
     <div class="row">
@@ -77,15 +79,35 @@
     <!-- page end-->
 
     <ul id="example2-context-menu" class="dropdown-menu">
-        <li data-item="edit"><a>Edit</a></li>
-        <li data-item="delete"><a>Delete</a></li>
-        <li data-item="action1"><a>Action Here</a></li>
-        <li data-item="action2"><a>And Action Here</a></li>
+        {% if perms.school_teacher_modify %}
+            <li data-item="resetpassword"><a>重置密码</a></li>
+        {% endif %}
+        {% if perms.checkin_view %}
+            <li data-item="checkin_view"><a>查看出勤情况</a></li>
+        {% endif %}
+        {% if perms.user_addrole %}
+            <li data-item="checkin_view"><a>角色管理</a></li>
+        {% endif %}
     </ul>
 
 {% endblock %}
 {% block page_script %}
     <script>
+        toastr.options = {
+            "closeButton": false,
+            "debug": false,
+            "progressBar": false,
+            "positionClass": "toast-top-center",
+            "onclick": null,
+            "showDuration": "300",
+            "hideDuration": "1000",
+            "timeOut": "5000",
+            "extendedTimeOut": "1000",
+            "showEasing": "swing",
+            "hideEasing": "linear",
+            "showMethod": "fadeIn",
+            "hideMethod": "fadeOut"
+        };
         {% if request.GET.major %}
             $("#administration").find("option[value='{{ request.GET.administration }}']").attr('selected', true);
         {% endif %}
@@ -95,53 +117,101 @@
 
         $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
         var $table = $('#table');
-        $table.bootstrapTable({
-            columns: [{
-                field: 'name',
-                title: '姓名',
-                searchable: true
-            }, {
-                field: 'teacherid',
-                title: '教职工号',
-                sortable: true,
-                order: 'desc'
-            }, {
-                field: 'sex',
-                title: '性别'
-            }, {
-                field: 'idnumber',
-                title: '身份证',
-                visible: false
-            }, {
-                field: 'department',
-                title: '系所'
-            }, {
-                field: 'administration',
-                title: '行政机构'
-            }, {
-                field: 'username',
-                title: '用户名',
-                visible: false
-            }, {
+        columns = [{
+            field: 'name',
+            title: '姓名',
+            searchable: true
+        }, {
+            field: 'teacherid',
+            title: '教职工号',
+            sortable: true,
+            order: 'desc'
+        }, {
+            field: 'sex',
+            title: '性别'
+        }, {
+            field: 'idnumber',
+            title: '身份证',
+            visible: false
+        }, {
+            field: 'department',
+            title: '系所'
+        }, {
+            field: 'administration',
+            title: '行政机构'
+        }, {
+            field: 'username',
+            title: '用户名',
+            visible: false
+        }, {
+            field: 'ip',
+            title: 'ip',
+            visible: false
+        }, {
+            field: 'lastlogintime',
+            title: '上次登录',
+            visible: false
+        }, {
+            field: 'role',
+            title: '角色',
+            visible: false
+        }, {
+            field: 'iswechat',
+            title: '微信关注'
+        }];
+        {% if perms.school_teacher_modify or perms.checkin_view or perms.user_addrole%}
+            function operateFormatter(value, row, index) {
+                return [
+                    '<div class="btn-group btn-group-xs">',
+                    '    <button type="button" class="btn btn-default dropdown-toggle example2-button" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">',
+                    '        <span class="caret"></span>',
+                    '        <span class="sr-only">操作</span>',
+                    '    </button>',
+                    '</div>'
+                ].join('');
+            }
+            columns.push({
                 field: 'operate',
                 title: '操作',
                 align: 'center',
                 formatter: operateFormatter
-            }],
-            contextMenu: '#example2-context-menu',
-            contextMenuButton: '.example2-button',
-            onContextMenuItem: function (row, $el) {
-                if ($el.data("item") == "edit") {
-                    alert("Edit: " + row.studentid + ' ' + row.name);
-                } else if ($el.data("item") == "delete") {
-                    alert("Delete: " + row.studentid + ' ' + row.name);
-                } else if ($el.data("item") == "action1") {
-                    alert("Action1: " + row.studentid + ' ' + row.name);
-                } else if ($el.data("item") == "action2") {
-                    alert("Action2: " + row.studentid + ' ' + row.name);
+            });
+            $table.bootstrapTable({
+                columns: columns,
+                contextMenu: '#example2-context-menu',
+                contextMenuButton: '.example2-button',
+                onContextMenuItem: function (row, $el) {
+                    if ($el.data("item") == "resetpassword") {
+                        $.ajax({
+                            url: '{% url 'user:control.resetpassword' %}',
+                            type: 'GET',
+                            dataType: "json",
+                            contentType: "application/json; charset=utf-8",
+                            data: {
+                                userid: row.user_id
+                            },
+                            success: function (data) {
+                                if (data.error != 0) {
+                                    toastr['error'](data.message, "操作失败");
+                                } else {
+                                    toastr['success'](data.message, "操作成功");
+                                }
+                            }, error: function (XMLHttpRequest, textStatus) {
+                                toastr['error'](textStatus, "与服务器连接失败");
+                            }
+                        });
+                    } else if ($el.data("item") == "checkin_view") {
+                        window.open("{% url 'checkin:teacher_data' '' %}" + row.teacherid);
+                    }
                 }
-            }
-        });
+            });
+        {% else %}
+            $table.bootstrapTable({
+                columns: columns
+            });
+        {% endif %}
+
+
         function queryParams(params) {
             params['administration'] = $('#administration').val();
             params['department'] = $('#department').val();

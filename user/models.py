@@ -70,9 +70,9 @@ class User(models.Model):
 
     def updateavatarfromwechat(self):
         if self.openid is not None:
-            from wechat.api import wechat
-            userinfo = wechat.get_user_info(self.openid, lang='zh_CN')
-            avatar_url = userinfo['headimgurl']
+            from wechat.client import wechat_client
+            userinfo = wechat_client.user.get(self.openid)
+            avatar_url = userinfo['avatar']
             from django.core.files import File
             from django.core.files.temp import NamedTemporaryFile
             import urllib2

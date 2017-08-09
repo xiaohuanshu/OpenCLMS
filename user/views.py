@@ -264,11 +264,11 @@ def forgetpassword(request):
     subject, form_email, to = '【checkinsystem】找回密码邮件', settings.SERVER_EMAIL, email
     text_content = (u'亲爱的%s您好,请点击下面的链接找回密码:\n%s%s\n此链接10分钟内有效,请尽快修改密码。\n'
                     u'如果您没有发起找回密码,请无视此邮件') % (
-        user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]))
-    html_content = (u'亲爱的%s您好,<br>请点击下面的链接找回密码:<br><a href="%s%s">%s%s</a><br>',
-                    u'此链接10分钟内有效,请尽快修改密码。<br>如果您没有发起找回密码,请无视此邮件') % (
-        user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]), settings.DOMAIN,
-        reverse('user:resetpassword', args=[uuidstr]))
+                       user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]))
+    html_content = (u'''亲爱的%s您好,<br>请点击下面的链接找回密码:<br><a href="%s%s">%s%s</a><br>
+                    此链接10分钟内有效,请尽快修改密码。<br>如果您没有发起找回密码,请无视此邮件''' % (
+                       user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]), settings.DOMAIN,
+                       reverse('user:resetpassword', args=[uuidstr])))
     msg = EmailMultiAlternatives(subject, text_content, form_email, [to])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()
@@ -293,3 +293,25 @@ def resetpassword(request, uuidstr):
                                                     'jumpurl': reverse('user:login', args=[])})
         else:
             return render(request, 'resetpassword.html', {})
+
+
+def changepassword(request):
+    if request.META['REQUEST_METHOD'] == 'POST':
+        oldpassword = request.POST.get('oldpassword')
+        password = request.POST.get('newpassword')
+        m = hashlib.md5()
+        m.update(password)
+        password = m.hexdigest()
+        m = hashlib.md5()
+        m.update(oldpassword)
+        oldpassword = m.hexdigest()
+        if request.user.password == oldpassword:
+            request.user.password = password
+            request.user.save()
+            logger.info('userid %d changed password')
+            return render(request, 'success.html', {'message': u'修改成功', 'submessage': u'密码修改成功',
+                                                    'jumpurl': reverse('home', args=[])})
+        else:
+            return redirect(reverse('user:changepassword', args=[]) + u'?error=原密码错误')
+    else:
+        return render(request, 'changepassword.html', {})

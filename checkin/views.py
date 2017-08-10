@@ -176,19 +176,21 @@ def student_data(request, studentid):
     student = Student.objects.get(studentid=studentid)
     if not (student.user == request.user or request.user.has_perm('checkin_view')):
         return render(request, 'error.html', {'message': '没有权限'})
-    studentcourse = Studentcourse.objects.filter(student=student).all()
-    coursecount = studentcourse.count()
+    schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
+    studentcourses = Studentcourse.objects.filter(student=student, course__schoolterm=schoolterm).values('course')
+    courses = Course.objects.filter(pk__in=studentcourses).prefetch_related('lesson_set').all()
+    coursecount = courses.count()
     course = {}
     maxlength = 0
-    for sc in studentcourse:
-        course[sc.course.id] = {'course': sc.course, 'checkindata': {}}
-        if sc.course.lesson_set.count() > maxlength:
-            maxlength = sc.course.lesson_set.count()
-        for (offset, l) in enumerate(sc.course.lesson_set.order_by('week', 'day', 'time').all()):
-            course[sc.course.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
-    checkindata = Checkin.objects.filter(student=student).select_related('lesson').all()
+    for sc in courses:
+        course[sc.id] = {'course': sc, 'checkindata': {}}
+        if sc.lesson_set.count() > maxlength:
+            maxlength = sc.lesson_set.count()
+        for (offset, l) in enumerate(sc.lesson_set.order_by('week', 'day', 'time').all()):
+            course[sc.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
+    checkindata = Checkin.objects.filter(student=student,lesson__course__in=courses).select_related('lesson').all()
     for c in checkindata:
-        course[c.lesson.course.id]['checkindata'][c.lesson.id]['status'] = c.status
+        course[c.lesson.course_id]['checkindata'][c.lesson.id]['status'] = c.status
 
     rows = []
     for (k, v) in course.items():
@@ -253,7 +255,8 @@ def teacher_data(request, teacherid):
     teacher = Teacher.objects.get(teacherid=teacherid)
     if not (teacher.user == request.user or request.user.has_perm('checkin_view')):
         return render(request, 'error.html', {'message': '没有权限'})
-    teachercourse = teacher.course_set.all()
+    schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
+    teachercourse = teacher.course_set.filter(schoolterm=schoolterm).prefetch_related('lesson_set').all()
     coursecount = teachercourse.count()
     course = {}
     maxlength = 0

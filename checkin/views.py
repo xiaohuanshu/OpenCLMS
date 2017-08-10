@@ -188,7 +188,7 @@ def student_data(request, studentid):
             maxlength = sc.lesson_set.count()
         for (offset, l) in enumerate(sc.lesson_set.order_by('week', 'day', 'time').all()):
             course[sc.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
-    checkindata = Checkin.objects.filter(student=student,lesson__course__in=courses).select_related('lesson').all()
+    checkindata = Checkin.objects.filter(student=student, lesson__course__in=courses).select_related('lesson').all()
     for c in checkindata:
         course[c.lesson.course_id]['checkindata'][c.lesson.id]['status'] = c.status
 
@@ -248,7 +248,7 @@ def student_data(request, studentid):
             {'field': 'lesson%d' % i, 'title': i + 1, 'cellStyle': 'cellStyle', 'formatter': 'identifierFormatter',
              'align': 'center'})
     data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
-    return render(request, 'student_data.html', {'student': student, 'data': data})
+    return render(request, 'student_data.html', {'student': student, 'data': data, 'schoolterm': schoolterm})
 
 
 def teacher_data(request, teacherid):
@@ -298,7 +298,7 @@ def teacher_data(request, teacherid):
         columns[1].append(
             {'field': 'lesson%d' % i, 'title': i + 1, 'align': 'center'})
     data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
-    return render(request, 'teacher_data.html', {'teacher': teacher, 'data': data})
+    return render(request, 'teacher_data.html', {'teacher': teacher, 'data': data, 'schoolterm': schoolterm})
 
 
 def personaldata(request):

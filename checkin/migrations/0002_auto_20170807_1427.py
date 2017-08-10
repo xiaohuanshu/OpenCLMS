@@ -91,7 +91,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='checkin',
             name='status',
-            field=models.SmallIntegerField(default=0),
+            field=models.SmallIntegerField(default=0, null=True),
         ),
         migrations.AlterField(
             model_name='checkin',

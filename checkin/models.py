@@ -11,7 +11,7 @@ class Checkin(models.Model):
     lesson = models.ForeignKey('course.Lesson', models.CASCADE, db_column='lessonid')
     student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
     seat = models.IntegerField(blank=True, null=True, db_column='seatid')
-    status = models.SmallIntegerField(default=CHECKIN_STATUS_NORMAL)
+    status = models.SmallIntegerField(default=CHECKIN_STATUS_NORMAL, null=True)
     laststatus = models.SmallIntegerField(null=True)
     time = models.DateTimeField(null=True)
     positionaccuracy = models.FloatField(null=True)

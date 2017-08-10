@@ -1,13 +1,16 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load checkin_extra %}
+{% load school_extra %}
 {% block title %}教师课程考勤数据{% endblock %}
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
 {% endblock %}
 {% block page_js %}
     <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
     <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 
 
@@ -30,6 +33,22 @@
                 <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <select name="viewType2" id="schoolterm" data-placeholder="学年学期">
+                                        <option value selected></option>
+                                        {% getterm as termdata %}
+
+                                        {% for m in termdata %}
+                                            {% if m == schoolterm %}
+                                                <option value="{{ m }}" selected>{{ m }}</option>
+                                            {% else %}
+                                                <option value="{{ m }}">{{ m }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <table id="table"
 
@@ -71,5 +90,10 @@
         }
 
         $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.rows|safe}}});
+        $('#schoolterm').chosen();
+
+        $('#schoolterm').on('change', function (evt, params) {
+            window.location.href = '?schoolterm=' + params.selected;
+        });
     </script>
 {% endblock %}

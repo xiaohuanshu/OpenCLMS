@@ -1,11 +1,10 @@
 {% extends 'base.html' %}
 {% load staticfiles %}
 {% load checkin_extra %}
+{% load school_extra %}
 {% block title %}学生考勤数据{% endblock %}
 {% block page_css %}
     <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
-
-
     <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
     <style>
         .bg-default {
@@ -41,6 +40,22 @@
                 <div class="box-body">
                     <div class="adv-table">
                         <div id="custom-toolbar">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <select name="viewType2" id="schoolterm" data-placeholder="学年学期">
+                                        <option value selected></option>
+                                        {% getterm as termdata %}
+
+                                        {% for m in termdata %}
+                                            {% if m == schoolterm %}
+                                                <option value="{{ m }}" selected>{{ m }}</option>
+                                            {% else %}
+                                                <option value="{{ m }}">{{ m }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
                         </div>
                         <table id="table"
 
@@ -79,9 +94,11 @@
         checkin_status_style_json ={{ checkin_status_style_json|safe }};
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         checkin_status_json ={{ checkin_status_json|safe }};
+
         function identifierFormatter(value, row, index) {
             return checkin_status_json[value];
         }
+
         function cellStyle(value, row, index) {
             if (value == null) {
                 return {}
@@ -90,12 +107,13 @@
                 classes: 'bg-' + checkin_status_style_json[value]
             };
         }
-        /*function clickrow(row, element){
-         var clickurl="{% url 'home' %}";
-         clickurl=clickurl.substring(0,clickurl.length-1);
-         window.location.href=clickurl+row.id;
-         }*/
+
 
         $table.bootstrapTable({columns:{{data.header|safe}}, data:{{data.rows|safe}}});
+        $('#schoolterm').chosen();
+
+        $('#schoolterm').on('change', function (evt, params) {
+            window.location.href = '?schoolterm=' + params.selected;
+        });
     </script>
 {% endblock %}

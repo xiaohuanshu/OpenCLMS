@@ -22,7 +22,8 @@
                     <a href="#"><i class="fa fa-calendar-check-o"></i> <span>考勤</span> <i
                             class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class="{% nav_active request.path 'whole' %}"><a href="#"><i class="fa fa-circle-o"></i>全校总览</a>
+                        <li class="{% nav_active request.path 'dashboard' %}"><a
+                                href="{% url 'checkin:dashboard_overview' %}"><i class="fa fa-circle-o"></i>全校总览</a>
                         </li>
                         <li class="{% nav_active request.path 'personal_data' %}"><a
                                 href="{% url 'checkin:personal_data' %}"><i class="fa fa-circle-o"></i>个人数据</a></li>

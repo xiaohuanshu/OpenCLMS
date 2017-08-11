@@ -1,6 +1,7 @@
 from django.conf.urls import url
 import control
 import views
+import dashboard
 
 urlpatterns = [
 
@@ -25,5 +26,9 @@ urlpatterns = [
     url(r'^ajax/delask$', control.delask, name='delask'),
 
     url(r'^jumptolesson_data/(\d+)', views.jumptolesson_data, name='jumptolesson_data'),
+
+    url(r'^dashboard/overview', dashboard.overview, name='dashboard_overview'),
+    url(r'^dashboard/today$', dashboard.today, name='dashboard_today'),
+    url(r'^dashboard/today_data', dashboard.today_data, name='dashboard_today_data'),
 
 ]

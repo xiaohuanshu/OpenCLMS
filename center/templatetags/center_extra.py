@@ -13,7 +13,7 @@ def DOMAIN():
 
 @register.simple_tag
 def nav_active(path, name):
-    if resolve(path).url_name == name:
+    if name in resolve(path).url_name:
         return 'active'
     else:
         return ''

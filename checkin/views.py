@@ -17,6 +17,7 @@ import datetime
 from django.db.models import Count, Case, When, Q
 from django.core.cache import cache
 from django.conf import settings
+from django.db.models import Prefetch
 
 
 def checkin(request, lessonid):
@@ -178,7 +179,8 @@ def student_data(request, studentid):
         return render(request, 'error.html', {'message': '没有权限'})
     schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
     studentcourses = Studentcourse.objects.filter(student=student, course__schoolterm=schoolterm).values('course')
-    courses = Course.objects.filter(pk__in=studentcourses).prefetch_related('lesson_set').all()
+    courses = Course.objects.filter(pk__in=studentcourses).prefetch_related(
+        Prefetch('lesson_set', queryset=Lesson.objects.order_by('week', 'day', 'time'))).all()
     coursecount = courses.count()
     course = {}
     maxlength = 0
@@ -186,7 +188,7 @@ def student_data(request, studentid):
         course[sc.id] = {'course': sc, 'checkindata': {}}
         if sc.lesson_set.count() > maxlength:
             maxlength = sc.lesson_set.count()
-        for (offset, l) in enumerate(sc.lesson_set.order_by('week', 'day', 'time').all()):
+        for (offset, l) in enumerate(sc.lesson_set.all()):  # order_by('week', 'day', 'time')
             course[sc.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
     checkindata = Checkin.objects.filter(student=student, lesson__course__in=courses).select_related('lesson').all()
     for c in checkindata:
@@ -256,7 +258,8 @@ def teacher_data(request, teacherid):
     if not (teacher.user == request.user or request.user.has_perm('checkin_view')):
         return render(request, 'error.html', {'message': '没有权限'})
     schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
-    teachercourse = teacher.course_set.filter(schoolterm=schoolterm).prefetch_related('lesson_set').all()
+    teachercourse = teacher.course_set.filter(schoolterm=schoolterm).prefetch_related(
+        Prefetch('lesson_set', queryset=Lesson.objects.order_by('week', 'day', 'time'))).all()
     coursecount = teachercourse.count()
     course = {}
     maxlength = 0
@@ -264,7 +267,7 @@ def teacher_data(request, teacherid):
         course[tc.id] = {'name': tc.title, 'schoolterm': tc.schoolterm, 'courseid': tc.id, 'checkindata': {}}
         if tc.lesson_set.count() > maxlength:
             maxlength = tc.lesson_set.count()
-        for (offset, l) in enumerate(tc.lesson_set.order_by('week', 'day', 'time').all()):
+        for (offset, l) in enumerate(tc.lesson_set.all()):  # order_by('week', 'day', 'time')
             course[tc.id]['checkindata'].update({l.id: {'status': None, 'offset': offset}})
     checkindata = Checkin.objects.filter(lesson__course__in=teachercourse).annotate(
         should=Count(Case(When(~Q(status__gt=10), then=1))), actually=Count(Case(

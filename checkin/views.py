@@ -179,7 +179,7 @@ def student_data(request, studentid):
         return render(request, 'error.html', {'message': '没有权限'})
     schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
     studentcourses = Studentcourse.objects.filter(student=student, course__schoolterm=schoolterm).values('course')
-    courses = Course.objects.filter(pk__in=studentcourses).prefetch_related(
+    courses = Course.objects.filter(pk__in=studentcourses).prefetch_related('scoreregulation_set').prefetch_related(
         Prefetch('lesson_set', queryset=Lesson.objects.order_by('week', 'day', 'time'))).all()
     coursecount = courses.count()
     course = {}
@@ -202,8 +202,8 @@ def student_data(request, studentid):
         score = 0.0
         totalscore = 0
         try:
-            scoreregulation = Scoreregulation.objects.get(course=v['course'])
-        except ObjectDoesNotExist:
+            scoreregulation = v['course'].scoreregulation_set.all()[0]
+        except IndexError:
             scoreregulation = Scoreregulation(course=v['course'])
         len = 0
         for (key, item) in v['checkindata'].items():

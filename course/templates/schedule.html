@@ -81,6 +81,7 @@
             language: 'zh-CN',
             classtime: {{ classtime|safe }},
             weekbetw: startdate,
+            first_day: {% if WEEK_FIRST_DAY == 0 %}2{% else %}{{ WEEK_FIRST_DAY }}{% endif %},
             events_source: function (start, end, timezone) {
                 var events_data = [];
                 if (start < startdate) {

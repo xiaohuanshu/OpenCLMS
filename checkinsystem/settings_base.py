@@ -59,6 +59,7 @@ TEMPLATES = [
                 'django.template.context_processors.static',
                 # Own processors
                 'course.context_processors.todaylesson',
+                'school.context_processors.school_settings',
                 'user.context_processors.auth',
             ],
             'loaders': [

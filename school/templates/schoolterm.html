@@ -73,8 +73,8 @@
 
                         <form method="post" class="form-horizontal" id="termform">
                             {% csrf_token %}
-                            <input type="hidden" name="termid" value="">
                             <div class="modal fade" id="schooltermModal" tabindex="-1" role="dialog" aria-hidden="true">
+                                <input type="hidden" name="termid" value="">
                                 <div class="modal-dialog">
                                     <div class="modal-content">
                                         <div class="modal-header">
@@ -120,7 +120,11 @@
                                                                data-date-format="yyyy-mm-dd" data-bv-notempty
                                                                data-bv-notempty-message="请选择结束日期">
                                                     </div>
-                                                    <span class="help-block">选择一个时间范围,学期的开始必须为周日</span>
+                                                    {% if WEEK_FIRST_DAY == 0 %}
+                                                        <span class="help-block">选择一个时间范围,学期的开始必须为周日</span>
+                                                    {% elif WEEK_FIRST_DAY == 1 %}
+                                                        <span class="help-block">选择一个时间范围,学期的开始必须为周一</span>
+                                                    {% endif %}
                                                 </div>
                                             </div>
                                         </div>
@@ -213,14 +217,17 @@
             $(function () {
                 $('.input-daterange input').eq(0).datepicker({
                     beforeShowDay: WorkingDates,
+                    weekStart:{{ WEEK_FIRST_DAY }},
                     language: 'cn'
                 });
                 $('.input-daterange input').eq(1).datepicker({
+                    weekStart:{{ WEEK_FIRST_DAY }},
                     language: 'cn'
                 });
+
                 function WorkingDates(date) {
                     var day = date.getDay()
-                    if (day == 0) {
+                    if (day == {{ WEEK_FIRST_DAY }}) {
                         return true;
                     }
                     return false;

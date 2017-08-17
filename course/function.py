@@ -1,7 +1,13 @@
 # -*- coding: utf-8 -*-
+from django.conf import settings
+
+WEEK_FIRST_DAY = settings.WEEK_FIRST_DAY
 import re
 
-weekstring = [u'周日', u'周一', u'周二', u'周三', u'周四', u'周五', u'周六']
+if WEEK_FIRST_DAY == 0:
+    weekstring = [u'周日', u'周一', u'周二', u'周三', u'周四', u'周五', u'周六']
+else:
+    weekstring = [u'周一', u'周二', u'周三', u'周四', u'周五', u'周六', u'周日']
 
 
 def getweek(str):
@@ -29,20 +35,36 @@ def gettime(str):
 
 
 def getday(str):
-    if u"周一" in str:
-        return 1
-    elif u"周二" in str:
-        return 2
-    elif u"周三" in str:
-        return 3
-    elif u"周四" in str:
-        return 4
-    elif u"周五" in str:
-        return 5
-    elif u"周六" in str:
-        return 6
-    elif u"周日" in str:
-        return 0
+    if WEEK_FIRST_DAY == 0:
+        if u"周一" in str:
+            return 1
+        elif u"周二" in str:
+            return 2
+        elif u"周三" in str:
+            return 3
+        elif u"周四" in str:
+            return 4
+        elif u"周五" in str:
+            return 5
+        elif u"周六" in str:
+            return 6
+        elif u"周日" in str:
+            return 0
+    else:
+        if u"周一" in str:
+            return 0
+        elif u"周二" in str:
+            return 1
+        elif u"周三" in str:
+            return 2
+        elif u"周四" in str:
+            return 3
+        elif u"周五" in str:
+            return 4
+        elif u"周六" in str:
+            return 5
+        elif u"周日" in str:
+            return 6
 
 
 def t(ele1, ele2):
@@ -98,17 +120,17 @@ def simplifytime(timestr, classroomstr):
         for s in simplifydata:
             # print simplifydata
             if ((s['day'] == d['day'] and
-                 s['location'] == s['location'] and
-                 s['time'] == d['time'] and
-                 s['length'] == d['length'] and
-                 s['weeklength'] + s['week'] == d['week'] and
-                 'interval' not in s)):
+                         s['location'] == s['location'] and
+                         s['time'] == d['time'] and
+                         s['length'] == d['length'] and
+                             s['weeklength'] + s['week'] == d['week'] and
+                         'interval' not in s)):
                 s['weeklength'] += 1
                 addflag = True
                 break
             elif s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == \
-                d['length'] and s['weeklength'] + s['week'] + 1 == d['week'] and (
-                    'interval' in s or s['weeklength'] == 1):
+                    d['length'] and s['weeklength'] + s['week'] + 1 == d['week'] and (
+                            'interval' in s or s['weeklength'] == 1):
                 s['weeklength'] += 2
                 s['interval'] = True
                 addflag = True
@@ -121,6 +143,6 @@ def simplifytime(timestr, classroomstr):
         ','.join([str(e) for e in range(s['time'], s['time'] + s['length'])]),
         s['week'], s['week'] + s['weeklength'] - 1,
         (('interval' in s and s['interval']) and '|' + (s['week'] % 2 == 0 and u'双周' or u'单周') or '')) for s in
-        simplifydata])
+                           simplifydata])
     newclassroomstr = u';'.join(s['location'] for s in simplifydata)
     return newtimestr, newclassroomstr

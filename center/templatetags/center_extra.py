@@ -1,6 +1,7 @@
 # coding:utf-8
 from django import template
 from django.core.urlresolvers import resolve
+from django.conf import settings
 
 register = template.Library()
 
@@ -29,17 +30,33 @@ def nav_menu_active(path, name):
 
 @register.filter
 def weekdeal(week):
-    if week == 0:
-        return u'周日'
-    elif week == 1:
-        return u'周一'
-    elif week == 2:
-        return u'周二'
-    elif week == 3:
-        return u'周三'
-    elif week == 4:
-        return u'周四'
-    elif week == 5:
-        return u'周五'
-    elif week == 6:
-        return u'周六'
+    if settings.WEEK_FIRST_DAY == 0:
+        if week == 0:
+            return u'周日'
+        elif week == 1:
+            return u'周一'
+        elif week == 2:
+            return u'周二'
+        elif week == 3:
+            return u'周三'
+        elif week == 4:
+            return u'周四'
+        elif week == 5:
+            return u'周五'
+        elif week == 6:
+            return u'周六'
+    else:
+        if week == 6:
+            return u'周日'
+        elif week == 0:
+            return u'周一'
+        elif week == 1:
+            return u'周二'
+        elif week == 2:
+            return u'周三'
+        elif week == 3:
+            return u'周四'
+        elif week == 4:
+            return u'周五'
+        elif week == 5:
+            return u'周六'

@@ -15,6 +15,7 @@ DOMAIN = 'http://DOMAIN'
 CHECKINURL = 'http://DOMAIN/checkin/ck'
 SCHOOLEMAIL = ''
 QRCODEREFRESHTIME = 5  # MORE THAN 3
+WEEK_FIRST_DAY = 1  # 0: Sunday 1:Monday
 
 # BROWSER_DOWNLOAD_URL = "" # html5 browser download url
 

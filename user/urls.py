@@ -25,4 +25,5 @@ urlpatterns = [
     url(r'^control/unbindwechat', control.unbindwechat, name='control.unbindwechat'),
     url(r'^control/resetpassword', control.resetpassword, name='control.resetpassword'),
     url(r'^addpermission$', views.add_permission, name='addpermission'),
+    url(r'^role$', views.role, name='role'),
 ]

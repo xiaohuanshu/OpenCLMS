@@ -252,6 +252,44 @@ def add_permission(request):
         return render(request, 'addpermission.html', mdata)
 
 
+@permission_required(permission='user_addrole')
+def role(request):
+    if request.META['REQUEST_METHOD'] == 'POST':
+        rolename = request.GET.get('role', default=None)
+        role = Role.objects.get(name=rolename)
+        teacherlist = request.POST.getlist('teacherlist[]')
+        teacher_users = User.objects.filter(
+            pk__in=Teacher.objects.filter(teacherid__in=teacherlist).values_list('user', flat=True))
+
+        old_teacher_user_list = role.user_set.values_list('id', flat=True)
+        for tuid in old_teacher_user_list:
+            cache.delete('perm_%d_cache' % tuid)
+        create_list = []
+        for tu in teacher_users:
+            cache.delete('perm_%d_cache' % tu.id)
+            create_list.append(Usertorole(role=role, user=tu))
+        Usertorole.objects.filter(role=role).delete()
+        Usertorole.objects.bulk_create(create_list)
+        return HttpResponse('{error:0}', content_type="application/json")
+    else:
+        newrole = request.GET.get('newrole', default=None)
+        if newrole:
+            if not Role.objects.filter(name=newrole).exists():
+                Role.objects.create(name=newrole)
+                return redirect(reverse('user:role', args=[]) + u'?role=%s' % newrole)
+        roledata = list(Role.objects.values_list('name', flat=True))
+        roledata.remove(u'学生')
+        roledata.remove(u'教师')
+        mdata = {}
+        mdata['roledata'] = roledata
+        rolename = request.GET.get('role', default=None)
+        if rolename:
+            role = Role.objects.get(name=rolename)
+            teachers = role.user_set.values('teacher__name', 'teacher__teacherid')
+            mdata['teachers'] = teachers
+        return render(request, 'role.html', mdata)
+
+
 def forgetpassword(request):
     email = request.GET.get('email')
     try:
@@ -267,8 +305,8 @@ def forgetpassword(request):
                        user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]))
     html_content = (u'''亲爱的%s您好,<br>请点击下面的链接找回密码:<br><a href="%s%s">%s%s</a><br>
                     此链接10分钟内有效,请尽快修改密码。<br>如果您没有发起找回密码,请无视此邮件''' % (
-                       user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]), settings.DOMAIN,
-                       reverse('user:resetpassword', args=[uuidstr])))
+        user.username, settings.DOMAIN, reverse('user:resetpassword', args=[uuidstr]), settings.DOMAIN,
+        reverse('user:resetpassword', args=[uuidstr])))
     msg = EmailMultiAlternatives(subject, text_content, form_email, [to])
     msg.attach_alternative(html_content, 'text/html')
     msg.send()

@@ -99,10 +99,11 @@
                     <a href="#"><i class="fa fa-users"></i> <span>用户</span> <i
                             class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class=""><a href="#"><i class="fa fa-circle-o"></i>角色</a></li>
+                        <li class="{% nav_active request.path 'role' %}"><a href="{% url "user:role" %}"><i
+                                class="fa fa-circle-o"></i>角色</a></li>
                         {% if perms.user_addpermission %}
-                            <li class=""><a href="{% url "user:addpermission" %}"><i class="fa fa-circle-o"></i>权限</a>
-                            </li>
+                            <li class="{% nav_active request.path 'addpermission' %}"><a
+                                    href="{% url "user:addpermission" %}"><i class="fa fa-circle-o"></i>权限</a></li>
                         {% endif %}
                     </ul>
                 </li>

@@ -1,0 +1,175 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}用户角色{% endblock %}
+{% block page_css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <!-- page start-->
+    <div class="row">
+        <div class="col-md-4">
+            <div class="box">
+                <div class="box-header">
+                    <h3 class="box-title">角色选择</h3>
+                    <div class="pull-right box-tools">
+                        <button type="button" class="btn btn-info btn-sm" data-toggle="modal"
+                                data-target="#newroleModal">
+                            新建角色
+                        </button>
+                    </div>
+                </div>
+                <div class="box-body">
+
+                    <div class="row">
+                        <div class="col-md-12">
+                            <select name="role" id="role" data-placeholder="角色">
+                                <option value></option>
+                                {% for r in  roledata %}
+                                    {% if r == request.GET.role %}
+                                        <option value="{{ r }}" selected>{{ r }}</option>
+                                    {% else %}
+                                        <option value="{{ r }}">{{ r }}</option>
+                                    {% endif %}
+                                {% endfor %}
+                            </select>
+                        </div>
+                    </div>
+                    {% if request.GET.role %}
+                        <div class="row">
+                            <div class="col-md-12">
+                                <button type="button" class="btn btn-primary btn-block" id="submit">提交修改</button>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        <div class="col-md-8">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">角色用户</h3>
+                </div>
+                <div class="box-body">
+                    <div class="panel-body">
+                        {% if request.GET.role %}
+                            <label>只能将角色赋予教师</label>
+                            <select class="form-control" multiple="multiple" data-placeholder="设置拥有此角色的教师"
+                                    id="teacherselecter"
+                                    style="width: 100%;"
+                                    name="addteachers">
+                                <option></option>
+                                {% for t in teachers %}
+                                    <option value="{{ t.teacher__teacherid }}" selected>{{ t.teacher__name }}</option>
+                                {% endfor %}
+                            </select>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!-- page end-->
+
+    <!-- Modal -->
+    <form method="GET" class="form-horizontal" id="termform">
+        <div class="modal fade" id="newroleModal" tabindex="-1" role="dialog" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                            <span aria-hidden="true">×</span></button>
+                        <h4 class="modal-title">创建新角色</h4>
+                    </div>
+                    <div class="modal-body">
+
+                        <div class="form-group">
+                            <label class="control-label col-md-4">角色名称</label>
+
+                            <div class="col-md-6 col-xs-11">
+                                <input size="11" type="text" value=""
+                                       class="form-control form-control-inline input-medium"
+                                       name="newrole" data-bv-notempty
+                                       data-bv-notempty-message="请输入角色名称">
+                                <span class="help-block">如:学生、教师、校长、辅导员</span>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-default pull-left"
+                                data-dismiss="modal">
+                            取消
+                        </button>
+                        <button type="submit" class="btn btn-success">提交</button>
+                    </div>
+                </div>
+                <!-- /.modal-content -->
+            </div>
+            <!-- /.modal-dialog -->
+        </div>
+    </form>
+    <!-- modal -->
+{% endblock %}
+{% block page_script %}
+    <script>
+        $('#role').chosen({width: '100%'});
+        $('#role').on('change', function (evt, params) {
+            window.location.href = "{% url 'user:role' %}?role=" + $(this).children('option:selected').val();
+        });
+        {% if request.GET.role %}
+            function TeacherformatRepo(repo) {
+                if (repo.loading) return repo.text;
+
+                var markup = "<div class='select2-result-student clearfix'>" +
+                    "<div class='select2-result-student__name'>" + repo.name + "(" + repo.id + ")</div>";
+
+                markup += "<div class='select2-result-student__statistics'>" +
+                    "<div class='select2-result-student__department'><i class='fa fa-building'></i> " + repo.department + "</div>" +
+                    "</div>" +
+                    "</div>";
+
+                return markup;
+            }
+
+            function formatRepoSelection(repo) {
+                return (repo.name || repo.text) + "(" + repo.id + ")";
+            }
+            $teacherselecter = $("#teacherselecter");
+            $teacherselecter.select2({
+                ajax: {
+                    url: "{% url 'school:getteacherselectdata' %}",
+                    dataType: 'json',
+                    delay: 250,
+                    data: function (params) {
+                        return {
+                            wd: params.term
+                        };
+                    },
+                    processResults: function (data, params) {
+                        return {
+                            results: data.rows
+                        };
+                    },
+                    cache: true
+                },
+                escapeMarkup: function (markup) {
+                    return markup;
+                }, // let our custom formatter work
+                minimumInputLength: 1,
+                templateResult: TeacherformatRepo, // omitted for brevity, see the source of this page
+                templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+            });
+
+            $('#submit').click(function () {
+                teacherlist = $teacherselecter.select2("val");
+                $.post("#", {teacherlist: teacherlist, csrfmiddlewaretoken: '{{ csrf_token }}'}, function (data) {
+                    alert('修改成功');
+                });
+            });
+        {% endif %}
+    </script>
+{% endblock %}

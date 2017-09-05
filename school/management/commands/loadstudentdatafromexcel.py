@@ -42,7 +42,7 @@ class Command(BaseCommand):
                 except ValueError:
                     pass
             except Exception, e:
-                logger.error("[loadstudentdatafromexcel]error on studentid:%s\n%s" % (studentid, e))
+                logger.exception("[loadstudentdatafromexcel]error on studentid:%s\n%s" % (studentid, e))
                 count -= 1
         notavailablecount = Student.objects.filter(studentid__in=students).update(available=False)
         logger.info("[loadstudentdatafromexcel]setnotavailable %d student on %s" % (notavailablecount, str(students)))

@@ -144,7 +144,7 @@ class Student(models.Model):
     available = models.BooleanField(default=True)
 
     def generateuser(self, save=True):
-        if self.user is None:
+        if self.user is None and self.idnumber is not None:
             studentrole = Role.objects.get(name=u'学生')
             m = hashlib.md5()
             m.update(self.idnumber)
@@ -181,7 +181,7 @@ class Teacher(models.Model):
     available = models.BooleanField(default=True)
 
     def generateuser(self, save=True):
-        if self.user is None:
+        if self.user is None and self.idnumber is not None:
             teacherrole = Role.objects.get(name=u'教师')
             m = hashlib.md5()
             m.update(self.idnumber)

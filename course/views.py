@@ -59,11 +59,11 @@ def data(request):
     search = request.GET.get('search', '')
     if not search == '':
         count = coursedata.filter(
-            (Q(title__icontains=search) | Q(teacher__name__icontains=search)) | Q(serialnumber=search)
+            (Q(title__icontains=search) | Q(teachers__name__icontains=search)) | Q(serialnumber=search)
         ).count()
         coursedata = coursedata.select_related('teacher').select_related('major').select_related(
             'department').filter(
-            (Q(title__icontains=search) | Q(teacher__name__icontains=search)) | Q(serialnumber=search)
+            (Q(title__icontains=search) | Q(teachers__name__icontains=search)) | Q(serialnumber=search)
         )[offset: (offset + limit)]
     else:
         count = coursedata.count()

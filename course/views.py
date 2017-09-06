@@ -61,7 +61,7 @@ def data(request):
         count = coursedata.filter(
             (Q(title__icontains=search) | Q(teachers__name__icontains=search)) | Q(serialnumber=search)
         ).count()
-        coursedata = coursedata.select_related('teacher').select_related('major').select_related(
+        coursedata = coursedata.prefetch_related('teachers').select_related('major').select_related(
             'department').filter(
             (Q(title__icontains=search) | Q(teachers__name__icontains=search)) | Q(serialnumber=search)
         )[offset: (offset + limit)]

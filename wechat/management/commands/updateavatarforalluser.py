@@ -1,7 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand, CommandError
 from user.models import User
-from wechat_sdk.exceptions import OfficialAPIError
 
 
 class Command(BaseCommand):
@@ -11,7 +10,7 @@ class Command(BaseCommand):
         for u in users:
             try:
                 u.updateavatarfromwechat()
-            except OfficialAPIError:
+            except:
                 pass
             counter += 1
-        print "update %d users" % counter
+        self.stdout.write("update %d users" % counter)

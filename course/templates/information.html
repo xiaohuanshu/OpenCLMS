@@ -164,13 +164,17 @@
                                                     <li><a class="control-checkindata"
                                                            href="{% url 'checkin:lesson_data' lesson.id %}">考勤数据</a>
                                                     </li>
-                                                    <li class="divider"></li>
                                                     <li>
                                                         <a class="control-lessonstart">设为课程开始</a>
                                                     </li>
                                                     <li>
                                                         <a class="control-lessonstop"
                                                            data-lessonid="{{ lesson.id }}">设为课程结束</a>
+                                                    </li>
+                                                    <li class="divider"></li>
+                                                    <li>
+                                                        <a class="control-lessonclear" style="color: red"
+                                                           data-lessonid="{{ lesson.id }}">清除课程数据</a>
                                                     </li>
                                                 </ul>
                                             </div>
@@ -277,30 +281,43 @@
             checkindata = lessontr.find('.control-checkindata');
             startlesson = lessontr.find('.control-lessonstart');
             stoplesson = lessontr.find('.control-lessonstop');
+            clearlesson = lessontr.find('.control-lessonclear');
             controlpanel = lessontr.find('.control-panel');
+            divider = lessontr.find('.divider');
             statusspan.text(statustext);
             statusspan.attr('class', 'lesson-status label label-' + lesson_status_style_json[status]);
             if (statustext == '正在上课') {
                 checkindata.show();
                 stoplesson.show();
+                clearlesson.show();
+                divider.show();
                 startlesson.hide();
             } else if (statustext == '未开始') {
                 checkindata.hide();
                 stoplesson.hide();
+                clearlesson.hide();
+                divider.hide();
                 startlesson.show();
             } else if (statustext == '课程取消') {
                 checkindata.hide();
                 stoplesson.hide();
                 startlesson.hide();
+                clearlesson.hide();
+                divider.hide();
                 controlpanel.hide();
             } else if (statustext == '正在签到') {
                 checkindata.show();
                 stoplesson.hide();
                 startlesson.hide();
+                clearlesson.hide();
+                divider.hide();
             } else {
-                controlpanel.hide();
+                controlpanel.show();
                 startlesson.hide();
-                checkindata.removeClass('btn-info').addClass('btn-warning').text('考勤数据');
+                stoplesson.hide();
+                clearlesson.show();
+                divider.show();
+                checkindata.eq(0).removeClass('btn-info').addClass('btn-warning').text('考勤数据');
             }
         }
         $(".lessontr").each(function () {
@@ -334,6 +351,33 @@
             $controlstop.click(function () {
                 $.ajax({
                     url: '{% url 'course:control.stoplesson' %}',
+                    type: 'GET',
+                    dataType: "json",
+                    contentType: "application/json; charset=utf-8",
+                    data: {
+                        lessonid: lessonid
+                    },
+                    success: function (data) {
+                        if (data.error != 0) {
+                            toastr['error'](data.message, "操作失败");
+                        } else {
+                            toastr['success'](data.message, "操作成功");
+                            changelessonstatus(lessonid, data.newstatus);
+                            $('#lesson_tag').hide();
+                            //showpanelforunclosedlesson();
+                        }
+                    }, error: function (XMLHttpRequest, textStatus) {
+                        toastr['error'](textStatus, "与服务器连接失败");
+                    }
+                });
+            });
+            var $controlclear = $(this).find('.control-lessonclear');
+            $controlclear.click(function () {
+                if(!confirm("此操作会清除全部考情数据并且设置课程为未开始状态，是否继续？")){
+                    return;
+                }
+                $.ajax({
+                    url: '{% url 'course:control.clearlesson' %}',
                     type: 'GET',
                     dataType: "json",
                     contentType: "application/json; charset=utf-8",

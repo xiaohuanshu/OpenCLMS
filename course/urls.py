@@ -13,6 +13,7 @@ urlpatterns = [
     url(r'^information/(\d+)$', views.information, name='information'),
     url(r'^control/startlesson/$', control.startLesson, name='control.startlesson'),
     url(r'^control/stoplesson/$', control.stopLesson, name='control.stoplesson'),
+    url(r'^control/clearlesson/$', control.clearLesson, name='control.clearlesson'),
     url(r'^control/sethomeworkscore/$', control.sethomeworkscore, name='control.sethomeworkscore'),
     url(r'^resource/(\d+)$', views.resource, name='resource'),
     url(r'^resource/upload$', views.resourceupload, name='resourceupload'),

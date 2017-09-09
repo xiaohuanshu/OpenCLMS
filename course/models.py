@@ -247,6 +247,7 @@ class Lesson(models.Model):
         self.endtime = None
         self.checkinrecord_set.all().delete()
         self.checkin_set.all().delete()
+        self.checkincount = 0
         self.save()
         logger.info('lesson %d cleared' % self.id)
         return {'error': 0, 'message': u'成功清除', 'newstatus': self.status,

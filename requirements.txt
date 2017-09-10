@@ -6,3 +6,4 @@ uwsgi
 django_redis
 Pillow
 django-debug-toolbar
+celery==4.1.0

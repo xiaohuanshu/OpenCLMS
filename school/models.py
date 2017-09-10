@@ -4,7 +4,6 @@ from django.db.models.signals import post_save, pre_save
 from django.dispatch import receiver
 from django.core.cache import cache
 from django.utils.functional import cached_property
-from user.models import User, Role, Usertorole
 import hashlib
 
 
@@ -145,6 +144,7 @@ class Student(models.Model):
 
     def generateuser(self, save=True):
         if self.user is None and self.idnumber is not None:
+            from user.models import User, Role, Usertorole
             studentrole = Role.objects.get(name=u'学生')
             m = hashlib.md5()
             m.update(self.idnumber)
@@ -182,6 +182,7 @@ class Teacher(models.Model):
 
     def generateuser(self, save=True):
         if self.user is None and self.idnumber is not None:
+            from user.models import User, Role, Usertorole
             teacherrole = Role.objects.get(name=u'教师')
             m = hashlib.md5()
             m.update(self.idnumber)

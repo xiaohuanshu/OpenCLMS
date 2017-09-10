@@ -1,11 +1,6 @@
 # Docker Environment Settings
 import os
 
-try:
-    from settings_base import *
-except:
-    pass
-
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = os.environ['SECRET_KEY']
 
@@ -65,3 +60,8 @@ EMAIL_USE_TLS = True
 # admin email
 SERVER_EMAIL = os.environ[
     'SERVER_EMAIL']  # The email address that error messages come from, such as those sent to ADMINS and MANAGERS.
+
+# Celery
+CELERY_BROKER_URL = os.environ['REDIS_URL']
+
+CELERY_RESULT_BACKEND = os.environ['REDIS_URL']

@@ -31,7 +31,6 @@ INSTALLED_APPS = [
     'school',
     'course',
     'checkin',
-    # 'rbac'
 
 ]
 
@@ -86,6 +85,9 @@ USE_I18N = False
 USE_L10N = False
 
 USE_TZ = False
+
+CELERY_ENABLE_UTC = True
+CELERY_TIMEZONE = TIME_ZONE
 
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
@@ -198,3 +200,16 @@ LOGGING = {
         },
     }
 }
+
+CELERY_BEAT_SCHEDULE = {
+    'auto_stop_lesson': {
+        'task': 'auto_stop_lesson',  # the same goes in the task name
+        'schedule': 300.0,
+        'args': ('today',)
+    },
+}
+
+try:
+    from settings_local import *
+except:
+    pass

@@ -1,8 +1,4 @@
 # Develop Environment Settings
-try:
-    from settings_base import *
-except:
-    pass
 
 # SECURITY WARNING: keep the secret key used in production secret!
 SECRET_KEY = ''
@@ -62,3 +58,8 @@ EMAIL_SUBJECT_PREFIX = '[CheckinSystem]'  # subject-line prefix
 EMAIL_USE_TLS = True
 # admin email
 SERVER_EMAIL = ''  # The email address that error messages come from, such as those sent to ADMINS and MANAGERS.
+
+# Celery
+CELERY_BROKER_URL = ''  # example: "redis://127.0.0.1:6379/1"
+
+CELERY_RESULT_BACKEND = ''  # example: "redis://127.0.0.1:6379/1"

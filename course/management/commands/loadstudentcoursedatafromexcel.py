@@ -12,36 +12,39 @@ logger = logging.getLogger(__name__)
 
 class Command(BaseCommand):
     def add_arguments(self, parser):
-        parser.add_argument('schoolterm', type=str)
         parser.add_argument('excelfile', type=str)
 
     def handle(self, *args, **options):
         rb = xlrd.open_workbook(options['excelfile'])
-        Studentcourse.objects.filter(course__schoolterm=options['schoolterm']).all().delete()
         rs = rb.sheets()[0]
+        course_student_map={}
+        for i in range(rs.nrows):
+            try:
+                course_student_map[rs.cell(i, 0).value].add(rs.cell(i, 1).value)
+            except KeyError:
+                course_student_map[rs.cell(i, 0).value] = set([rs.cell(i, 1).value])
         count = 0
         coursenotfound = 0
         studentnotfound = 0
         progress = ProgressBar()
-        for i in progress(range(rs.nrows)):
-            count += 1
+        for course_serial in progress(course_student_map):
+            count+=1
             try:
-                course = Course.objects.get(serialnumber=rs.cell(i, 0).value)
+                course = Course.objects.get(serialnumber=course_serial)
             except ObjectDoesNotExist:
                 count -= 1
                 coursenotfound += 1
-                # logger.debug("error on course not found:%s" % rs.cell(i, 0).value)
                 continue
-            try:
-                student = Student.objects.get(studentid=rs.cell(i, 1).value)
-            except ObjectDoesNotExist:
-                count -= 1
-                studentnotfound += 1
-                # logger.debug("error on student not found:%s" % rs.cell(i, 1).value)
-                continue
-            data = Studentcourse(course=course, student=student)
-            data.save()
+            Studentcourse.objects.filter(course=course).all().delete()
+            student_course_list = []
+            for student_id in course_student_map[course_serial]:
+                try:
+                    student = Student.objects.get(studentid=student_id)
+                except ObjectDoesNotExist:
+                    studentnotfound += 1
+                    continue
+                student_course_list.append(Studentcourse(course=course, student=student))
+            Studentcourse.objects.bulk_create(student_course_list)
         logger.info(
-            ("[loadstudentcoursedatafromexcel]successful upgrade %d studentcourse ",
-             "with %d course not found and %d student not found on %s") % (
+            "[loadstudentcoursedatafromexcel]successful upgrade %d studentcourse with %d course not found and %d student not found on %s" % (
                 count, coursenotfound, studentnotfound, options['excelfile']))

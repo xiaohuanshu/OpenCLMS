@@ -35,6 +35,8 @@ class Command(BaseCommand):
 
         # print json.dumps(userlist, encoding='utf-8', ensure_ascii=False)
 
+        create_list = []
+
         # for student
         students = Student.objects.select_related('classid').filter(available=True).all()
         for s in students:
@@ -51,13 +53,12 @@ class Command(BaseCommand):
                     logger.debug("%s exist" % s.studentid)
                 userlist.remove(userinfo)
             else:
-                logger.debug("%s create" % s.studentid)
-                createcount += 1
-                contact_helper.user.create('S%s' % s.studentid, s.name, s.classid.wechatdepartmentid, u'学生',
-                                          gender=s.sex,
-                                          email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL),
-                                          extattr={"attrs": [{"name": u"学工号", "value": s.studentid},
-                                                             {"name": u"身份证号", "value": s.idnumber[-6:]}]})
+                create_list.append(dict(user_id='S%s' % s.studentid, name=s.name,
+                                        department=s.classid.wechatdepartmentid, position=u'学生',
+                                        gender=s.sex,
+                                        email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL),
+                                        extattr={"attrs": [{"name": u"学工号", "value": s.studentid},
+                                                           {"name": u"身份证号", "value": s.idnumber[-6:]}]}))
 
         # for teacher
         teachers = Teacher.objects.filter(available=True).exclude(name__regex='.*\d+.*').all()
@@ -71,24 +72,28 @@ class Command(BaseCommand):
                     logger.debug("%s update" % t.teacherid)
                     updatecount += 1
                     contact_helper.user.update(userinfo['userid'], department=tdeps,
-                                              extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
-                                                                 {"name": u"身份证号", "value": t.idnumber[-6:]}]})
+                                               extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
+                                                                  {"name": u"身份证号", "value": t.idnumber[-6:]}]})
                 else:
                     logger.debug("%s exist" % t.teacherid)
                 userlist.remove(userinfo)
             else:
-                logger.debug("%s create" % t.teacherid)
-                createcount += 1
-                contact_helper.user.create('T%s' % t.teacherid, t.name, tdeps, u'教师',
-                                          gender=t.sex,
-                                          email='%s@gengdan.edu.cn' % t.teacherid,
-                                          extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
-                                                             {"name": u"身份证号", "value": t.idnumber[-6:]}]})
+                create_list.append(dict(user_id='T%s' % t.teacherid, name=t.name, department=tdeps, position=u'教师',
+                                        gender=t.sex,
+                                        email='%s@gengdan.edu.cn' % t.teacherid,
+                                        extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
+                                                           {"name": u"身份证号", "value": t.idnumber[-6:]}]}))
 
         # delete
         for user in userlist:
             logger.debug("%s delete" % user['userid'])
             deletecount += 1
             contact_helper.user.delete(user['userid'])
+
+        # create
+        for c in create_list:
+            logger.debug("%s create" % c['user_id'])
+            createcount += 1
+            contact_helper.user.create(**c)
         logger.info("[updateuser] Successful exist:%d update:%d create:%d delete:%d" % (
             existcount, updatecount, createcount, deletecount))

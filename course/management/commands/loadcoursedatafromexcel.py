@@ -26,6 +26,8 @@ class Command(BaseCommand):
                 serialnumber = rs.cell(i, 0).value
                 data, created = Course.objects.get_or_create(serialnumber=serialnumber,
                                                              schoolterm=options['schoolterm'])
+                last_time = data.time
+                last_location = data.location
                 data.title = rs.cell(i, 1).value
                 data.number = rs.cell(i, 2).value
                 if rs.cell_type(i, 3) != 0 and rs.cell(i, 3).value != '' and rs.cell(i, 3).value != ' ':
@@ -42,10 +44,11 @@ class Command(BaseCommand):
                         except:
                             pass
                 data.save()
-                if data.time is not None and data.location is not None:
+                if (data.time != last_time or data.location != last_location) and \
+                                data.time is not None and data.location is not None:
                     data.simplifytime()
                     data.generatelesson()
-            except Exception, e:
+            except Exception as e:
                 logger.exception("[loadcoursedatafromexcel]error on serialnumber:%s\n%s" % (serialnumber, e))
                 count -= 1
         logger.info("[loadcoursedatafromexcel]successful upgrade %d course on %s" % (count, options['excelfile']))

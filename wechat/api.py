@@ -56,8 +56,6 @@ def api(request):
             reply = Wechatkeyword.objects.extra(where=['%s SIMILAR TO keyword'], params=[text]).first()
             if reply:
                 response = TextReply(content=u'%s' % reply.data, message=msg)
-            else:
-                response = TextReply(content='text reply', message=msg)
     elif msg.type == 'event':
         if msg.event == 'subscribe':  # 关注事件
             response = EmptyReply()

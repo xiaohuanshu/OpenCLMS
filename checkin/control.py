@@ -94,9 +94,8 @@ def ck(request, qr_str):
         return render(request, 'error.html',
                       {'message': u'签到失败', 'submessage': u'二维码失效或不存在', 'wechatclose': True})
     lesson = Lesson.objects.get(id=lessonid)
-    user = User.objects.get(id=request.session.get('userid'))
     try:
-        student = Student.objects.get(user=user)
+        student = Student.objects.get(user=request.user)
     except ObjectDoesNotExist:
         return render(request, 'error.html',
                       {'message': u'签到失败', 'submessage': u'您的身份不是学生', 'wechatclose': True})

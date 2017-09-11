@@ -128,7 +128,10 @@ def clear_last_checkin(lesson):
 
 
 def student_checkin(student, lesson, abnormal=None):
-    checkin = Checkin.objects.get(lesson=lesson, student=student)
+    try:
+        checkin = Checkin.objects.get(lesson=lesson, student=student)
+    except ObjectDoesNotExist:
+        checkin = Checkin(lesson=lesson, student=student)
     # checkindata.seatid = seatid
     nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
     if checkin.status > 10:  # ASK

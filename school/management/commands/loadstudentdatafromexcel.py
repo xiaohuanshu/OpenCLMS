@@ -40,7 +40,8 @@ class Command(BaseCommand):
                 try:
                     data.major = Major.objects.get(name=rs.cell(i, 6).value)
                 except ObjectDoesNotExist:
-                    data.major = data.classid.major
+                    if data.classid:
+                        data.major = data.classid.major
                 data.save()
                 try:
                     students.remove(studentid)

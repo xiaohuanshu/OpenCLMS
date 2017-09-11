@@ -57,7 +57,8 @@ def data(request):
               'name': p.name,
               'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
               'idnumber': p.idnumber,
-              'schoolyear': p.classid.schoolyear, 'class': (p.classid and [p.classid.name] or [None])[0],
+              'schoolyear': (p.classid and [p.classid.schoolyear] or [None])[0],
+              'class': (p.classid and [p.classid.name] or [None])[0],
               'major': (p.major and [p.major.name] or [None])[0],
               'department': p.department.name,
               }

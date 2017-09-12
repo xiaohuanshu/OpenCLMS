@@ -293,6 +293,30 @@ def settings(request, courseid):
         elif type == 'people':
             students = request.POST.getlist('addstudents', default=None)
             teachers = request.POST.getlist('addteachers', default=None)
+            disable_sync = request.POST.get('disable_sync', default=None)
+            add_student_from_course = request.POST.get('add_student_from_course', default=None)
+            if disable_sync and disable_sync == 'on':
+                disable_sync = True
+            else:
+                disable_sync = False
+            if course.disable_sync != disable_sync:
+                course.disable_sync = disable_sync
+                course.save()
+            if add_student_from_course and add_student_from_course != '':
+                try:
+                    if add_student_from_course.isdigit():
+                        from_course = Course.objects.get(id=int(add_student_from_course))
+                    else:
+                        from_course = Course.objects.get(serialnumber=add_student_from_course)
+                except ObjectDoesNotExist:
+                    return render(request, 'error.html',
+                                  {'message': '没有找到课程，请检查课程编号或id'})
+                new_students = Studentcourse.objects.filter(course=from_course).values_list('student', flat=True)
+                new_students_create = []
+                for ns in new_students:
+                    if not Studentcourse.objects.filter(course=course, student=ns).exists():
+                        new_students_create.append(Studentcourse(course=course, student_id=ns))
+                Studentcourse.objects.bulk_create(new_students_create)
             if students:
                 for s in students:
                     Studentcourse.objects.create(course=course, student=Student.objects.get(studentid=s))

@@ -84,6 +84,28 @@
                                     </select>
                                 </div>
                             </div>
+                            <div class="form-group">
+                                <label class="col-sm-2 control-label">导入其他课程学生:</label>
+                                <div class="col-sm-10">
+                                    <input type="number" class="form-control" name="add_student_from_course"
+                                           placeholder="请输入课程编号或者课程id">
+                                    <p class="help-block">将其他课程的学生导入当前课程当中，不会清除对应课程的学生</p>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <div class="col-sm-offset-2 col-sm-10">
+                                    <div class="checkbox">
+                                        <label>
+                                            {% if coursedata.disable_sync %}
+                                                <input type="checkbox" name="disable_sync" checked> 禁止系统自动同步学生
+                                            {% else %}
+                                                <input type="checkbox" name="disable_sync"> 禁止系统自动同步学生
+                                            {% endif %}
+                                        </label>
+                                    </div>
+                                    <p class="help-block">每隔一段时间学生名单将会与教务系统进行同步，如果您修改后的上课名单与教务系统不同，请禁止系统同步</p>
+                                </div>
+                            </div>
                         </div>
 
                         <div class="box-footer">
@@ -183,6 +205,7 @@
 
             return markup;
         }
+
         function TeacherformatRepo(repo) {
             if (repo.loading) return repo.text;
 
@@ -200,6 +223,7 @@
         function formatRepoSelection(repo) {
             return repo.name + "(" + repo.id + ")" || repo.text;
         }
+
         $studentselecter = $("#studentselecter");
         $studentselecter.select2({
             ajax: {

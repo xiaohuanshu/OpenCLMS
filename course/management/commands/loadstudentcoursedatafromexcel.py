@@ -35,6 +35,8 @@ class Command(BaseCommand):
                 count -= 1
                 coursenotfound += 1
                 continue
+            if course.disable_sync:
+                continue
             Studentcourse.objects.filter(course=course).all().delete()
             student_course_list = []
             for student_id in course_student_map[course_serial]:

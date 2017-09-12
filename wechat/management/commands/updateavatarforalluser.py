@@ -1,16 +1,10 @@
 # -*- coding: utf-8 -*-
 from django.core.management.base import BaseCommand, CommandError
-from user.models import User
+from wechat.tasks import update_avatar_from_wechat
 
 
 class Command(BaseCommand):
     def handle(self, *args, **options):
-        counter = 0
-        users = User.objects.exclude(openid=None).all()
-        for u in users:
-            try:
-                u.updateavatarfromwechat()
-            except:
-                pass
-            counter += 1
+        res = update_avatar_from_wechat.delay()
+        counter = res.get()
         self.stdout.write("update %d users" % counter)

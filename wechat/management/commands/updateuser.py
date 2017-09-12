@@ -28,7 +28,7 @@ class Command(BaseCommand):
             return None
 
         def getidnumber(user):
-            if user['extattr']['attrs'][0]['name'] == u"身份证号":
+            if user['extattr']['attrs'][0]['name'] == u"验证码":
                 return user['extattr']['attrs'][0]['value']
             else:
                 return user['extattr']['attrs'][1]['value']
@@ -41,24 +41,27 @@ class Command(BaseCommand):
         students = Student.objects.select_related('classid').filter(available=True).all()
         for s in students:
             userinfo = getinfomation(s.studentid)
+            if s.classid:
+                s_depid = s.classid.wechatdepartmentid
+            else:
+                s_depid = 1
             if userinfo:
                 existcount += 1
-                if userinfo['department'][0] != s.classid.wechatdepartmentid or getidnumber(userinfo) != s.idnumber[
-                                                                                                         -6:]:
+                if userinfo['department'][0] != s_depid or getidnumber(userinfo) != s.idnumber[-6:]:
                     logger.debug("%s update" % s.studentid)
                     updatecount += 1
-                    contact_helper.user.update(userinfo['userid'], department=[s.classid.wechatdepartmentid], extattr={
-                        "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"身份证号", "value": s.idnumber[-6:]}]})
+                    contact_helper.user.update(userinfo['userid'], department=[s_depid], extattr={
+                        "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"验证码", "value": s.idnumber[-6:]}]})
                 else:
                     logger.debug("%s exist" % s.studentid)
                 userlist.remove(userinfo)
             else:
                 create_list.append(dict(user_id='S%s' % s.studentid, name=s.name,
-                                        department=s.classid.wechatdepartmentid, position=u'学生',
+                                        department=s_depid, position=u'学生',
                                         gender=s.sex,
                                         email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL),
                                         extattr={"attrs": [{"name": u"学工号", "value": s.studentid},
-                                                           {"name": u"身份证号", "value": s.idnumber[-6:]}]}))
+                                                           {"name": u"验证码", "value": s.idnumber[-6:]}]}))
 
         # for teacher
         teachers = Teacher.objects.filter(available=True).exclude(name__regex='.*\d+.*').all()
@@ -73,7 +76,7 @@ class Command(BaseCommand):
                     updatecount += 1
                     contact_helper.user.update(userinfo['userid'], department=tdeps,
                                                extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
-                                                                  {"name": u"身份证号", "value": t.idnumber[-6:]}]})
+                                                                  {"name": u"验证码", "value": t.idnumber[-6:]}]})
                 else:
                     logger.debug("%s exist" % t.teacherid)
                 userlist.remove(userinfo)
@@ -82,7 +85,7 @@ class Command(BaseCommand):
                                         gender=t.sex,
                                         email='%s@gengdan.edu.cn' % t.teacherid,
                                         extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
-                                                           {"name": u"身份证号", "value": t.idnumber[-6:]}]}))
+                                                           {"name": u"验证码", "value": t.idnumber[-6:]}]}))
 
         # delete
         for user in userlist:

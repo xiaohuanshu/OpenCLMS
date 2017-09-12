@@ -27,7 +27,7 @@ INSTALLED_APPS = [
     # Own apps
     'center',
     'wechat',
-    'user',
+    'user_system',
     'school',
     'course',
     'checkin',
@@ -41,7 +41,7 @@ MIDDLEWARE = [
     'django.middleware.csrf.CsrfViewMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
     # Own middleware
-    'user.middleware.UserMiddleware',
+    'user_system.middleware.UserMiddleware',
 ]
 
 ROOT_URLCONF = 'checkinsystem.urls'
@@ -59,7 +59,7 @@ TEMPLATES = [
                 # Own processors
                 'course.context_processors.todaylesson',
                 'school.context_processors.school_settings',
-                'user.context_processors.auth',
+                'user_system.context_processors.auth',
             ],
             'loaders': [
                 ('django.template.loaders.cached.Loader', [

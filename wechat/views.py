@@ -7,7 +7,7 @@ from django.core.urlresolvers import reverse
 from django.core import signing
 from django.core.cache import cache
 from django.shortcuts import HttpResponseRedirect, render, redirect
-from user.models import User
+from user_system.models import User
 from django.conf import settings
 import logging
 

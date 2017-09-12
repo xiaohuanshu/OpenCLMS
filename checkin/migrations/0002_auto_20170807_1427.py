@@ -21,7 +21,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='ask',
             name='operater',
-            field=models.ForeignKey(db_column='operater', null=True, on_delete=django.db.models.deletion.SET_NULL, to='user.User'),
+            field=models.ForeignKey(db_column='operater', null=True, on_delete=django.db.models.deletion.SET_NULL, to='user_system.User'),
         ),
         migrations.AlterField(
             model_name='ask',

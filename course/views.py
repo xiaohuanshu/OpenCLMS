@@ -12,7 +12,7 @@ from school.models import Student, Teacher
 from checkin.models import Scoreregulation
 from django.db.models import ObjectDoesNotExist
 from constant import *
-from user.auth import permission_required
+from user_system.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
 from message import sendmessagetocoursestudent

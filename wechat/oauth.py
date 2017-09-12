@@ -4,7 +4,7 @@ from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
 from django.contrib.auth.hashers import make_password
 from datetime import datetime, timedelta
-from user.models import User
+from user_system.models import User
 from django.http.response import HttpResponse, HttpResponseBadRequest
 from client import wechat_client
 from django.views.decorators.csrf import csrf_exempt

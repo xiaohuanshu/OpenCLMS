@@ -9,7 +9,7 @@ import django.db.models.deletion
 class Migration(migrations.Migration):
 
     dependencies = [
-        ('user', '0002_user_mainrole'),
+        ('user_system', '0002_user_mainrole'),
     ]
 
     operations = [
@@ -81,11 +81,11 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='usertorole',
             name='role',
-            field=models.ForeignKey(db_column=b'roleid', on_delete=django.db.models.deletion.CASCADE, to='user.Role'),
+            field=models.ForeignKey(db_column=b'roleid', on_delete=django.db.models.deletion.CASCADE, to='user_system.Role'),
         ),
         migrations.AlterField(
             model_name='usertorole',
             name='user',
-            field=models.ForeignKey(db_column=b'userid', on_delete=django.db.models.deletion.CASCADE, to='user.User'),
+            field=models.ForeignKey(db_column=b'userid', on_delete=django.db.models.deletion.CASCADE, to='user_system.User'),
         ),
     ]

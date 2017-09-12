@@ -10,13 +10,13 @@ from django.core.urlresolvers import reverse
 from function import startcheckin, endcheckin, student_checkin, generateqrstr, addaskinformationinstartedlesson, \
     delaskinformationinstartedlesson, clear_checkin, clear_last_checkin
 from models import Checkin, Ask, Asktostudent
-from user.models import User
+from user_system.models import User
 from school.models import Student
 from django.db.models import ObjectDoesNotExist, Q
 from course.auth import has_course_permission
 import datetime
 from school.function import getCurrentSchoolYearTerm
-from user.auth import permission_required
+from user_system.auth import permission_required
 
 
 def getqrstr(request, lessonid):

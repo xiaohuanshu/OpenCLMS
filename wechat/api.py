@@ -3,7 +3,7 @@ from django.http.response import HttpResponse, HttpResponseBadRequest
 from django.conf import settings
 import time
 from django.views.decorators.csrf import csrf_exempt
-from user.models import User
+from user_system.models import User
 from models import Wechatkeyword
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException

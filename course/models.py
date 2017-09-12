@@ -33,6 +33,7 @@ class Course(models.Model):
     major = models.ForeignKey('school.Major', models.SET_NULL, db_column='majorid', null=True)
     department = models.ForeignKey('school.Department', models.SET_NULL, db_column='departmentid', null=True)
     teachclass = models.ForeignKey('school.Class', models.SET_NULL, db_column='teachclassid', null=True)
+    disable_sync = models.BooleanField(default=False)
 
     def gettitlewithclass(self):
         if self.teachclass:

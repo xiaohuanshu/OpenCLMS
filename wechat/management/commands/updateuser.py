@@ -18,20 +18,18 @@ class Command(BaseCommand):
 
         def getinfomation(id):
             for user in userlist:
-                # print json.dumps(user, encoding='utf-8', ensure_ascii=False)
-                if user['extattr']['attrs'][0]['name'] == u"学工号":
-                    thisuserworkid = user['extattr']['attrs'][0]['value']
-                else:
-                    thisuserworkid = user['extattr']['attrs'][1]['value']
+                for item in user['extattr']['attrs']:
+                    if item['name'] == u"学工号":
+                        thisuserworkid = item['value']
+                        break
                 if thisuserworkid == id:
                     return user
             return None
 
         def getidnumber(user):
-            if user['extattr']['attrs'][0]['name'] == u"验证码":
-                return user['extattr']['attrs'][0]['value']
-            else:
-                return user['extattr']['attrs'][1]['value']
+            for item in user['extattr']['attrs']:
+                if item['name'] == u"验证码":
+                    return item['value']
 
         # print json.dumps(userlist, encoding='utf-8', ensure_ascii=False)
 

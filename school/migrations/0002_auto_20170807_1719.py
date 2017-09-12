@@ -136,7 +136,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='student',
             name='user',
-            field=models.ForeignKey(db_column=b'userid', null=True, on_delete=django.db.models.deletion.PROTECT, to='user.User'),
+            field=models.ForeignKey(db_column=b'userid', null=True, on_delete=django.db.models.deletion.PROTECT, to='user_system.User'),
         ),
         migrations.AlterField(
             model_name='teacher',
@@ -156,7 +156,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='teacher',
             name='user',
-            field=models.ForeignKey(db_column=b'userid', null=True, on_delete=django.db.models.deletion.PROTECT, to='user.User'),
+            field=models.ForeignKey(db_column=b'userid', null=True, on_delete=django.db.models.deletion.PROTECT, to='user_system.User'),
         ),
         migrations.AlterField(
             model_name='teachertoadministration',

@@ -22,7 +22,7 @@ urlpatterns = [
     url(r'^$', home, name='home'),
 
     url(r'^wechat/', include('wechat.urls', namespace="wechat")),
-    url(r'^user/', include('user.urls', namespace="user")),
+    url(r'^user/', include('user_system.urls', namespace="user")),
     url(r'^school/', include('school.urls', namespace="school")),
     url(r'^course/', include('course.urls', namespace="course")),
     url(r'^checkin/', include('checkin.urls', namespace="checkin")),

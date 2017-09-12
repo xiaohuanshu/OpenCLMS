@@ -4,7 +4,7 @@ from django.core.urlresolvers import resolve
 from wechat.oauth import getuserinfo
 from django.contrib.auth.hashers import check_password
 from django.conf import settings
-from user.models import User
+from user_system.models import User
 from django.db.models import ObjectDoesNotExist
 
 

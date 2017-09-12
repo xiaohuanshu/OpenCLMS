@@ -139,12 +139,12 @@ class Student(models.Model):
 
     department = models.ForeignKey(Department, models.SET_NULL, db_column='departmentid', null=True)
     major = models.ForeignKey(Major, models.SET_NULL, db_column='majorid', null=True)
-    user = models.ForeignKey('user.User', models.PROTECT, db_column='userid', null=True)
+    user = models.ForeignKey('user_system.User', models.PROTECT, db_column='userid', null=True)
     available = models.BooleanField(default=True)
 
     def generateuser(self, save=True):
         if self.user is None and self.idnumber is not None:
-            from user.models import User, Role, Usertorole
+            from user_system.models import User, Role, Usertorole
             studentrole = Role.objects.get(name=u'学生')
             m = hashlib.md5()
             m.update(self.idnumber)
@@ -173,7 +173,7 @@ class Teacher(models.Model):
     name = models.CharField(max_length=20)
     sex = models.SmallIntegerField(null=True)
     idnumber = models.CharField(max_length=18, null=True)
-    user = models.ForeignKey('user.User', models.PROTECT, db_column='userid', null=True)
+    user = models.ForeignKey('user_system.User', models.PROTECT, db_column='userid', null=True)
     administration = models.ManyToManyField(Administration, through='Teachertoadministration',
                                             through_fields=('teacher', 'administration'))
     department = models.ManyToManyField(Department, through='Teachertodepartment',
@@ -182,7 +182,7 @@ class Teacher(models.Model):
 
     def generateuser(self, save=True):
         if self.user is None and self.idnumber is not None:
-            from user.models import User, Role, Usertorole
+            from user_system.models import User, Role, Usertorole
             teacherrole = Role.objects.get(name=u'教师')
             m = hashlib.md5()
             m.update(self.idnumber)

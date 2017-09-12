@@ -6,7 +6,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from models import Student
-from user.auth import permission_required
+from user_system.auth import permission_required
 
 
 @permission_required(permission='school_student_view')

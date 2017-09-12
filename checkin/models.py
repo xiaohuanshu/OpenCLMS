@@ -52,7 +52,7 @@ class Ask(models.Model):
     endtime = models.DateTimeField(null=True)
     status = models.IntegerField(default=ASK_STATUS_WAITING)
     reason = models.CharField(max_length=100, blank=True, null=True)
-    operater = models.ForeignKey('user.User', models.SET_NULL, db_column='operater', null=True)
+    operater = models.ForeignKey('user_system.User', models.SET_NULL, db_column='operater', null=True)
     type = models.IntegerField(null=True)
     student = models.ManyToManyField('school.Student', through='Asktostudent', through_fields=('ask', 'student'))
 

@@ -6,8 +6,8 @@ from django.db import migrations, models
 
 
 def add_mainrole(apps, schema_editor):
-    User = apps.get_model("user", "User")
-    Role = apps.get_model("user", "Role")
+    User = apps.get_model("user_system", "User")
+    Role = apps.get_model("user_system", "Role")
     db_alias = schema_editor.connection.alias
 
     teacherrole = Role.objects.using(db_alias).get(name=u'教师')
@@ -19,7 +19,7 @@ def add_mainrole(apps, schema_editor):
 
 class Migration(migrations.Migration):
     dependencies = [
-        ('user', '0001_initial'),
+        ('user_system', '0001_initial'),
     ]
 
     operations = [

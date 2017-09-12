@@ -8,7 +8,7 @@ import django.db.models.deletion
 
 
 def add_default_role_func(apps, schema_editor):
-    Role = apps.get_model("user", "Role")
+    Role = apps.get_model("user_system", "Role")
     db_alias = schema_editor.connection.alias
     Role.objects.using(db_alias).bulk_create([
         Role(name="学生",
@@ -109,9 +109,9 @@ class Migration(migrations.Migration):
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('role', models.ForeignKey(blank=True, db_column=b'roleid', null=True,
-                                           on_delete=django.db.models.deletion.DO_NOTHING, to='user.Role')),
+                                           on_delete=django.db.models.deletion.DO_NOTHING, to='user_system.Role')),
                 ('user', models.ForeignKey(blank=True, db_column=b'userid', null=True,
-                                           on_delete=django.db.models.deletion.DO_NOTHING, to='user.User')),
+                                           on_delete=django.db.models.deletion.DO_NOTHING, to='user_system.User')),
             ],
             options={
                 'db_table': 'UsertoRole',
@@ -120,7 +120,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='user',
             name='role',
-            field=models.ManyToManyField(through='user.Usertorole', to='user.Role'),
+            field=models.ManyToManyField(through='user_system.Usertorole', to='user_system.Role'),
         ),
         migrations.AlterUniqueTogether(
             name='usertorole',

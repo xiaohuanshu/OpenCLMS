@@ -11,7 +11,7 @@ class Migration(migrations.Migration):
     initial = True
 
     dependencies = [
-        ('user', '0001_initial'),
+        ('user_system', '0001_initial'),
     ]
 
     operations = [
@@ -116,7 +116,7 @@ class Migration(migrations.Migration):
                 ('classid', models.ForeignKey(blank=True, db_column=b'classid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='school.Class')),
                 ('department', models.ForeignKey(blank=True, db_column=b'departmentid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='school.Department')),
                 ('major', models.ForeignKey(blank=True, db_column=b'majorid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='school.Major')),
-                ('user', models.ForeignKey(blank=True, db_column=b'userid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='user.User')),
+                ('user', models.ForeignKey(blank=True, db_column=b'userid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='user_system.User')),
             ],
             options={
                 'db_table': 'Student',
@@ -170,7 +170,7 @@ class Migration(migrations.Migration):
         migrations.AddField(
             model_name='teacher',
             name='user',
-            field=models.ForeignKey(blank=True, db_column=b'userid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='user.User'),
+            field=models.ForeignKey(blank=True, db_column=b'userid', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='user_system.User'),
         ),
         migrations.AddField(
             model_name='classroom',

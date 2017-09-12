@@ -12,7 +12,7 @@ class Migration(migrations.Migration):
 
     dependencies = [
         ('school', '0001_initial'),
-        ('user', '0001_initial'),
+        ('user_system', '0001_initial'),
         ('course', '0001_initial'),
     ]
 
@@ -27,7 +27,7 @@ class Migration(migrations.Migration):
                 ('status', models.IntegerField(blank=True, null=True)),
                 ('reason', models.CharField(blank=True, max_length=100, null=True)),
                 ('type', models.IntegerField(blank=True, null=True)),
-                ('operater', models.ForeignKey(blank=True, db_column='operater', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='user.User')),
+                ('operater', models.ForeignKey(blank=True, db_column='operater', null=True, on_delete=django.db.models.deletion.DO_NOTHING, to='user_system.User')),
             ],
             options={
                 'db_table': 'Ask',

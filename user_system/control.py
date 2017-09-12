@@ -2,7 +2,7 @@
 from models import User
 from django.http import HttpResponse
 import json
-from user.auth import permission_required
+from user_system.auth import permission_required
 import hashlib
 
 

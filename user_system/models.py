@@ -9,7 +9,6 @@ from django.db.models.signals import post_save
 
 # Create your models here.
 
-
 class Role(models.Model):
     name = models.CharField(max_length=20)
     permission = ArrayField(models.CharField(max_length=50), blank=True, default=[])
@@ -67,19 +66,6 @@ class User(models.Model):
                 return True
             else:
                 return False
-
-    def updateavatarfromwechat(self):
-        if self.openid is not None:
-            from wechat.client import wechat_client
-            userinfo = wechat_client.user.get(self.openid)
-            avatar_url = userinfo['avatar']
-            from django.core.files import File
-            from django.core.files.temp import NamedTemporaryFile
-            import urllib2
-            img_temp = NamedTemporaryFile(delete=True)
-            img_temp.write(urllib2.urlopen(avatar_url).read())
-            img_temp.flush()
-            self.avatar.save('%s.jpeg' % self.openid, File(img_temp))
 
     def __unicode__(self):
         return u"%s" % (self.username)

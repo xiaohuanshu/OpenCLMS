@@ -92,8 +92,10 @@ def selectdata(request):
 
     rows = []
     for p in studentdata:
-        ld = {'id': p.studentid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0], 'class': p.classid.name,
-              'major': (p.major and [p.major.name] or [None])[0], 'department': p.department.name}
+        ld = {'id': p.studentid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
+              'class': (p.classid and [p.classid.name] or [None])[0],
+              'major': (p.major and [p.major.name] or [None])[0],
+              'department': p.department.name}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

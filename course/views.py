@@ -314,12 +314,13 @@ def settings(request, courseid):
                 new_students = Studentcourse.objects.filter(course=from_course).values_list('student', flat=True)
                 new_students_create = []
                 for ns in new_students:
-                    if not Studentcourse.objects.filter(course=course, student=ns).exists():
+                    if not Studentcourse.objects.filter(course=course, student_id=ns).exists():
                         new_students_create.append(Studentcourse(course=course, student_id=ns))
                 Studentcourse.objects.bulk_create(new_students_create)
             if students:
                 for s in students:
-                    Studentcourse.objects.create(course=course, student=Student.objects.get(studentid=s))
+                    if not Studentcourse.objects.filter(course=course, student_id=s).exists():
+                        Studentcourse.objects.create(course=course, student_id=s)
             if teachers:
                 for t in teachers:
                     course.teachers.add(Teacher.objects.get(teacherid=t))

@@ -40,7 +40,8 @@ def today_data(request):
     today_lessons = Lesson.objects.filter(week=now_week, day=now_day, term=now_term)
     data['today_lessons'] = today_lessons.count()
     today_start_lessons = today_lessons.filter(status__in=[LESSON_STATUS_NOW, LESSON_STATUS_CHECKIN,
-                                                           LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN])
+                                                           LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN,
+                                                           LESSON_STATUS_END])
     data['today_start_lessons'] = today_start_lessons.count()
     today_start_checkin_lessons = today_start_lessons.filter(checkincount__gt=0)
     data['today_start_checkin_lessons'] = today_start_checkin_lessons.count()

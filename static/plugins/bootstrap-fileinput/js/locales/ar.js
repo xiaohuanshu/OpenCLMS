@@ -26,6 +26,7 @@
         msgNoFilesSelected: '',
         msgCancelled: 'ألغيت',
         msgZoomModalHeading: 'معاينة تفصيلية',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'الملف "{name}" (<b>{size} ك.ب</b>) تعدى الحد الأقصى المسموح للرفع <b>{maxSize} ك.ب</b>.',
         msgFilesTooLess: 'يجب عليك اختيار <b>{n}</b> {files} على الأقل للرفع.',
@@ -53,6 +54,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: 'خطأ التحقق من صحة',
         msgLoading: 'تحميل ملف {index} من {files} &hellip;',
         msgProgress: 'تحميل ملف {index} من {files} - {name} - {percent}% منتهي.',
@@ -77,6 +79,7 @@
         fileActionSettings: {
             removeTitle: 'إزالة الملف',
             uploadTitle: 'رفع الملف',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'مشاهدة التفاصيل',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'لم يتم الرفع بعد',

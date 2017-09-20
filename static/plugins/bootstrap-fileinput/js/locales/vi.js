@@ -26,6 +26,7 @@
         msgNoFilesSelected: 'Không tập tin nào được chọn',
         msgCancelled: 'Đã hủy',
         msgZoomModalHeading: 'Chi tiết xem trước',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Tập tin "{name}" (<b>{size} KB</b>) vượt quá kích thước giới hạn cho phép <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Bạn phải chọn ít nhất <b>{n}</b> {files} để upload.',
@@ -53,6 +54,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: 'Lỗi xác nhận',
         msgLoading: 'Đang nạp {index} tập tin trong số {files} &hellip;',
         msgProgress: 'Đang nạp {index} tập tin trong số {files} - {name} - {percent}% hoàn thành.',
@@ -77,6 +79,7 @@
         fileActionSettings: {
             removeTitle: 'Gỡ bỏ',
             uploadTitle: 'Upload tập tin',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Phóng lớn',
             dragTitle: 'Di chuyển / Sắp xếp lại',
             indicatorNewTitle: 'Chưa được upload',

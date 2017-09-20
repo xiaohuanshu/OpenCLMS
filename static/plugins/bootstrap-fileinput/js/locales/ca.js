@@ -25,6 +25,7 @@
         msgNoFilesSelected: '',
         msgCancelled: 'cancel·lat',
         msgZoomModalHeading: 'Vista prèvia detallada',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Arxiu "{name}" (<b>{size} KB</b>) excedeix la mida màxima permès de <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Heu de seleccionar almenys <b>{n}</b> {files} a carregar.',
@@ -52,6 +53,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: 'Error de validació',
         msgLoading: 'Pujant fitxer {index} de {files} &hellip;',
         msgProgress: 'Pujant fitxer {index} de {files} - {name} - {percent}% completat.',
@@ -76,6 +78,7 @@
         fileActionSettings: {
             removeTitle: 'Eliminar arxiu',
             uploadTitle: 'Pujar arxiu',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Veure detalls',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'No pujat encara',

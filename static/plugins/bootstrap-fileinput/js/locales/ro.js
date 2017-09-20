@@ -26,6 +26,7 @@
         msgNoFilesSelected: '',
         msgCancelled: 'Anulat',
         msgZoomModalHeading: 'Previzualizare detaliată',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Fișierul "{name}" (<b>{size} KB</b>) depășește limita maximă de încărcare de <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Trebuie să selectezi cel puțin <b>{n}</b> {files} pentru a încărca.',
@@ -53,6 +54,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: 'Eroare de validare',
         msgLoading: 'Se încarcă fișierul {index} din {files} &hellip;',
         msgProgress: 'Se încarcă fișierul {index} din {files} - {name} - {percent}% încărcat.',
@@ -77,6 +79,7 @@
         fileActionSettings: {
             removeTitle: 'Scoateți fișier',
             uploadTitle: 'Incarca fisier',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Vezi detalii',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'Nu a încărcat încă',

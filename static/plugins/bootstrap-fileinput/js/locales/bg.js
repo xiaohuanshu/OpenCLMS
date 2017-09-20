@@ -25,6 +25,7 @@
         msgNoFilesSelected: '',
         msgCancelled: 'Отменен',
         msgZoomModalHeading: 'Детайлен преглед',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Файла "{name}" (<b>{size} KB</b>) надвишава максималните разрешени <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Трябва да изберете поне <b>{n}</b> {files} файла.',
@@ -52,6 +53,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: 'утвърждаване грешка',
         msgLoading: 'Зареждане на файл {index} от общо {files} &hellip;',
         msgProgress: 'Зареждане на файл {index} от общо {files} - {name} - {percent}% завършени.',
@@ -76,6 +78,7 @@
         fileActionSettings: {
             removeTitle: 'Махни файл',
             uploadTitle: 'Качване на файл',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Вижте детайли',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'Все още не е качил',

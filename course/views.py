@@ -201,7 +201,8 @@ def homework(request, courseid):
             for file in attachments:
                 commitdata.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
             commitdata.save()
-            data['commitdata'] = commitdata
+            return redirect(
+                reverse('course:homework', args=[courseid]) + '?homeworkid=%d' % request.GET.get('homeworkid'))
         else:
             if coursestudent:
                 try:

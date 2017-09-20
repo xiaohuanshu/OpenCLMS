@@ -25,7 +25,6 @@
         msgNoFilesSelected: '',
         msgCancelled: 'aflyst',
         msgZoomModalHeading: 'Detaljeret visning',
-        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Fil "{name}" (<b>{size} KB</b>) er st&oslash;rre end de tilladte <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Du skal mindst v&aelig;lge <b>{n}</b> {files} til upload.',
@@ -53,7 +52,6 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
-        msgUploadError: 'Error',
         msgValidationError: 'Validering Fejl',
         msgLoading: 'Henter fil {index} af {files} &hellip;',
         msgProgress: 'Henter fil {index} af {files} - {name} - {percent}% f&aelig;rdiggjort.',
@@ -78,7 +76,6 @@
         fileActionSettings: {
             removeTitle: 'Fjern fil',
             uploadTitle: 'Upload fil',
-            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Se detaljer',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'Ikke uploadet endnu',

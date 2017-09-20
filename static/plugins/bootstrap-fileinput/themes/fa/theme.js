@@ -1,5 +1,5 @@
 /*!
- * bootstrap-fileinput v4.4.3
+ * bootstrap-fileinput v4.3.9
  * http://plugins.krajee.com/file-input
  *
  * Font Awesome icon theme configuration for bootstrap-fileinput. Requires font awesome assets to be loaded.
@@ -17,7 +17,6 @@
         fileActionSettings: {
             removeIcon: '<i class="fa fa-trash text-danger"></i>',
             uploadIcon: '<i class="fa fa-upload text-info"></i>',
-            uploadRetryIcon: '<i class="fa fa-repeat text-info"></i>',
             zoomIcon: '<i class="fa fa-search-plus"></i>',
             dragIcon: '<i class="fa fa-bars"></i>',
             indicatorNew: '<i class="fa fa-hand-o-down text-warning"></i>',

@@ -25,7 +25,6 @@
         msgNoFilesSelected: 'Brak zaznaczonych plików',
         msgCancelled: 'Odwołany',
         msgZoomModalHeading: 'Szczegółowy podgląd',
-        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'Plik "{name}" (<b>{size} KB</b>) jest zbyt mały i musi być większy niż <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Plik o nazwie "{name}" (<b>{size} KB</b>) przekroczył maksymalną dopuszczalną wielkość pliku wynoszącą <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Minimalna liczba plików do wgrania: <b>{n}</b>.',
@@ -43,7 +42,6 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
-        msgUploadError: 'Error',
         msgValidationError: 'Błąd walidacji',
         msgLoading: 'Wczytywanie pliku {index} z {files} &hellip;',
         msgProgress: 'Wczytywanie pliku {index} z {files} - {name} - {percent}% zakończone.',
@@ -68,7 +66,6 @@
         fileActionSettings: {
             removeTitle: 'Usuń plik',
             uploadTitle: 'Przesyłanie pliku',
-            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Pokaż szczegóły',
             dragTitle: 'Przenies / Ponownie zaaranżuj',
             indicatorNewTitle: 'Jeszcze nie przesłanych',

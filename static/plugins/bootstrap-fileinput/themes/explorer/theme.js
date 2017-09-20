@@ -1,5 +1,5 @@
 /*!
- * bootstrap-fileinput v4.4.3
+ * bootstrap-fileinput v4.3.9
  * http://plugins.krajee.com/file-input
  *
  * Krajee Explorer theme configuration for bootstrap-fileinput. Load this theme file after loading `fileinput.js`.
@@ -27,8 +27,9 @@
             '    </div>\n' +
             '</div>',
             footer: '<td class="file-details-cell"><div class="explorer-caption" title="{caption}">{caption}</div> ' +
-            '{size}{progress}</td><td class="file-actions-cell">{indicator} {actions}</td>',
-            actions: '{drag}\n' +
+            '{size}{progress}</td><td class="file-actions-cell">{actions}</td>',
+            actions: '<div class="file-upload-indicator" title="{indicatorTitle}">{indicator}</div>\n' +
+            '{drag}\n' +
             '<div class="file-actions">\n' +
             '    <div class="file-footer-buttons">\n' +
             '        {upload} {delete} {zoom} {other} ' +
@@ -39,7 +40,7 @@
         },
         previewMarkupTags: {
             tagBefore1: teTagBef + '>' + teContent,
-            tagBefore2: teTagBef + ' title="{caption}">' + teContent,
+            tagBefore2: teTagBef + ' title="{caption}" style="width:{width};height:{height};">' + teContent,
             tagAfter: '</td>\n{footer}</tr>\n'
         },
         previewSettings: {

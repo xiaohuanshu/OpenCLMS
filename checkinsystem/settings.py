@@ -211,6 +211,8 @@ CELERY_BEAT_SCHEDULE = {
     },
 }
 
+DATA_UPLOAD_MAX_MEMORY_SIZE = None  # Disable the RequestDataTooBig check
+
 try:
     from settings_local import *
 except:

@@ -26,3 +26,5 @@ def update_avatar_from_wechat():
         u.avatar.save('%s.jpeg' % u.openid, File(img_temp))
     logger.info("[update_avatar_from_wechat]successful update %d avatar" % counter)
     return counter
+
+

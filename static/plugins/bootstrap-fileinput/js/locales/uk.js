@@ -26,7 +26,6 @@
         msgNoFilesSelected: '',
         msgCancelled: 'Cкасовано',
         msgZoomModalHeading: 'Детальний превью',
-        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Файл "{name}" (<b>{size} KB</b>) перевищує максимальний розмір <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Ви повинні вибрати як мінімум <b>{n}</b> {files} для загрузки.',
@@ -54,7 +53,6 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
-        msgUploadError: 'Error',
         msgValidationError: 'Помилка перевірки',
         msgLoading: 'Загрузка файла {index} із {files} &hellip;',
         msgProgress: 'Загрузка файла {index} із {files} - {name} - {percent}% завершено.',
@@ -79,7 +77,6 @@
         fileActionSettings: {
             removeTitle: 'Видалити файл',
             uploadTitle: 'Загрузити файл',
-            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Подивитися деталі',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'Ще не загружено',

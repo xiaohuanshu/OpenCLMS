@@ -25,7 +25,6 @@
         msgNoFilesSelected: 'Δεν επιλέχθηκαν αρχεία',
         msgCancelled: 'Ακυρώθηκε',
         msgZoomModalHeading: 'Λεπτομερής Προεπισκόπηση',
-        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'Το "{name}" (<b>{size} KB</b>) είναι πολύ μικρό, πρέπει να είναι μεγαλύτερο από <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Το αρχείο "{name}" (<b>{size} KB</b>) υπερβαίνει το μέγιστο επιτρεπόμενο μέγεθος μεταφόρτωσης <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Πρέπει να επιλέξετε τουλάχιστον <b>{n}</b> {files} για να ξεκινήσει η μεταφόρτωση.',
@@ -53,7 +52,6 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
-        msgUploadError: 'Error',
         msgValidationError: 'Σφάλμα Επικύρωσης',
         msgLoading: 'Φόρτωση αρχείου {index} από {files} &hellip;',
         msgProgress: 'Φόρτωση αρχείου {index} απο {files} - {name} - {percent}% ολοκληρώθηκε.',
@@ -78,7 +76,6 @@
         fileActionSettings: {
             removeTitle: 'Αφαιρέστε το αρχείο',
             uploadTitle: 'Μεταφορτώστε το αρχείο',
-            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Δείτε λεπτομέρειες',
             dragTitle: 'Μετακίνηση/Προσπαρμογή',
             indicatorNewTitle: 'Δεν μεταφορτώθηκε ακόμα',

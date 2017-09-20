@@ -26,6 +26,7 @@
         msgNoFilesSelected: '',
         msgCancelled: 'Dibatalkan',
         msgZoomModalHeading: 'Pratinjau terperinci',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: 'Berkas "{name}" (<b>{size} KB</b>) melebihi ukuran upload maksimal yaitu <b>{maxSize} KB</b>.',
         msgFilesTooLess: 'Anda harus memilih setidaknya <b>{n}</b> {files} untuk diunggah.',
@@ -53,6 +54,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: 'Kesalahan validasi',
         msgLoading: 'Memuat {index} dari {files} berkas &hellip;',
         msgProgress: 'Memuat {index} dari {files} berkas - {name} - {percent}% selesai.',
@@ -77,6 +79,7 @@
         fileActionSettings: {
             removeTitle: 'Hapus berkas',
             uploadTitle: 'Unggah berkas',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: 'Tampilkan Rincian',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: 'Belum diunggah',

@@ -27,6 +27,7 @@
         msgCancelled: '取消',
         zoomTitle: '詳細資料',
         msgZoomModalHeading: '內容預覽',
+        msgFileRequired: 'You must select a file to upload.',
         msgSizeTooSmall: 'File "{name}" (<b>{size} KB</b>) is too small and must be larger than <b>{minSize} KB</b>.',
         msgSizeTooLarge: '檔案 "{name}" (<b>{size} KB</b>) 大小超過上限 <b>{maxSize} KB</b>.',
         msgFilesTooLess: '最少必須選擇 <b>{n}</b> {files} 來上傳. ',
@@ -54,6 +55,7 @@
         msgUploadBegin: 'Initializing...',
         msgUploadEnd: 'Done',
         msgUploadEmpty: 'No valid data available for upload.',
+        msgUploadError: 'Error',
         msgValidationError: '驗證錯誤',
         msgLoading: '載入第 {index} 個檔案，共 {files} &hellip;',
         msgProgress: '載入第 {index} 個檔案，共 {files} - {name} - {percent}% 成功.',
@@ -78,6 +80,7 @@
         fileActionSettings: {
             removeTitle: '刪除檔案',
             uploadTitle: '上傳檔案',
+            uploadRetryTitle: 'Retry upload',
             zoomTitle: '詳細資料',
             dragTitle: 'Move / Rearrange',
             indicatorNewTitle: '尚未上傳',

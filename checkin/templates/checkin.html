@@ -290,6 +290,7 @@
         checkin_status_json ={{ checkin_status_json|safe }};
         {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
         checkin_status_style_json ={{ checkin_status_style_json|safe }};
+
         function shake(ele, cls, times) {
             var i = 0, t = false, o = ele.attr("class") + " ", c = "", times = times || 2;
             if (t) return;
@@ -303,6 +304,10 @@
                 }
             }, 300);
         }
+
+        function isElectron() {
+            return navigator.userAgent.indexOf('Electron') !== -1;
+        }
     </script>
     <script type="text/javascript">
         function generateqr() {
@@ -312,7 +317,11 @@
                 width: 512,
                 text: qrstr
             });
+            if (isElectron()) {
+                ipc.send("qrcodedata", $qrcode.children().get(0).toDataURL())
+            }
         }
+
         function countdown(num) {
             var can = $qrcode.children('canvas').get(0);
             var cans = can.getContext('2d');
@@ -325,6 +334,7 @@
             cans.font = "120px sans-serif";
             cans.fillText(num, 256, 310);
         }
+
         function getqrstr() {
             $.ajax({
                 contentType: "application/json; charset=utf-8",
@@ -335,7 +345,11 @@
                 }
             });
         }
+
         function loading1() {
+            if (isElectron()) {
+                ipc.send("qrcodedata", 'loading')
+            }
             var canvas = $qrcode.children('canvas').get(0),
                 ctx = canvas.getContext("2d"),
                 w = canvas.width,
@@ -368,6 +382,7 @@
                 }
             }, 25);
         }
+
         function qraction() {
             if (time == 3) {
                 qrstr = '';
@@ -400,6 +415,7 @@
                 "    </button>";
 
         }
+
         function changestudentstatus(studentid, status, toast) {
             var $slstudent = $("#sl" + studentid);
             $slstudent.find("td:eq(2) button").remove();
@@ -432,6 +448,7 @@
             $slstudent.find(".btn-group li").show();
             $slstudent.find("td:eq(2) ul li:contains(" + checkin_status_json[status] + ")").hide();
         }
+
         function reflashdata(first) {
             $.ajax({
                 contentType: "application/json; charset=utf-8",
@@ -448,6 +465,7 @@
                 }
             });
         }
+
         function changestatus(studentid, status) {
             $.ajax({
                 contentType: "application/json; charset=utf-8",
@@ -479,6 +497,7 @@
                 }
             });
         }
+
         $('#toastEnable').iCheck({
             checkboxClass: 'icheckbox_square-blue',
             radioClass: 'iradio_square-blue',
@@ -524,6 +543,10 @@
             $(".set-lateearly").bind('click', function () {
                 changestatus($(this).parents('tr').data("studentid"), 'lateearly');
             });
+            window.onbeforeunload = function () {
+                ipc.send("checkinwindow", 'down');
+                return;
+            }
         });
     </script>
     <script>
@@ -552,7 +575,11 @@
                 }
             };
             qrcode.addEventListener('click', function (e) {
-                handleFullscreen();
+                if (isElectron()) {
+                    ipc.send('checkinwindow', 'up');
+                } else {
+                    handleFullscreen();
+                }
             });
             var isFullScreen = function () {
                 return !!(document.fullScreen || document.webkitIsFullScreen || document.mozFullScreen || document.msFullscreenElement || document.fullscreenElement);

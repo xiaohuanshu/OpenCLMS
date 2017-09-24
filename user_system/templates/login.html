@@ -51,8 +51,7 @@
             {% endif %}
             <a data-toggle="modal" href="#myModal">忘记密码?</a>
             {% if browserdownload %}
-                <a style="float:right;" id="browserdownload" href="{{ browserdownload }}"
-                   download="browser.exe">下载浏览器</a><br>
+                <a style="float:right;color:red" id="browserdownload" href="{{ browserdownload }}">下载客户端</a><br>
             {% endif %}
 
         </div>
@@ -129,7 +128,12 @@
                 $('#normalloginbody').show();
             });
         });
-        if (window.applicationCache) {
+
+        function isElectron() {
+            return navigator.userAgent.indexOf('Electron') !== -1;
+        }
+
+        if (isElectron()) {
             $('#browserdownload').hide();
         }
     </script>

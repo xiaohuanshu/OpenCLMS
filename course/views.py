@@ -84,9 +84,9 @@ def data(request):
 
 def studentcourse(request, courseid):
     coursedata = Course.objects.get(id=courseid)
-    students = Studentcourse.objects.filter(course=coursedata).select_related('student', 'student__classid',
-                                                                              'student__classid__major',
-                                                                              'student__classid__department').all()
+    students = Studentcourse.objects.filter(course=coursedata). \
+        select_related('student', 'student__classid', 'student__classid__major', 'student__classid__department') \
+        .order_by('student_id').all()
     return render(request, 'studentcourse.html',
                   {'coursedata': coursedata, 'students': students,
                    'courseperms': has_course_permission(request.user, coursedata)})

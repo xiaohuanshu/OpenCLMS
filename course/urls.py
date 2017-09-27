@@ -24,5 +24,6 @@ urlpatterns = [
 
     url(r'^codeview', views.codeview, name='codeview'),
     url(r'^imgview', views.imgview, name='imgview'),
+    url(r'^studentcourse_selectdata/(\d+)$', views.studentcourse_selectdata, name='studentcourse_selectdata'),
 
 ]

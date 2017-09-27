@@ -292,6 +292,7 @@ def settings(request, courseid):
             scoreregulation.save()
         elif type == 'people':
             students = request.POST.getlist('addstudents', default=None)
+            del_students = request.POST.getlist('delstudents', default=None)
             teachers = request.POST.getlist('addteachers', default=None)
             disable_sync = request.POST.get('disable_sync', default=None)
             add_student_from_course = request.POST.get('add_student_from_course', default=None)
@@ -321,6 +322,9 @@ def settings(request, courseid):
                 for s in students:
                     if not Studentcourse.objects.filter(course=course, student_id=s).exists():
                         Studentcourse.objects.create(course=course, student_id=s)
+            if del_students:
+                for s in del_students:
+                    Studentcourse.objects.filter(course=course, student_id=s).delete()
             if teachers:
                 for t in teachers:
                     course.teachers.add(Teacher.objects.get(teacherid=t))
@@ -336,3 +340,33 @@ def settings(request, courseid):
             'courseperms': has_course_permission(request.user, course)
             }
     return render(request, 'settings.html', data)
+
+
+def studentcourse_selectdata(request, courseid):
+    course = Course.objects.get(id=courseid)
+    courseperms = has_course_permission(request.user, course)
+    if not courseperms:
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+    wd = request.GET['wd']
+    limit = 5
+    offset = 0
+    # lessondata = Lesson.objects.all()[offset: (offset + limit)]
+    studentcourse_data = Studentcourse.objects.filter(course=course).values_list('student')
+    studentdata = Student.objects.filter(studentid__in=studentcourse_data).order_by('studentid')
+    count = studentdata.filter(
+        (Q(name__icontains=wd) | Q(studentid__startswith=wd))
+    ).count()
+    studentdata = studentdata.select_related('classid').select_related('major').select_related(
+        'department').filter(
+        (Q(name__icontains=wd) | Q(studentid__startswith=wd))
+    )[offset: (offset + limit)]
+
+    rows = []
+    for p in studentdata:
+        ld = {'id': p.studentid, 'name': p.name, 'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
+              'class': (p.classid and [p.classid.name] or [None])[0],
+              'major': (p.major and [p.major.name] or [None])[0],
+              'department': p.department.name}
+        rows.append(ld)
+    data = {'total': count, 'rows': rows}
+    return HttpResponse(json.dumps(data), content_type="application/json")

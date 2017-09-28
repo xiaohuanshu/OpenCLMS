@@ -78,6 +78,7 @@ class Scoreregulation(models.Model):
     late = models.IntegerField(default=70)
     private_ask = models.IntegerField(default=70)
     public_ask = models.IntegerField(default=95)
+    sick_ask = models.IntegerField(default=95)
 
     def getscore(self, status):
         if status == CHECKIN_STATUS_NORMAL:
@@ -94,6 +95,8 @@ class Scoreregulation(models.Model):
             return self.private_ask
         elif status == CHECKIN_STATUS_PUBLIC_ASK:
             return self.public_ask
+        elif status == CHECKIN_STATUS_SICK_ASK:
+            return self.sick_ask
         else:
             return 0
 

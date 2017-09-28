@@ -9,7 +9,7 @@ register = template.Library()
 @register.assignment_tag
 def CHECKIN_STATUS_JSON():
     data = {CHECKIN_STATUS_NORMAL: u"未到", CHECKIN_STATUS_SUCCESS: u"正常", CHECKIN_STATUS_EARLY: u"早退",
-            CHECKIN_STATUS_LATEEARLY: u"迟&早", CHECKIN_STATUS_PRIVATE_ASK: u"私假",
+            CHECKIN_STATUS_LATEEARLY: u"迟&早", CHECKIN_STATUS_PRIVATE_ASK: u"事假", CHECKIN_STATUS_SICK_ASK: u"病假",
             CHECKIN_STATUS_LATE: u"迟到", CHECKIN_STATUS_PUBLIC_ASK: u"公假", CHECKIN_STATUS_CANCEL: u"取消"}
     return json.dumps(data)
 
@@ -17,7 +17,7 @@ def CHECKIN_STATUS_JSON():
 @register.assignment_tag
 def CHECKIN_STATUS_STYLE_JSON():
     data = {CHECKIN_STATUS_NORMAL: "gray", CHECKIN_STATUS_SUCCESS: "green", CHECKIN_STATUS_EARLY: "fuchsia",
-            CHECKIN_STATUS_LATEEARLY: "purple", CHECKIN_STATUS_PRIVATE_ASK: "blue",
+            CHECKIN_STATUS_LATEEARLY: "purple", CHECKIN_STATUS_PRIVATE_ASK: "blue", CHECKIN_STATUS_SICK_ASK: "blue",
             CHECKIN_STATUS_LATE: "maroon", CHECKIN_STATUS_PUBLIC_ASK: "blue", CHECKIN_STATUS_CANCEL: "yellow"}
     return json.dumps(data)
 
@@ -47,9 +47,11 @@ def CHECKIN_STATUS(status):
     elif status == CHECKIN_STATUS_LATE:
         return u'迟到'
     elif status == CHECKIN_STATUS_PRIVATE_ASK:
-        return u'私假'
+        return u'事假'
     elif status == CHECKIN_STATUS_PUBLIC_ASK:
         return u'公假'
+    elif status == CHECKIN_STATUS_SICK_ASK:
+        return u'病假'
     elif status == CHECKIN_STATUS_CANCEL:
         return u'取消'
 
@@ -69,6 +71,8 @@ def CHECKIN_STATUS_STYLE(status):
     elif status == CHECKIN_STATUS_PRIVATE_ASK:
         return 'blue'
     elif status == CHECKIN_STATUS_PUBLIC_ASK:
+        return 'blue'
+    elif status == CHECKIN_STATUS_SICK_ASK:
         return 'blue'
     elif status == CHECKIN_STATUS_CANCEL:
         return 'yellow'

@@ -319,7 +319,7 @@ def askmanager(request):
 
 
 def askdata(request):
-    typedata = {CHECKIN_STATUS_PRIVATE_ASK: '私假', CHECKIN_STATUS_PUBLIC_ASK: '公假'}
+    typedata = {CHECKIN_STATUS_PRIVATE_ASK: '事假', CHECKIN_STATUS_PUBLIC_ASK: '公假', CHECKIN_STATUS_SICK_ASK: '病假'}
     order = request.GET['order']
     limit = int(request.GET['limit'])
     offset = int(request.GET['offset'])

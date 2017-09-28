@@ -140,8 +140,8 @@ def majordata(request):
 
     rows = []
     for p in majordata:
-        ld = {'id': p.id, 'name': p.name, 'department': p.department.name, 'number': p.studentnumber(),
-              'classamount': p.classamount()}
+        ld = {'id': p.id, 'name': p.name, 'department': p.department.name, 'number': p.studentnumber,
+              'classamount': p.classamount}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")
@@ -168,8 +168,8 @@ def departmentdata(request):
 
     rows = []
     for p in departmentdata:
-        ld = {'id': p.id, 'name': p.name, 'studentnumber': p.studentnumber(), 'teachernumber': p.teachernumber(),
-              'majoramount': p.majoramount()}
+        ld = {'id': p.id, 'name': p.name, 'studentnumber': p.studentnumber, 'teachernumber': p.teachernumber,
+              'majoramount': p.majoramount}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")
@@ -196,7 +196,7 @@ def administrationdata(request):
 
     rows = []
     for p in administrationdata:
-        ld = {'id': p.id, 'name': p.name, 'teachernumber': p.teachernumber()}
+        ld = {'id': p.id, 'name': p.name, 'teachernumber': p.teachernumber}
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")

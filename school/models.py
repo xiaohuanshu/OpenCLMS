@@ -13,6 +13,7 @@ class Administration(models.Model):
     def __unicode__(self):
         return u"%s" % (self.name)
 
+    @cached_property
     def teachernumber(self):
         return self.teacher_set.count()
 
@@ -63,12 +64,15 @@ class Department(models.Model):
     name = models.CharField(max_length=50)
     wechatdepartmentid = models.SmallIntegerField(null=True)
 
+    @cached_property
     def majoramount(self):
         return self.major_set.count()
 
+    @cached_property
     def studentnumber(self):
         return self.student_set.count()
 
+    @cached_property
     def teachernumber(self):
         return self.teacher_set.count()
 

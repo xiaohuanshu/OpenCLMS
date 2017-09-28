@@ -289,6 +289,7 @@ def settings(request, courseid):
             scoreregulation.late = request.POST.get('late')
             scoreregulation.private_ask = request.POST.get('private_ask')
             scoreregulation.public_ask = request.POST.get('public_ask')
+            scoreregulation.sick_ask = request.POST.get('sick_ask')
             scoreregulation.save()
         elif type == 'people':
             students = request.POST.getlist('addstudents', default=None)
@@ -336,6 +337,7 @@ def settings(request, courseid):
             'late': scoreregulation.late,
             'private_ask': scoreregulation.private_ask,
             'public_ask': scoreregulation.public_ask,
+            'sick_ask': scoreregulation.sick_ask,
             'coursedata': course,
             'courseperms': has_course_permission(request.user, course)
             }

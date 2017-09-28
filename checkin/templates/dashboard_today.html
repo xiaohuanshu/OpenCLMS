@@ -117,7 +117,8 @@
             '未到': "#888b90",
             '请假': "#0073b7",
             '公假': "#0098e2",
-            '私假': "#003757",
+            '事假': "#003757",
+            '病假': "#004d77",
             '迟到': "#d81b60",
             '早退': "#f012be",
             '迟&早': "#605ca8",
@@ -142,7 +143,7 @@
             $('#today_start_checkin_lessons').text(data.today_start_checkin_lessons);
             $('#today_start_lessons').text(data.today_start_lessons);
             $('#student_all_count').text(data.student_all_count);
-            $('#student_ask').text(data.student_public_ask + data.student_private_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask, data.student_all_count) + ')');
+            $('#student_ask').text(data.student_public_ask + data.student_private_ask + data.student_sick_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask + data.student_sick_ask, data.student_all_count) + ')');
             $('#course_normal_count').text(data.course_normal_count);
             $('#course_late_count').text(data.course_late_count);
             $('#student_late_count').text(data.student_late_count + '(' + Percentage(data.student_late_count, data.student_all_count) + ')');
@@ -202,7 +203,8 @@
                             {value: data.course_status_data.lateearly, name: '迟&早'},
                             {value: data.course_status_data.normal, name: '未到'},
                             {value: data.course_status_data.public_ask, name: '公假'},
-                            {value: data.course_status_data.private_ask, name: '私假'}
+                            {value: data.course_status_data.sick_ask, name: '病假'},
+                            {value: data.course_status_data.private_ask, name: '事假'}
                         ]
                     }
                 ]
@@ -316,7 +318,8 @@
                             {value: data.student_all_arrive, name: '全勤'},
                             {value: data.student_all_normal, name: '全旷'},
                             {value: data.student_public_ask, name: '公假'},
-                            {value: data.student_private_ask, name: '私假'},
+                            {value: data.student_sick_ask, name: '病假'},
+                            {value: data.student_private_ask, name: '事假'},
                         ]
                     }
                 ]

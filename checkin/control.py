@@ -78,6 +78,18 @@ def changecheckinstatus(request, lessonid):
         checkin.status = CHECKIN_STATUS_LATEEARLY
         checkin.save()
         data = {'studentid': studentid, 'status': checkin.status}
+    elif newstatus == 'private_ask':
+        checkin.status = CHECKIN_STATUS_PRIVATE_ASK
+        checkin.save()
+        data = {'studentid': studentid, 'status': checkin.status}
+    elif newstatus == 'public_ask':
+        checkin.status = CHECKIN_STATUS_PRIVATE_ASK
+        checkin.save()
+        data = {'studentid': studentid, 'status': checkin.status}
+    elif newstatus == 'sick_ask':
+        checkin.status = CHECKIN_STATUS_SICK_ASK
+        checkin.save()
+        data = {'studentid': studentid, 'status': checkin.status}
     elif newstatus.isdigit():
         checkin.status = newstatus
         checkin.save()
@@ -163,7 +175,7 @@ def addask(request):
     starttime = datetime.datetime.strptime(request.GET.get('starttime', default=False), "%Y-%m-%d %I:%M %p")
     endtime = datetime.datetime.strptime(request.GET.get('endtime', default=False), "%Y-%m-%d %I:%M %p")
     reason = request.GET.get('reason', default='')
-    typedata = {u'公假': CHECKIN_STATUS_PUBLIC_ASK, u'私假': CHECKIN_STATUS_PRIVATE_ASK}
+    typedata = {u'公假': CHECKIN_STATUS_PUBLIC_ASK, u'事假': CHECKIN_STATUS_PRIVATE_ASK, u'病假': CHECKIN_STATUS_SICK_ASK}
     type = typedata[request.GET.get('type')]
     schoolterm = getCurrentSchoolYearTerm()['term']
     students = Student.objects.in_bulk(student)

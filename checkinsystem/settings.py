@@ -86,9 +86,6 @@ USE_L10N = False
 
 USE_TZ = False
 
-CELERY_ENABLE_UTC = True
-CELERY_TIMEZONE = TIME_ZONE
-
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.9/howto/static-files/
 
@@ -202,13 +199,20 @@ LOGGING = {
         },
     }
 }
+from celery.schedules import crontab
 
+CELERY_ENABLE_UTC = True
+CELERY_TIMEZONE = TIME_ZONE
 CELERY_BEAT_SCHEDULE = {
     'auto_stop_lesson': {
         'task': 'auto_stop_lesson',  # the same goes in the task name
         'schedule': 300.0,
         'args': ('today',)
     },
+    # 'send_birthday_blessing': {
+    #    'task': 'send_birthday_blessing',  # the same goes in the task name
+    #    'schedule': crontab(hour=2, minute=56),
+    # },
 }
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = None  # Disable the RequestDataTooBig check

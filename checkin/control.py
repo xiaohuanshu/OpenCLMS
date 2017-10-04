@@ -44,16 +44,18 @@ def changecheckinstatus(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
     studentid = request.GET.get('studentid', default=False) or request.GET.get('pk')
     newstatus = request.GET.get('newstatus', default=False) or request.GET.get('value')
-    student = Student.objects.get(studentid=studentid)
+    try:
+        student = Student.objects.get(studentid=studentid)
+    except ObjectDoesNotExist:
+        return HttpResponse(json.dumps({'error': 101, 'message': '未找到，请输入正确的学号'}), content_type="application/json")
     if not (has_course_permission(request.user, lesson.course) or request.user.has_perm('checkin_modify')):
         return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
     try:
         checkin = Checkin.objects.get(student=student, lesson=lesson)
     except ObjectDoesNotExist:
-        if Studentcourse.objects.filter(course=lesson.course, student=student).exists():
-            checkin = Checkin(student=student, lesson=lesson)
-        else:
-            return HttpResponse(json.dumps({'error': 101, 'message': '学生没有此课'}), content_type="application/json")
+        if not Studentcourse.objects.filter(course=lesson.course, student=student).exists():
+            Studentcourse.objects.create(course=lesson.course, student=student)
+        checkin = Checkin(student=student, lesson=lesson)
     if checkin.status > 10:  # ASK
         return HttpResponse(json.dumps({'error': 101, 'message': '学生已经请假'}), content_type="application/json")
     if newstatus == 'newcheckin':
@@ -231,6 +233,7 @@ def clearcheckin(request, lessonid):
     elif request.GET.get('deletethis', 0):
         if lesson.ischeckinnow():
             clear_last_checkin(lesson)
+            cache.delete('lesson_%d_clear_flag' % lesson.id)
         elif cache.get('lesson_%d_clear_flag' % lesson.id, default=False):
             clear_last_checkin(lesson)
             cache.delete('lesson_%d_clear_flag' % lesson.id)

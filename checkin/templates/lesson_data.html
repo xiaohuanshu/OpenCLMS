@@ -5,8 +5,26 @@
 {% block title %}{{ lessondata.course.title }}{% endblock %}
 {% block page_js %}
     <script src="{% static 'plugins/echarts/echarts.js' %}"></script>
+    <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
 {% endblock %}
 {% block page_css %}
+    <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
+    <style>
+        .select2-selection {
+            border-radius: 0 !important;
+            box-shadow: none;
+            border-color: #d2d6de !important;
+            height: 34px;
+            font-size: 14px;
+        }
+
+        .select2-container--default .select2-selection--multiple .select2-selection__choice {
+            background-color: #3c8dbc;
+            border-color: #367fa9;
+            padding: 1px 10px;
+            color: #fff;
+        }
+    </style>
 {% endblock %}
 {% block beforecontent %}
     <section class="content-header">
@@ -102,6 +120,9 @@
                         <i class="fa fa-trash"></i> 清除全部数据
                     </a>
                 {% endif %}
+                <a class="btn btn-app" data-toggle="modal" href="#LessonAskModal">
+                    <i class="fa fa-medkit"></i> 请假录入
+                </a>
                 <a class="btn btn-app" data-toggle="modal" href="#LessonCloseModal">
                     <i class="fa fa-stop"></i> 结束课程
                 </a>
@@ -245,7 +266,7 @@
                                     <th>系所</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody id="ask_table_body">
                                 {% for s in askdata %}
                                     <tr id="sl{{ s.student.studentid }}" data-studentid="{{ s.student.studentid }}"
                                         data-status="0">
@@ -288,6 +309,44 @@
                         <a href="{% url 'course:control.stoplesson' %}?lessonid={{ lessondata.id }}">
                             <button class="btn btn-warning" type="button"> 确认</button>
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade modal-dialog-center top-modal-with-space" id="LessonAskModal" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">请假录入</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="input-group">
+                            <select class="form-control" multiple="multiple" data-placeholder="学号或姓名"
+                                    id="studentselecter2"
+                                    style="width: 100%;"
+                                    name="delstudents"
+                            >
+                                <option></option>
+                            </select>
+                            <div class="input-group-btn">
+                                <button type="button" class="btn btn-info dropdown-toggle"
+                                        data-toggle="dropdown" aria-expanded="false">请假
+                                    <span class="fa fa-caret-down"></span></button>
+                                <ul class="dropdown-menu">
+                                    <li><a class="set_ask" data-status="sick_ask">病假</a></li>
+                                    <li><a class="set_ask" data-status="private_ask">事假</a></li>
+                                    <li><a class="set_ask" data-status="public_ask">公假</a></li>
+                                </ul>
+                            </div>
+                        </div>
+                        <p class="help-block">输入学号或姓名选择学生，录入请假信息</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
                     </div>
                 </div>
             </div>
@@ -399,12 +458,26 @@
                 },
                 success: function (value) {
                     if (value.error && value.error != 0) {
+                        alert(value.message);
                     } else {
                         $("#sl" + studentid).data("status", value.status);
                         //$("#sl" + studentid + " td:eq(5) button").removeClass("btn-danger");
                         //$("#sl" + studentid + " td:eq(5) button").removeClass("btn-success");
                         $("#sl" + studentid + " td:eq(5) button").attr("class", "btn dropdown-toggle btn-xs bg-" + checkin_status_style_json[value.status]);
                         $("#sl" + studentid + " td:eq(5) button").text(checkin_status_json[value.status]);
+                        if (value.status >= 10) {
+                            $('.info-box-number').eq(0).text($('.info-box-number').eq(0).text() - 1);
+                            $('.info-box-number').eq(2).text(parseInt($('.info-box-number').eq(2).text()) + 1);
+                            str = '<tr id="sl' + value.studentid + '" data-studentid="' + value.studentid + '" data-status="' + value.status + '">' +
+                                '<td>' + $("#sl" + studentid + " td:eq(0)").text() + '</td>' +
+                                '<td>' + value.studentid + '</td>' +
+                                '<td>' + $("#sl" + studentid + " td:eq(2)").text() + '</td>' +
+                                '<td>' + $("#sl" + studentid + " td:eq(3)").text() + '</td>' +
+                                '<td>' + $("#sl" + studentid + " td:eq(4)").text() + '</td>' +
+                                '</tr>';
+                            $('#ask_table_body').append(str);
+                            $("#sl" + studentid).remove();
+                        }
                     }
                 },
                 error: function () {
@@ -425,6 +498,65 @@
         });
         $(".set-normal").bind('click', function () {
             changestatus($(this).parents('tr').data("studentid"), 'delete');
+        });
+
+        $(".set_ask").bind('click', function () {
+            ask_type = $(this).data("status");
+            ask_student = $('#studentselecter2').select2('data');
+            if (ask_student.length == 0) {
+                return;
+            }
+            ask_student = ask_student[0]['id'];
+            changestatus(ask_student, ask_type);
+            $('#studentselecter2').val([]).trigger('change');
+        });
+
+
+        function formatRepo(repo) {
+            if (repo.loading) return repo.text;
+
+            var markup = "<div class='select2-result-student clearfix'>" +
+                "<div class='select2-result-student__name'>" + repo.name + "(" + repo.id + ")</div>";
+
+            markup += "<div class='select2-result-student__statistics'>" +
+                "<div class='select2-result-student__major'><i class='fa fa-comment'></i> " + repo.major + "</div>" +
+                "<div class='select2-result-student__department'><i class='fa fa-building'></i> " + repo.department + "</div>" +
+                "<div class='select2-result-student__class'><i class='fa fa-clone'></i> " + repo.class + "</div>" +
+                "</div>" +
+                "</div>";
+
+            return markup;
+        }
+
+        function formatRepoSelection(repo) {
+            return repo.name + "(" + repo.id + ")" || repo.text;
+        }
+
+        $studentselecter2 = $("#studentselecter2");
+        $studentselecter2.select2({
+            ajax: {
+                url: "{% url 'course:studentcourse_selectdata' lessondata.course.id %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        wd: params.term
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.rows
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 1,
+            maximumSelectionLength: 1,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
         });
     </script>
 {% endblock %}

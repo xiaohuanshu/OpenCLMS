@@ -118,7 +118,7 @@ LOGGING = {
             'class': 'logging.StreamHandler',
         },
         'request': {
-            'level': 'DEBUG',
+            'level': 'ERROR',
             'class': 'logging.handlers.RotatingFileHandler',
             'filename': os.path.join('logs/', 'request.log'),
             'maxBytes': 1024 * 1024 * 5,  # 5 MB

@@ -15,6 +15,8 @@
     {% if courseperms %}
         <link href="{% static 'plugins/toastr-master/toastr.css' %}" rel="stylesheet" type="text/css"/>
     {% endif %}
+    <link href="{% static 'ownplugins/imgbox/imgbox.css' %}" media="all" rel="stylesheet"
+          type="text/css"/>
 {% endblock %}
 {% block page_js %}
     {% if coursestudent %}
@@ -28,6 +30,7 @@
         <script src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
     {% endif %}
     <script src="{% static 'js/csrf.js' %}"></script>
+    <script src="{% static 'ownplugins/imgbox/drawrotated.js' %}"></script>
 {% endblock %}
 
 {% block beforecontent %}
@@ -80,7 +83,8 @@
                                     <ul class="list-unstyled">
                                         {% for a in resources %}
                                             <li><a href="{{ a.file.url }}"
-                                                   download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a></li>
+                                                   download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
+                                            </li>
                                         {% endfor %}
                                     </ul>
                                 </div>
@@ -300,7 +304,7 @@
                         <!-- /.box-header -->
                         <div class="box-body" style="display: none;">
                             <div class="row">
-                                <div class="col-xs-12">{{ c.text|safe }}</div>
+                                <div class="col-xs-12 homework_box">{{ c.text|safe }}</div>
                             </div>
                             <div class="row">
                                 <div class="col-xs-12">
@@ -476,7 +480,31 @@
                 $('#filepreview').on('hide.bs.modal', function () {
                     $('iframe').attr("src", '');
                 });
-            })
+            });
+
+            $(".homework_box img").each(function () {
+                wtext = "<div class=\"imgBox\"></div>";
+                winner = "<div class=\"tool\">\n" +
+                    "    <a class=\"imgLeft\" title=\"向右转\"></a>\n" +
+                    "    <a class=\"imgRight\" title=\"向左转\"></a>\n" +
+                    "    <a class=\"viewImg\" href=\"" + $(this).attr("src") + "\" target=\"_blank\" title=\"查看原图\"></a>\n" +
+                    "  </div>";
+                $(this).wrap(wtext);
+                $(this).before(winner);
+                var $imgBox = $(this).parent();
+                $imgBox.hover(function () {
+                    $imgBox.addClass('js_hover');
+                }, function () {
+                    $imgBox.removeClass('js_hover');
+                });
+                var img = $(this);
+                $imgBox.find(".imgLeft").click(function () {
+                    drawRotated(img, "right");
+                });
+                $imgBox.find(".imgRight").click(function () {
+                    drawRotated(img, "left");
+                });
+            });
         </script>
     {% endif %}
 {% endblock %}

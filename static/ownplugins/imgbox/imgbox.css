@@ -1,0 +1,63 @@
+.imgBox {
+    position: relative;
+}
+
+.imgBox .tool {
+    visibility: hidden;
+    position: absolute;
+    top: 8px;
+    left: 8px;
+}
+
+.imgBox.js_hover .tool {
+    visibility: visible;
+}
+
+.imgBox .tool a {
+    float: left;
+    display: block;
+    height: 24px;
+    width: 24px;
+    text-indent: -9999em;
+    overflow: hidden;
+    color: #FFF;
+    background-color: #3A6EA5;
+    text-decoration: none;
+    filter: alpha(opacity=50);
+    opacity: 0.5;
+    background-image: url(photoTool.gif);
+    background-repeat: no-repeat;
+}
+
+.imgBox .tool a:hover {
+    background-color: #FFF;
+    filter: alpha(opacity=80);
+    opacity: 0.8;
+}
+
+.imgBox .tool a.hideImg {
+    display: none;
+}
+
+.imgBox .tool a.imgLeft {
+    background-position: 0 0;
+}
+
+.imgBox .tool a.imgLeft {
+    background-position: -24px 0;
+}
+
+.imgBox .tool a.viewImg {
+    background-position: 0 -24px;
+}
+
+a.miniImg:hover,
+.imgBox .tool span {
+    border-color: #8294C8;
+    -moz-border-radius: 5px;
+    -webkit-border-radius: 5px;
+    border-radius: 5px;
+    -moz-box-shadow: 0 0 3px rgba(58, 110, 165, 0.5);
+    -webkit-box-shadow: 0 0 3px rgba(58, 110, 165, 0.5);
+    box-shadow: 0 0 3px rgba(58, 110, 165, 0.5);
+}

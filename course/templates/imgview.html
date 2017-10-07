@@ -3,9 +3,39 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
+    <link href="{% static 'ownplugins/imgbox/imgbox.css' %}" media="all" rel="stylesheet"
+          type="text/css"/>
     <title>Img view</title>
 </head>
 <body>
 <img src="{{ imgurl }}" width="100%">
+<script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
+<script src="{% static 'ownplugins/imgbox/drawrotated.js' %}"></script>
+<script>
+    $("img").each(function () {
+        wtext = "<div class=\"imgBox\"></div>";
+        winner = "<div class=\"tool\">\n" +
+            "    <a class=\"imgLeft\" title=\"向右转\"></a>\n" +
+            "    <a class=\"imgRight\" title=\"向左转\"></a>\n" +
+            "    <a class=\"viewImg\" href=\"" + $(this).attr("src") + "\" target=\"_blank\" title=\"查看原图\"></a>\n" +
+            "  </div>";
+        $(this).wrap(wtext);
+        $(this).before(winner);
+        var $imgBox = $(this).parent();
+        $imgBox.hover(function () {
+            $imgBox.addClass('js_hover');
+        }, function () {
+            $imgBox.removeClass('js_hover');
+        });
+        var img = $(this);
+        $imgBox.find(".imgLeft").click(function () {
+            drawRotated(img, "right", true);
+        });
+        $imgBox.find(".imgRight").click(function () {
+            drawRotated(img, "left", true);
+        });
+        img.next().width("100%");
+    });
+</script>
 </body>
 </html>

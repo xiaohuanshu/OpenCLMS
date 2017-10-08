@@ -4,8 +4,8 @@
 {% load center_extra %}
 {% block title %}{{ lessondata.course.title }}{% endblock %}
 {% block page_js %}
-    <script src="{% static 'plugins/echarts/echarts.js' %}"></script>
     <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
+    <script src="{% static 'plugins/echarts/echarts.js' %}"></script>
 {% endblock %}
 {% block page_css %}
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
@@ -413,35 +413,37 @@
             '早退': "#f012be",
             '迟&早': "#605ca8"
         };
-        var status_chart = echarts.init(document.getElementById('status_chart'));
-        status_chart.setOption({
-            tooltip: {
-                trigger: 'item',
-                formatter: "{a} <br/>{b}: {c} ({d}%)"
-            },
-            itemStyle: {
-                normal: {
-                    color: function (params) {
-                        return colorList[params.name];
+        if (document.getElementById('status_chart') !== null) {
+            status_chart = echarts.init(document.getElementById('status_chart'));
+            status_chart.setOption({
+                tooltip: {
+                    trigger: 'item',
+                    formatter: "{a} <br/>{b}: {c} ({d}%)"
+                },
+                itemStyle: {
+                    normal: {
+                        color: function (params) {
+                            return colorList[params.name];
+                        }
                     }
-                }
-            },
-            series: [
-                {
-                    name: '学生比例',
-                    type: 'pie',
-                    selectedMode: 'single',
-                    data: [
-                        {value: {{ checkin_success }}, name: '正常'},
-                        {value: {{ checkin_normal }}, name: '未到'},
-                        {value: {{ asknumber }}, name: '请假'},
-                        {value: {{ checkin_late }}, name: '迟到'},
-                        {value: {{ checkin_early }}, name: '早退'},
-                        {value: {{ checkin_lateearly }}, name: '迟&早'},
-                    ]
-                }
-            ]
-        });
+                },
+                series: [
+                    {
+                        name: '学生比例',
+                        type: 'pie',
+                        selectedMode: 'single',
+                        data: [
+                            {value: {{ checkin_success }}, name: '正常'},
+                            {value: {{ checkin_normal }}, name: '未到'},
+                            {value: {{ asknumber }}, name: '请假'},
+                            {value: {{ checkin_late }}, name: '迟到'},
+                            {value: {{ checkin_early }}, name: '早退'},
+                            {value: {{ checkin_lateearly }}, name: '迟&早'},
+                        ]
+                    }
+                ]
+            });
+        }
 
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         var checkin_status_json ={{ checkin_status_json|safe }};

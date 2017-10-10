@@ -8,3 +8,4 @@ Pillow
 django-debug-toolbar
 celery==4.1.0
 xlrd
+dj-database-url

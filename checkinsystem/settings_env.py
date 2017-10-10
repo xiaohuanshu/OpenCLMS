@@ -26,15 +26,10 @@ CONTACTSECRET = os.environ['CONTACTSECRET']
 WEEK_FIRST_DAY = os.environ['WEEK_FIRST_DAY']  # 0: Sunday 1:Monday
 
 # Database
+import dj_database_url
+
 DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': os.environ['DB_NAME'],
-        'USER': os.environ['DB_USER'],
-        'PASSWORD': os.environ['DB_PASS'],
-        'HOST': os.environ['DB_SERVICE'],
-        'PORT': os.environ['DB_PORT']
-    }
+    'default': dj_database_url.config(conn_max_age=60),
 }
 
 # Cache

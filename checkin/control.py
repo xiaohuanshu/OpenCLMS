@@ -56,8 +56,10 @@ def changecheckinstatus(request, lessonid):
         if not Studentcourse.objects.filter(course=lesson.course, student=student).exists():
             Studentcourse.objects.create(course=lesson.course, student=student)
         checkin = Checkin(student=student, lesson=lesson)
+    """ 关闭请假不允许修改功能
     if checkin.status > 10:  # ASK
         return HttpResponse(json.dumps({'error': 101, 'message': '学生已经请假'}), content_type="application/json")
+    """
     if newstatus == 'newcheckin':
         data = student_checkin(student, lesson)
     elif newstatus == 'delete':

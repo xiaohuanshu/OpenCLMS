@@ -16,6 +16,7 @@ from user_system.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
 from message import sendmessagetocoursestudent
+from course.tasks import send_homework_notification
 
 
 def information(request, courseid):
@@ -174,6 +175,7 @@ def homework(request, courseid):
             homework.save()
             for file in attachments:
                 homework.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
+            send_homework_notification.delay(homework.id)
             return redirect(reverse('course:homework', args=[courseid]) + '?homeworkid=%d' % homework.id)
         else:
             return render(request, 'newhomework.html',

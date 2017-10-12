@@ -4,9 +4,12 @@ from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 
 from school.function import getnowlessontime
-from course.models import Lesson
+from course.models import Lesson, Coursehomework, Studentcourse
 from course.constant import LESSON_STATUS_NOW, LESSON_STATUS_END
+from wechat.client import wechat_client
+from django.conf import settings
 from django.db.models import Q, F
+from django.core.urlresolvers import reverse
 import logging
 
 logger = logging.getLogger(__name__)
@@ -35,3 +38,21 @@ def auto_stop_lesson(before):
     if count:
         logger.info('autostop %d lessons this %s' % (count, before))
     return count
+
+
+@shared_task(name='send_homework_notification')
+def send_homework_notification(homeworkid):
+    homework = Coursehomework.objects.get(pk=homeworkid)
+    course = homework.course
+    studentcourses = Studentcourse.objects.select_related("student__user").filter(course=course).all()
+    userid = []
+    for sc in studentcourses:
+        if sc.student.user and sc.student.user.openid:
+            userid.append(sc.student.user.openid)
+    article = {
+        "title": "[%s]新作业!" % (course.title),
+        "description": "%s\n点击提交或查看详情，电脑提交请访问%s" % (homework.title, settings.DOMAIN),
+        "url": "%s%s" % (settings.DOMAIN, reverse('course:homework', args=[course.id]) + '?homeworkid=%d' % homeworkid),
+        "picurl": "%s/static/img/homework.jpg"
+    }
+    wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=userid, articles=[article])

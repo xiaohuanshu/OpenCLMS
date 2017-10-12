@@ -53,6 +53,6 @@ def send_homework_notification(homeworkid):
         "title": "[%s]新作业!" % (course.title),
         "description": "%s\n点击提交或查看详情，电脑提交请访问%s" % (homework.title, settings.DOMAIN),
         "url": "%s%s" % (settings.DOMAIN, reverse('course:homework', args=[course.id]) + '?homeworkid=%d' % homeworkid),
-        "picurl": "%s/static/img/homework.jpg"
+        "image": "%s/static/img/homework.jpg"
     }
     wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=userid, articles=[article])

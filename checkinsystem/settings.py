@@ -31,7 +31,7 @@ INSTALLED_APPS = [
     'school',
     'course',
     'checkin',
-
+    'zhengfang'
 ]
 
 MIDDLEWARE = [
@@ -164,6 +164,14 @@ LOGGING = {
             'maxBytes': 1024 * 1024 * 5,  # 5 MB
             'backupCount': 5,
             'formatter': 'mainlog',
+        },
+        'zhengfangfile': {
+            'level': 'INFO',
+            'class': 'logging.handlers.RotatingFileHandler',
+            'filename': os.path.join('logs/', 'zhengfanglog.log'),
+            'maxBytes': 1024 * 1024 * 5,  # 5 MB
+            'backupCount': 5,
+            'formatter': 'mainlog',
         }
     },
     'loggers': {
@@ -194,6 +202,11 @@ LOGGING = {
         },
         'school': {
             'handlers': ['schoolfile', 'console'],
+            'propagate': True,
+            'level': 'INFO',
+        },
+        'zhengfang': {
+            'handlers': ['zhengfangfile', 'console'],
             'propagate': True,
             'level': 'INFO',
         },

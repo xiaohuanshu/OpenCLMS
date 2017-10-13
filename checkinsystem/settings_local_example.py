@@ -33,8 +33,19 @@ DATABASES = {
         'PASSWORD': '',
         'HOST': '',
         'PORT': '5432'
-    }
+    },
 }
+
+""" add if using zhengfang
+'zhengfang': {
+        'ENGINE': 'django.db.backends.oracle',
+        'NAME': 'ORCL',
+        'USER': 'zfxfzb',
+        'PASSWORD': '',
+        'HOST': '',
+        'PORT': '',
+    }
+"""
 
 # CACHES
 CACHES = {

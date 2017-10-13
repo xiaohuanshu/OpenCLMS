@@ -7,7 +7,7 @@
     <script type="text/javascript" src="{% static 'plugins/toastr-master/toastr.js' %}"></script>
     <script type="text/javascript" src="{% static 'js/jquery.qrcode.min.js' %}"></script>
     <script src="{% static 'plugins/iCheck/icheck.min.js' %}"></script>
-    <script src="{% static 'js/jquery.nicescroll.min.js' %}"></script>
+    <script src="{% static 'plugins/nicescroll/jquery.nicescroll.min.js' %}"></script>
     <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
 {% endblock %}
 {% block page_css %}
@@ -598,8 +598,17 @@
             window.onbeforeunload = function () {
                 ipc.send("checkinwindow", 'down');
                 return;
-            }
+            };
+
+            $("#studentlistbody").niceScroll();
+            $("#studentlistbody").niceScroll().hide();
         });
+        $(document).on('shown.bs.modal', '#StudentList', function () {
+            $("#studentlistbody").niceScroll().resize();
+        })
+        $(document).on('hide.bs.modal', '#StudentList', function () {
+            $("#studentlistbody").niceScroll().hide();
+        })
     </script>
     <script>
         // Check if the browser supports the Fullscreen API
@@ -682,9 +691,6 @@
                 $checkinbox.attr("style", "");
             });
         });
-
-
-        $("#studentlistbody").niceScroll();
 
         function formatRepo(repo) {
             if (repo.loading) return repo.text;

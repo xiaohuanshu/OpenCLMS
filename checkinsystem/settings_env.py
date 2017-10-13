@@ -32,7 +32,7 @@ DATABASES = {
     'default': dj_database_url.config(conn_max_age=60),
 }
 
-if os.environ.get('ZHENGFANG_DATABASE_URL', default=None):
+if os.environ.get('ZHENGFANG_DATABASE_URL'):
     DATABASES['zhengfang'] = dj_database_url.parse(os.environ['ZHENGFANG_DATABASE_URL'])
 
 # Cache

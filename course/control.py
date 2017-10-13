@@ -80,6 +80,8 @@ def clearLesson(request):
 def sethomeworkscore(request):
     homeworkcommit = Homeworkcommit.objects.select_related('coursehomework').get(id=request.GET.get('homeworkcommitid'))
     score = request.GET.get('score')
+    if not score.isdigit():
+        return HttpResponse(json.dumps({'error': 101, 'message': '分数只能设置为数字'}), content_type="application/json")
     if not has_course_permission(request.user, homeworkcommit.coursehomework.course):
         return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
     homeworkcommit.score = score

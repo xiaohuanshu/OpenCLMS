@@ -4,7 +4,8 @@ from celery import shared_task
 from django.conf import settings
 from wechat.client import wechat_client
 from user_system.models import User
-from school.models import Student
+from school.models import Student, Class, Department, Teacher, Major, Administration
+from wechat.contact import contact_helper
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 import urllib2
@@ -43,3 +44,238 @@ def send_birthday_blessing():
         wechat_client.message.send_text(agent_id=settings.AGENTID, user_ids=[s.user.openid], content=message)
     logger.info("[send_birthday_blessing]successful send %d students" % counter)
     return counter
+
+
+@shared_task(name='sync_wechat')
+def sync_wechat(continuous=None):
+    """
+    同步过程：部门->用户(学生->教师)->标签->标签用户
+    """
+
+    # 部门
+    departmentlist = contact_helper.department.get()
+    for dep in departmentlist:
+        if dep['parentid'] == 1:
+            thisdepartmentid = dep['id']
+            thisdepartment = Department.objects.get(name=dep['name'])
+            cls = Class.objects.filter(department=thisdepartment).all()
+            for c in cls:
+                exist = False
+                for d in departmentlist:
+                    if c.name == d['name']:
+                        exist = True
+                        break
+                if not exist:
+                    depid = contact_helper.department.create(c.name, thisdepartmentid)['id']
+                    c.wechatdepartmentid = depid
+                    c.save()
+                    logger.info("[sync_wechat] add department %s" % c.name)
+
+    # (用户)学生-教师
+    userlist = contact_helper.user.list(1, True)
+    deletecount = 0
+    updatecount = 0
+    existcount = 0
+    createcount = 0
+
+    def getinfomation(id):
+        for user in userlist:
+            for item in user['extattr']['attrs']:
+                if item['name'] == u"学工号":
+                    thisuserworkid = item['value']
+                    break
+            if thisuserworkid == id:
+                return user
+        return None
+
+    def getverifycode(user):
+        for item in user['extattr']['attrs']:
+            if item['name'] == u"验证码":
+                return item['value']
+
+    create_list = []
+
+    # for student
+    students = Student.objects.select_related('classid').filter(available=True).all()
+    for s in students:
+        userinfo = getinfomation(s.studentid)
+        if s.classid:
+            s_depid = s.classid.wechatdepartmentid
+        else:
+            s_depid = 1
+        if userinfo:
+            existcount += 1
+            if userinfo['department'][0] != s_depid or getverifycode(userinfo) != s.idnumber[-6:]:
+                logger.debug("%s update" % s.studentid)
+                updatecount += 1
+                contact_helper.user.update(userinfo['userid'], department=[s_depid], extattr={
+                    "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"验证码", "value": s.idnumber[-6:]}]})
+            else:
+                logger.debug("%s exist" % s.studentid)
+            userlist.remove(userinfo)
+        else:
+            create_list.append(dict(user_id='S%s' % s.studentid, name=s.name,
+                                    department=s_depid, position=u'学生',
+                                    gender=s.sex,
+                                    email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL),
+                                    extattr={"attrs": [{"name": u"学工号", "value": s.studentid},
+                                                       {"name": u"验证码", "value": s.idnumber[-6:]}]}))
+
+    # for teacher
+    teachers = Teacher.objects.filter(available=True).exclude(name__regex='.*\d+.*').all()
+    for t in teachers:
+        userinfo = getinfomation(t.teacherid)
+        tdeps = [de.wechatdepartmentid for de in t.department.all()]
+
+        if userinfo:
+            existcount += 1
+            if sorted(userinfo['department']) != sorted(tdeps) or getverifycode(userinfo) != t.idnumber[-6:]:
+                logger.debug("%s update" % t.teacherid)
+                updatecount += 1
+                contact_helper.user.update(userinfo['userid'], department=tdeps,
+                                           extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
+                                                              {"name": u"验证码", "value": t.idnumber[-6:]}]})
+            else:
+                logger.debug("%s exist" % t.teacherid)
+            userlist.remove(userinfo)
+        else:
+            create_list.append(dict(user_id='T%s' % t.teacherid, name=t.name, department=tdeps, position=u'教师',
+                                    gender=t.sex,
+                                    email='%s@gengdan.edu.cn' % t.teacherid,
+                                    extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
+                                                       {"name": u"验证码", "value": t.idnumber[-6:]}]}))
+
+    # delete
+    for user in userlist:
+        logger.debug("%s delete" % user['userid'])
+        deletecount += 1
+        contact_helper.user.delete(user['userid'])
+
+    # create
+    for c in create_list:
+        logger.debug("%s create" % c['user_id'])
+        createcount += 1
+        contact_helper.user.create(**c)
+    logger.info("[sync_wechat]User Finished exist:%d update:%d create:%d delete:%d" % (
+        existcount, updatecount, createcount, deletecount))
+
+    # 标签
+
+    taglist = contact_helper.tag.list()
+    taglist = [t['tagname'] for t in taglist]
+    if u'学生' not in taglist:
+        contact_helper.tag.create(u'学生')
+    if u'教师' not in taglist:
+        contact_helper.tag.create(u'教师')
+    # for schoolyear
+    schoolyears = Class.objects.distinct('schoolyear').only('schoolyear')
+    for s in schoolyears:
+        if str(s.schoolyear) not in taglist:
+            contact_helper.tag.create(s.schoolyear)
+    # for major
+    majors = Major.objects.all()
+    for m in majors:
+        if m.name not in taglist:
+            contact_helper.tag.create(m.name)
+
+    # for administration
+    administrations = Administration.objects.all()
+    for a in administrations:
+        if a.name not in taglist:
+            contact_helper.tag.create(a.name)
+
+    logger.info("[sync_wechat] Update tag Finished")
+
+    # 标签用户
+    userlist = contact_helper.user.list(1, True)
+
+    # 等分list
+    def splist(l, s):
+        return [l[i:i + s] for i in range(len(l)) if i % s == 0]
+
+    def tag_update(tagid, newuserlist):
+        oldlist = [user['userid'] for user in contact_helper.tag.get_users(tagid)['userlist']]
+        deletelist = list(set(oldlist).difference(set(newuserlist)))
+        newlist = list(set(newuserlist).difference(set(oldlist)))
+        if len(deletelist) > 0:
+            contact_helper.tag.delete_users(tagid, deletelist)
+        for new in splist(newlist, 100):
+            contact_helper.tag.add_users(tagid, new)
+
+    taglist = contact_helper.tag.list()
+    tagname_to_id = {}
+    for t in taglist:
+        tagname_to_id[t['tagname']] = t['tagid']
+
+    # for student
+    students = Student.objects.filter(available=True).only('studentid').all()
+    taguserlist = []
+    for s in students:
+        userinfo = getinfomation(s.studentid)
+        if userinfo:
+            thiswechatuserid = userinfo['userid']
+        else:
+            thiswechatuserid = 'S%s' % s.studentid
+        taguserlist.append(thiswechatuserid)
+    tag_update(tagname_to_id[u'学生'], taguserlist)
+    logger.info("[sync_wechat] Finished Tag user for student")
+    # for teacher
+    teachers = Teacher.objects.filter(available=True).exclude(name__regex='.*\d+.*').only('teacherid').all()
+    taguserlist = []
+    for t in teachers:
+        userinfo = getinfomation(t.teacherid)
+        if userinfo:
+            thiswechatuserid = userinfo['userid']
+
+        else:
+            thiswechatuserid = 'T%s' % t.teacherid
+        taguserlist.append(thiswechatuserid)
+    tag_update(tagname_to_id[u'教师'], taguserlist)
+    logger.info("[sync_wechat] Finished Tag user for teacher")
+    # for major
+    majors = Major.objects.all()
+    for m in majors:
+        students = Student.objects.filter(available=True, major=m).only('studentid').all()
+        taguserlist = []
+        for s in students:
+            userinfo = getinfomation(s.studentid)
+            if userinfo:
+                thiswechatuserid = userinfo['userid']
+            else:
+                thiswechatuserid = 'S%s' % s.studentid
+            taguserlist.append(thiswechatuserid)
+        tag_update(tagname_to_id[m.name], taguserlist)
+    logger.info("[sync_wechat] Finished Tag user for major")
+    # for administration
+    administrations = Administration.objects.all()
+    for a in administrations:
+        teachers = Teacher.objects.filter(available=True, administration=a).exclude(name__regex='.*\d+.*').only(
+            'teacherid').all()
+        taguserlist = []
+        for t in teachers:
+            userinfo = getinfomation(t.teacherid)
+            if userinfo:
+                thiswechatuserid = userinfo['userid']
+
+            else:
+                thiswechatuserid = 'T%s' % t.teacherid
+            taguserlist.append(thiswechatuserid)
+        tag_update(tagname_to_id[a.name], taguserlist)
+    logger.info("[sync_wechat] Finished Tag user for administration")
+    # for school year
+    schoolyears = Class.objects.distinct('schoolyear').only('schoolyear')
+    schoolyears = [cl.schoolyear for cl in schoolyears]
+    for sy in schoolyears:
+        students = Student.objects.filter(available=True, classid__schoolyear=sy).only('studentid').all()
+        taguserlist = []
+        for s in students:
+            userinfo = getinfomation(s.studentid)
+            if userinfo:
+                thiswechatuserid = userinfo['userid']
+            else:
+                thiswechatuserid = 'S%s' % s.studentid
+            taguserlist.append(thiswechatuserid)
+        tag_update(tagname_to_id[str(sy)], taguserlist)
+    logger.info("[sync_wechat] Finished Tag user for schoolyear")
+
+    logger.info("[sync_wechat] All Finished")

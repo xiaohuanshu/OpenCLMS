@@ -1,6 +1,7 @@
 <!DOCTYPE html>
 <html lang="zh">
 {% include 'head.html' %}
+{% load piwik %}
 {% block page_css %}
 {% endblock %}
 <script>document.title = '{% block title %}{% endblock %} - Checkin system'</script>
@@ -38,5 +39,6 @@
 {% endblock %}
 {% block page_script %}
 {% endblock %}
+{% piwik %}
 </body>
 </html>

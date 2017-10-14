@@ -74,3 +74,7 @@ SERVER_EMAIL = ''  # The email address that error messages come from, such as th
 CELERY_BROKER_URL = ''  # example: "redis://127.0.0.1:6379/1"
 
 CELERY_RESULT_BACKEND = ''  # example: "redis://127.0.0.1:6379/1"
+
+# Piwik
+PIWIK_DOMAIN_PATH = ''
+PIWIK_SITE_ID = ''

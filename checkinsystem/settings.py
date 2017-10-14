@@ -31,7 +31,8 @@ INSTALLED_APPS = [
     'school',
     'course',
     'checkin',
-    'zhengfang'
+    'zhengfang',
+    'analytical',
 ]
 
 MIDDLEWARE = [
@@ -229,6 +230,8 @@ CELERY_BEAT_SCHEDULE = {
 }
 
 DATA_UPLOAD_MAX_MEMORY_SIZE = None  # Disable the RequestDataTooBig check
+
+ANALYTICAL_AUTO_IDENTIFY = False  # Django-analytical
 
 try:
     from settings_local import *

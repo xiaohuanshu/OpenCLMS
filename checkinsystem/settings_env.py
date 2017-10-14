@@ -63,3 +63,8 @@ SERVER_EMAIL = os.environ[
 CELERY_BROKER_URL = os.environ['REDIS_URL']
 
 CELERY_RESULT_BACKEND = os.environ['REDIS_URL']
+
+# Piwik
+if os.environ.get('PIWIK_SITE_ID'):
+    PIWIK_DOMAIN_PATH = os.environ['PIWIK_DOMAIN_PATH']
+    PIWIK_SITE_ID = os.environ['PIWIK_SITE_ID']

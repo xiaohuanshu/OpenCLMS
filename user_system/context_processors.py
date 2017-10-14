@@ -3,10 +3,12 @@ def auth(request):
         user = request.user
         return {
             'perms': PermWrapper(user),
+            'piwik_identity': user.academiccode  # for Piwik identity
         }
     else:
         return {
             'perms': NonePermWrapper(),
+            'piwik_identity': None
         }
 
 

@@ -295,6 +295,7 @@ def settings(request, courseid):
             scoreregulation.save()
         elif type == 'people':
             students = request.POST.getlist('addstudents', default=None)
+            exempt_students = request.POST.getlist('exempt_students', default=None)
             del_students = request.POST.getlist('delstudents', default=None)
             teachers = request.POST.getlist('addteachers', default=None)
             disable_sync = request.POST.get('disable_sync', default=None)
@@ -328,6 +329,20 @@ def settings(request, courseid):
             if del_students:
                 for s in del_students:
                     Studentcourse.objects.filter(course=course, student_id=s).delete()
+            # exempt_students:
+            old_exempt_students_id = []
+            for s in course.exempt_students.all():
+                old_exempt_students_id.append(s.studentid)
+            new_exempt_students = Student.objects.filter(studentid__in=exempt_students).all()
+            course.exempt_students.set(new_exempt_students)
+            Studentcourse.objects.filter(course=course, student__in=new_exempt_students).delete()
+            for s in new_exempt_students:
+                try:
+                    old_exempt_students_id.remove(s.studentid)
+                except ValueError:
+                    pass
+            for s in old_exempt_students_id:
+                    Studentcourse.objects.create(course=course, student_id=s)
             if teachers:
                 for t in teachers:
                     course.teachers.add(Teacher.objects.get(teacherid=t))
@@ -341,6 +356,7 @@ def settings(request, courseid):
             'public_ask': scoreregulation.public_ask,
             'sick_ask': scoreregulation.sick_ask,
             'coursedata': course,
+            'exempt_students': course.exempt_students.all(),
             'courseperms': has_course_permission(request.user, course)
             }
     return render(request, 'settings.html', data)

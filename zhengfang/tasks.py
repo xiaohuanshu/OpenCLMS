@@ -228,6 +228,7 @@ def sync_studentcourse(continuous=None):
             continue
         if course.disable_sync:
             continue
+        exempt_students = course.exempt_students.all()
         student_course_list = []
         for student_id in z_course.xs.read().split(','):
             try:
@@ -235,7 +236,8 @@ def sync_studentcourse(continuous=None):
             except ObjectDoesNotExist:
                 studentnotfound += 1
                 continue
-            student_course_list.append(Studentcourse(course=course, student=student))
+            if student not in exempt_students:
+                student_course_list.append(Studentcourse(course=course, student=student))
         Studentcourse.objects.filter(course=course).all().delete()
         Studentcourse.objects.bulk_create(student_course_list)
     logger.info("[sync_studentcourse]Finished count:%d,coursenotfound:%d,studentnotfound:%d" % (

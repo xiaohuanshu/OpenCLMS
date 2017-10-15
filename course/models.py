@@ -34,6 +34,7 @@ class Course(models.Model):
     department = models.ForeignKey('school.Department', models.SET_NULL, db_column='departmentid', null=True)
     teachclass = models.ForeignKey('school.Class', models.SET_NULL, db_column='teachclassid', null=True)
     disable_sync = models.BooleanField(default=False)
+    exempt_students = models.ManyToManyField('school.Student')
 
     def gettitlewithclass(self):
         if self.teachclass:

@@ -85,6 +85,21 @@
                                 </div>
                             </div>
                             <div class="form-group">
+                                <label class="col-sm-2 control-label text-warning">免修学生:</label>
+                                <div class="col-sm-10">
+                                    <select class="form-control" multiple="multiple" data-placeholder="选择免修的学生"
+                                            id="studentselecter3"
+                                            style="width: 100%;"
+                                            name="exempt_students">
+                                        <option></option>
+                                        {% for s in exempt_students %}
+                                            <option value="{{ s.studentid }}"
+                                                    selected>{{ s.name }}</option>
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                            <div class="form-group">
                                 <label class="col-sm-2 control-label text-danger">删除学生:</label>
                                 <div class="col-sm-10">
                                     <select class="form-control" multiple="multiple" data-placeholder="选择删除的学生"
@@ -239,7 +254,7 @@
         }
 
         function formatRepoSelection(repo) {
-            return repo.name + "(" + repo.id + ")" || repo.text;
+            return (repo.name || repo.text) + "(" + repo.id + ")";
         }
 
         $studentselecter = $("#studentselecter");
@@ -270,6 +285,31 @@
 
         $studentselecter2 = $("#studentselecter2");
         $studentselecter2.select2({
+            ajax: {
+                url: "{% url 'course:studentcourse_selectdata' coursedata.id %}",
+                dataType: 'json',
+                delay: 250,
+                data: function (params) {
+                    return {
+                        wd: params.term
+                    };
+                },
+                processResults: function (data, params) {
+                    return {
+                        results: data.rows
+                    };
+                },
+                cache: true
+            },
+            escapeMarkup: function (markup) {
+                return markup;
+            }, // let our custom formatter work
+            minimumInputLength: 1,
+            templateResult: formatRepo, // omitted for brevity, see the source of this page
+            templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
+        });
+        $studentselecter3 = $("#studentselecter3");
+        $studentselecter3.select2({
             ajax: {
                 url: "{% url 'course:studentcourse_selectdata' coursedata.id %}",
                 dataType: 'json',

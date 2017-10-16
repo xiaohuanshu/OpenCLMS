@@ -223,6 +223,10 @@ CELERY_BEAT_SCHEDULE = {
         'schedule': 300.0,
         'args': ('today',)
     },
+    'sync_zhengfang': {
+        'task': 'sync_zhengfang',
+        'schedule': crontab(hour=7, minute=30),
+    },
     # 'send_birthday_blessing': {
     #    'task': 'send_birthday_blessing',  # the same goes in the task name
     #    'schedule': crontab(hour=2, minute=56),

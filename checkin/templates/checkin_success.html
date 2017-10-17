@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+{% load static %}
+{% load checkin_extra %}
+<head>
+    <meta charset="utf-8">
+    <title>签到成功</title>
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body>
+<div class="container">
+    <div class="row text-center">
+        <div class="col-sm-6 col-sm-offset-3">
+            <br><br>
+            <h2 style="color:#0fad00">签到成功</h2>
+            <img src="{% static 'img/success.png' %}" width="30%">
+            <h3>{{ coursename }}</h3>
+            <p style="font-size:20px;color:#5C5C5C;">XXXX同学，恭喜你签到成功</p>
+            <p style="font-size:20px;color:#5C5C5C;">状态为：{{ status|CHECKIN_STATUS }}</p>
+            <br><br>
+            <br><br>
+            <a href="{% url 'home' %}" class="btn btn-default">进入主页</a>
+            <a href="{% url 'course:information' courseid %}" class="btn btn-default">查看课程</a>
+            <a href="{% url 'checkin:personal_data' %}" class="btn btn-default">个人数据</a>
+            <p>页面自动 关闭 等待时间：<b id="wait">{{ waittime|default:3 }}</b></p>
+            <br><br>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
+<script language="JavaScript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{% load wechat_extra %}
+{% wxconfig request.get_full_path 'closeWindow,hideOptionMenu,getLocation' as wxc %}
+{{ wxc | safe }}
+<script>
+    wx.ready(function () {
+        wx.hideOptionMenu();
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                $.get("{% url 'checkin:get_position' %}", {
+                    checkinid: {{ checkinid }},
+                    latitude: res.latitude,
+                    longitude: res.longitude,
+                    accuracy: res.accuracy
+                });
+            }
+        });
+        var wait = document.getElementById('wait');
+        var interval = setInterval(function () {
+            var time = --wait.innerHTML;
+            if (time <= 0) {
+                wx.closeWindow();
+                clearInterval(interval);
+            }
+        }, 1000);
+    });
+</script>
+</html>

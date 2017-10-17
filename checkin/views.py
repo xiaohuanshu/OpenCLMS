@@ -373,3 +373,8 @@ def jumptolesson_data(request, courseid):
                        'submessage': '请在课程详情中开启课程',
                        'jumpurl': str(
                            reverse('course:information', args=[courseid]))})
+
+
+def checkin_success_test(request):
+    return render(request, 'checkin_success.html',
+                  {'coursename': '计算机组成原理', 'status': 1, 'courseid': 1, 'checkinid': 1})

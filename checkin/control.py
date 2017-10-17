@@ -129,8 +129,38 @@ def ck(request, qr_str):
         if re['error'] != 0:
             return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title,
                                                   'wechatclose': True})
-        return render(request, 'success.html',
-                      {'message': u'签到成功', 'submessage': lesson.course.title, 'wechatclose': True})
+        return render(request, 'checkin_success.html',
+                      {
+                          'coursename': lesson.course.title,
+                          'status': re['status'],
+                          'courseid': lesson.course_id,
+                          'checkinid': re['checkin_id']
+                      })
+
+
+def get_position(request):
+    agent = request.META.get('HTTP_USER_AGENT', None)
+    if "MicroMessenger" not in agent:
+        return HttpResponse(json.dumps({}), content_type="application/json")
+    checkin_id = request.GET.get('checkinid')
+    try:
+        checkindata = Checkin.objects.get(pk=checkin_id)
+    except ObjectDoesNotExist:
+        return HttpResponse(json.dumps({'error': 101, 'message': "checkin not found"}), content_type="application/json")
+    try:
+        student = Student.objects.get(user=request.user)
+    except ObjectDoesNotExist:
+        return HttpResponse(json.dumps({'error': 101, 'message': "student not found"}), content_type="application/json")
+    if student != checkindata.student:
+        return HttpResponse(json.dumps({'error': 101, 'message': "student not match"}), content_type="application/json")
+    latitude = request.GET.get('latitude')
+    longitude = request.GET.get('longitude')
+    accuracy = request.GET.get('accuracy')
+    checkindata.positionaccuracy = accuracy
+    checkindata.positionlatitude = latitude
+    checkindata.positionlongitude = longitude
+    checkindata.save()
+    return HttpResponse(json.dumps({'error': 0, 'message': "success!"}), content_type="application/json")
 
 
 def startCheckin(request, lessonid):

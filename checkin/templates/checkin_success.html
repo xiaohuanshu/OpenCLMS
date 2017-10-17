@@ -16,7 +16,7 @@
             <h2 style="color:#0fad00">签到成功</h2>
             <img src="{% static 'img/success.png' %}" width="30%">
             <h3>{{ coursename }}</h3>
-            <p style="font-size:20px;color:#5C5C5C;">XXXX同学，恭喜你签到成功</p>
+            <p style="font-size:20px;color:#5C5C5C;">{{ studentname }}同学，恭喜你签到成功</p>
             <p style="font-size:20px;color:#5C5C5C;">状态为：{{ status|CHECKIN_STATUS }}</p>
             <br><br>
             <br><br>

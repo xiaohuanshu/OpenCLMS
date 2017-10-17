@@ -132,6 +132,7 @@ def ck(request, qr_str):
         return render(request, 'checkin_success.html',
                       {
                           'coursename': lesson.course.title,
+                          'studentname': student.name,
                           'status': re['status'],
                           'courseid': lesson.course_id,
                           'checkinid': re['checkin_id']

@@ -32,21 +32,21 @@
                     <ul class="dropdown-menu">
                         <li class="header">你今天有{{ todaylesson | length }}节课</li>
                         {% for lesson in todaylesson %}
-                        <li>
+                            <li>
 
-                            <ul class="menu">
-                                <li>
-                                    <a href="{% url 'course:information' lesson.course.id %}">
-                                        <h4>
-                                            {{ lesson.course.title }}
-                                        </h4>
-                                        <p>第{{ lesson.week }}周{{ lesson.day|weekdeal }}
-                                    ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</p>
-                                    </a>
-                                </li>
-                            </ul>
+                                <ul class="menu">
+                                    <li>
+                                        <a href="{% url 'course:information' lesson.course.id %}">
+                                            <h4>
+                                                {{ lesson.course.title }}
+                                            </h4>
+                                            <p>第{{ lesson.week }}周{{ lesson.day|weekdeal }}
+                                                ,第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</p>
+                                        </a>
+                                    </li>
+                                </ul>
 
-                        </li>
+                            </li>
                         {% endfor %}
                         <li class="footer"><a href="{% url 'course:schedule' %}">查看课表</a></li>
                     </ul>
@@ -61,7 +61,7 @@
                         <!-- The user image in the navbar-->
                         <img src="{{ request.user.avatar.url }}" class="user-image" alt="User Image">
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                        <span class="hidden-xs">{{ request.user.username }}</span>
+                        <span class="hidden-xs">{{ request.user.username|default:"未注册" }}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
@@ -69,8 +69,8 @@
                             <img src="{{ request.user.avatar.url }}" class="img-circle" alt="User Image">
 
                             <p>
-                                {{ request.user.username }}
-                                <small>{{ request.user.email }}</small>
+                                {{ request.user.username|default:"未注册" }}
+                                <small>{{ request.user.email|default:"" }}</small>
                             </p>
                         </li>
                         <!-- Menu Body -->

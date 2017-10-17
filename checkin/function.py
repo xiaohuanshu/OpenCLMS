@@ -162,7 +162,7 @@ def student_checkin(student, lesson, abnormal=None):
     if checkin.abnormal is None and abnormal is not None:
         checkin.abnormal = abnormal
     checkin.save()
-    return {'error': 0, 'status': checkin.status}
+    return {'error': 0, 'status': checkin.status, 'checkin_id': checkin.id}
 
 
 def generateqrstr(lessonid):

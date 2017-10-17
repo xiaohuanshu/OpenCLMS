@@ -5,6 +5,8 @@ from school.function import getnowlessontime
 def todaylesson(request):
     if request.is_ajax():
         return {}
+    if request.path.startswith("/checkin/ck"):
+        return {}
     if hasattr(request, 'user'):
         nowlessontime = getnowlessontime()
         if request.user.isteacher:

@@ -225,7 +225,7 @@ CELERY_BEAT_SCHEDULE = {
     },
     'sync_zhengfang': {
         'task': 'sync_zhengfang',
-        'schedule': crontab(hour=7, minute=30),
+        'schedule': crontab(hour=19, minute=30),  # because of celery timezone bug
     },
     # 'send_birthday_blessing': {
     #    'task': 'send_birthday_blessing',  # the same goes in the task name

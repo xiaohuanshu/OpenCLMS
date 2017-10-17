@@ -4,7 +4,7 @@ import json
 from django.db.models import Q
 from django.http import HttpResponse
 from django.utils.http import urlunquote
-from django.shortcuts import render, redirect
+from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
 from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit
@@ -181,7 +181,7 @@ def homework(request, courseid):
             return render(request, 'newhomework.html',
                           {'coursedata': coursedata, 'courseperms': courseperms})
     elif request.GET.get('homeworkid'):
-        homeworkdata = Coursehomework.objects.get(id=request.GET.get('homeworkid'))
+        homeworkdata = get_object_or_404(Coursehomework, pk=request.GET.get('homeworkid'))
         data = {'coursedata': coursedata, 'courseperms': courseperms,
                 'homework': homeworkdata, 'coursestudent': coursestudent}
         if request.META['REQUEST_METHOD'] == 'POST' and COURSE_HOMEWORK_TYPE_ONLINESUBMIT == homeworkdata.type:
@@ -342,7 +342,7 @@ def settings(request, courseid):
                 except ValueError:
                     pass
             for s in old_exempt_students_id:
-                    Studentcourse.objects.create(course=course, student_id=s)
+                Studentcourse.objects.create(course=course, student_id=s)
             if teachers:
                 for t in teachers:
                     course.teachers.add(Teacher.objects.get(teacherid=t))

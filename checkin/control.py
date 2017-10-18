@@ -140,9 +140,6 @@ def ck(request, qr_str):
 
 
 def get_position(request):
-    agent = request.META.get('HTTP_USER_AGENT', None)
-    if "MicroMessenger" not in agent:
-        return HttpResponse(json.dumps({}), content_type="application/json")
     checkin_id = request.GET.get('checkinid')
     try:
         checkindata = Checkin.objects.get(pk=checkin_id)

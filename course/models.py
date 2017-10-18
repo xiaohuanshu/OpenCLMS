@@ -77,10 +77,7 @@ class Course(models.Model):
         location = self.location
         term = self.schoolterm
         for ele in splitlesson(time, location):
-            try:
-                locationid = Classroom.objects.get(location=ele['location'])
-            except ObjectDoesNotExist:
-                return -1
+            locationid, created = Classroom.objects.get_or_create(location=ele['location'])
             if not Lesson.objects.filter(course=self.id, time=ele['time'], term=term,
                                          week=ele['week'], day=ele['day'], length=ele['length'],
                                          classroom=locationid.id).exists():

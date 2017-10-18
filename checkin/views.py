@@ -238,7 +238,7 @@ def student_data(request, studentid):
     columns = [
         [
             {'field': 'name', 'title': u'课程名称', 'rowspan': 2, 'align': 'center', 'valign': 'middle',
-             'searchable': True},
+             'searchable': True, 'formatter': 'courseFormatter'},
             {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'field': 'score', 'title': u'考勤成绩', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'title': u'签到数据', 'colspan': maxlength, 'align': 'center'}

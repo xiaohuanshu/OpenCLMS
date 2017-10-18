@@ -99,6 +99,12 @@
             return checkin_status_json[value];
         }
 
+        function courseFormatter(value, row, index) {
+            var clickurl = "{% url 'course:information' 0 %}";
+            clickurl = clickurl.substring(0, clickurl.length - 1);
+            return "<a href='" + clickurl + row.courseid + "'>" + value + "</a>";
+        }
+
         function cellStyle(value, row, index) {
             if (value == null) {
                 return {}

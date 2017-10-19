@@ -1,6 +1,5 @@
 # -*- coding: utf-8 -*-
 from course.models import Course, Studentcourse
-from school.models import Student
 from django.core.urlresolvers import reverse
 from icalendar import Calendar, Event
 from datetime import datetime, timedelta
@@ -8,9 +7,10 @@ from course.function import getweek, gettime, getday
 from school.function import getTermDate, getClassTime, getCurrentSchoolYearTerm
 from django.conf import settings
 from user_system.models import User
-from django.shortcuts import get_object_or_404
+from django.shortcuts import get_object_or_404, render
 import pytz
 from django.http import HttpResponse
+from django.shortcuts import redirect
 
 
 def get_lesson_time(term, week, day, time, length):
@@ -90,6 +90,9 @@ def generate_ics(courses):
 
 def ics(request, userid):
     user = get_object_or_404(User, id=userid)
+    agent = request.META.get('HTTP_USER_AGENT', None)
+    if agent and "MicroMessenger" in agent:
+        return render(request, 'openinbrowser.html')
     if user.isteacher:
         teacher = user.teacher_set.get()
         course = teacher.course_set.filter(schoolterm=getCurrentSchoolYearTerm()['term']).all()
@@ -99,3 +102,7 @@ def ics(request, userid):
             'term']).values_list('course', flat=True)
         course = Course.objects.filter(id__in=termcourse).all()
     return HttpResponse(generate_ics(course), content_type="text/calendar")
+
+
+def download(request):
+    return redirect(reverse('course:ics', args=[request.user.id]))

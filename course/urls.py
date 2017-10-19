@@ -28,5 +28,6 @@ urlpatterns = [
     url(r'^studentcourse_selectdata/(\d+)$', views.studentcourse_selectdata, name='studentcourse_selectdata'),
 
     url(r'^ics/(\d+).ics$', ics.ics, name='ics'),
+    url(r'^ics/download$', ics.download, name='ics_download'),
 
 ]

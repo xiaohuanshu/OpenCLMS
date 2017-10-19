@@ -19,7 +19,7 @@ class UserMiddleware(object):
         allow_url = ['user:login', 'user:loginProcess', 'user:logout',
                      'user:check_username', 'user:check_email',
                      'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword',
-                     'wechat:wxauth', 'wechat:wechatlogin']
+                     'wechat:wxauth', 'wechat:wechatlogin', 'course:ics']
         wechat_allow_url = ['wechat:oauth', 'wechat:wxauth', 'user:register', 'user:check_username', 'user:check_email',
                             'user:registerProcess']
         if request.session.get('userid', '') == '':

@@ -2,6 +2,7 @@ from django.conf.urls import url
 import schedule
 import views
 import control
+import ics
 
 urlpatterns = [
 
@@ -25,5 +26,7 @@ urlpatterns = [
     url(r'^codeview', views.codeview, name='codeview'),
     url(r'^imgview', views.imgview, name='imgview'),
     url(r'^studentcourse_selectdata/(\d+)$', views.studentcourse_selectdata, name='studentcourse_selectdata'),
+
+    url(r'^ics/(\d+).ics$', ics.ics, name='ics'),
 
 ]

@@ -2,6 +2,7 @@ import datetime
 from center.cache import cache_func
 from models import Major, Schoolterm, Classtime, Department, Administration
 from django.db.models import ObjectDoesNotExist
+from django.core.cache import cache
 
 
 @cache_func('majordata', 60 * 60 * 24)
@@ -24,9 +25,12 @@ def getCurrentSchoolYearTerm():
 
 
 def getTermDate(term):
-    data = Schoolterm.objects.get(description=term)
-    # cache.set('gettermdate_%s' % term, [data.startdate, data.enddate], 60 * 60 * 24)
-    return [data.startdate, data.enddate]
+    data = cache.get('gettermdate_%s' % term, default=None)
+    if not data:
+        data = Schoolterm.objects.get(description=term)
+        data = [data.startdate, data.enddate]
+        cache.set('gettermdate_%s' % term, data, 60 * 60 * 24)
+    return data
 
 
 @cache_func('termdata', 60 * 60 * 24)

@@ -352,20 +352,16 @@
                                     <tbody>
                                     {% for s in students %}
                                         <tr>
-                                            <td>
-                                                {% if s.time %}
-                                                    <a style="cursor: pointer" class="homeworkLink"
-                                                       data-submitid="{{ s.submitid }}">{{ s.studentid }} {{ s.name }}</a>
-                                                {% else %}
-                                                    {{ s.studentid }} {{ s.name }}
-                                                {% endif %}
-                                            </td>
+                                            <td>{% if s.time %}<a style="cursor: pointer" class="homeworkLink"
+                                                                  data-submitid="{{ s.submitid }}">{{ s.studentid }} {{ s.name }}</a>
+                                                {% else %}{{ s.studentid }} {{ s.name }}{% endif %}</td>
                                             <td>
                                                 {% if s.time %}
                                                     {% if s.score %}
-                                                        <span class="badge bg-green score">{{ s.score }}</span>
+                                                        <span class="badge bg-green score"
+                                                              id="slist_{{ s.submitid }}">{{ s.score }}</span>
                                                     {% else %}
-                                                        <span class="badge score">未评分</span>
+                                                        <span class="badge score" id="slist_{{ s.submitid }}">未评分</span>
                                                     {% endif %}
                                                 {% else %}
                                                     <span class="badge bg-gray-active score">未提交</span>
@@ -382,55 +378,52 @@
                 </div>
             </div>
             <div class="col-xs-12 col-md-9">
-                {% for c in students %}
-                    {% if c.time %}
-                        <div class="col-md-12 commit" data-homeworkcommitid="{{ c.submitid }}">
-                            <div class="box box-default collapsed-box">
-                                <div class="box-header with-border">
-                                    <h3 class="box-title">{{ c.name }}({{ c.studentid }})</h3>
+                {% for c in students %}{% if c.time %}
+                    <div class="box box-default collapsed-box commit"
+                         data-source="{% url 'course:get_homework_commit' c.submitid %}"
+                         data-homeworkcommitid="{{ c.submitid }}">
+                        <div class="box-header with-border">
+                            <h3 class="box-title">{{ c.name }}({{ c.studentid }})</h3>
 
-                                    <div class="box-tools pull-right">
-                                        {% if c.score %}
-                                            <span class="badge bg-green score">{{ c.score }}</span>
-                                        {% else %}
-                                            <span class="badge bg-gray-active score">未评分</span>
-                                        {% endif %}
-                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                                class="fa fa-plus"></i>
-                                        </button>
-                                    </div>
-                                    <!-- /.box-tools -->
-                                </div>
-                                <!-- /.box-header -->
-                                <div class="box-body" style="display: none;">
-
-                                </div>
-                                <!-- /.box-body -->
-                                {% comment %}<div class="overlay">
-                                    <i class="fa fa-refresh fa-spin"></i>
-                                </div>{% endcomment %}
-                                <div class="box-footer">
-                                    <div class="col-xs-6">
-                                        提交时间:{{ c.time|date:'Y-m-d H:i' }}
-                                        {% if homework.deadline < c.time %}
-                                            <span class="badge bg-red">过期提交</span>
-                                        {% endif %}
-                                    </div>
-                                    <div class="col-xs-6">
-                                        <div class="input-group input-group-sm">
-                                            <input type="number" class="form-control scorenumber"
-                                                   value="{{ c.score|default:'' }}">
-                                            <span class="input-group-btn">
-                      <button type="button" class="btn btn-primary sethomeworkscore">评分</button>
-                    </span>
-                                        </div>
-                                    </div>
-                                </div>
+                            <div class="box-tools pull-right">
+                                {% if c.score %}
+                                    <span class="badge bg-green score">{{ c.score }}</span>
+                                {% else %}
+                                    <span class="badge bg-gray-active score">未评分</span>
+                                {% endif %}
+                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                        class="fa fa-plus"></i>
+                                </button>
                             </div>
+                            <!-- /.box-tools -->
+                        </div>
+                        <!-- /.box-header -->
+                        <div class="box-body" style="display: none;">
 
                         </div>
-                    {% endif %}
-                {% endfor %}
+                        <!-- /.box-body -->
+                        {% comment %}<div class="overlay">
+                                    <i class="fa fa-refresh fa-spin"></i>
+                                </div>{% endcomment %}
+                        <div class="box-footer">
+                            <div class="col-xs-6">
+                                提交时间:{{ c.time|date:'Y-m-d H:i' }}
+                                {% if homework.deadline < c.time %}
+                                    <span class="badge bg-red">过期提交</span>
+                                {% endif %}
+                            </div>
+                            <div class="col-xs-6">
+                                <div class="input-group input-group-sm">
+                                    <input type="number" class="form-control scorenumber"
+                                           value="{{ c.score|default:'' }}">
+                                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-primary sethomeworkscore">评分</button>
+                    </span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% endif %}{% endfor %}
             </div>
         </div>
         <div class="modal fade modal-dialog-center top-modal-with-space" id="DeleteHomeworkModal" tabindex="-1"
@@ -525,9 +518,32 @@
                 "showMethod": "fadeIn",
                 "hideMethod": "fadeOut"
             };
+            overlay_template = '<div class="overlay"><div class="fa fa-refresh fa-spin"></div></div>';
             $(".commit").each(function () {
+                $(this).boxWidget();
+                $(this).on('expanded.boxwidget', function () {
+                    var $box = $(this);
+                    if ($box.data("loaded") === true) {
+                        return;
+                    }
+                    if ($box.find(".overlay").length > 0) {
+                        return;
+                    }
+                    var $overlay = $(overlay_template);
+                    $box.append($overlay);
+                    $.get($box.data('source'), function (response) {
+                        $box.find('.box-body').html(response);
+                        $box.data("loaded", true);
+                    }).fail(function () {
+                        toastr['error']("获取作业失败，请稍候再试", "获取失败");
+                        $box.boxWidget('collapse');
+                    }).always(function () {
+                        $box.find(".overlay").remove();
+                    });
+                });
                 var homeworkcommitid = $(this).data('homeworkcommitid');
                 var score = $(this).find('.score');
+                var score2 = $("#slist_" + homeworkcommitid);
                 var scorenumber = $(this).find('.scorenumber');
                 var sethomeworkscore = $(this).find('.sethomeworkscore');
                 sethomeworkscore.click(function () {
@@ -549,6 +565,8 @@
                                 score.text(scoren);
                                 score.removeClass('bg-gray-active');
                                 score.addClass('bg-green');
+                                score2.text(scoren);
+                                score2.addClass('bg-green');
                             }
                         }, error: function (XMLHttpRequest, textStatus) {
                             toastr['error'](textStatus, "与服务器连接失败");
@@ -592,16 +610,16 @@
             });
             $(".homeworkLink").click(function () {
                 var submitid = $(this).data("submitid");
-                var $homework = $("[data-homeworkcommitid='" + submitid + "']")
+                var $homework = $("[data-homeworkcommitid='" + submitid + "']");
                 $("html, body").animate({
                     scrollTop: $homework.offset().top
                 }, {
-                    duration: 500, easing: "swing", callback: function () {
+                    duration: 500, easing: "swing", complete: function () {
                         $homework.boxWidget('expand');
                     }
                 });
 
-            })
+            });
         </script>
     {% endif %}
 {% endblock %}

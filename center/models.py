@@ -88,6 +88,8 @@ class Filemodel(models.Model):
             return icon['txt']
         elif extension in ['.avi', '.mpg', '.mkv', '.mov', '.mp4', '.3gp', '.webm', '.wmv']:
             return icon['mov']
+        elif extension in ['.bmp', '.jpg', '.jpeg', '.png', '.gif', '.ico', '.psd']:
+            return icon['jpg']
         elif extension in ['.mp3', '.wav']:
             return icon['mp3']
         elif extension == '.pdf':

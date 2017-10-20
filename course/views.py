@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import json
 
-from django.db.models import Q
+from django.db.models import Q, Subquery, OuterRef
 from django.http import HttpResponse
 from django.utils.http import urlunquote
 from django.shortcuts import render, redirect, get_object_or_404
@@ -196,7 +196,7 @@ def homework(request, courseid):
             commitdata.text = text
             commitdata.deal_base64img()
             commitdata.submittime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-            if not created:
+            if not created and attachments:
                 for ca in commitdata.attachment.exclude(title=None).all():
                     ca.file.delete()
                     ca.delete()
@@ -212,8 +212,16 @@ def homework(request, courseid):
                 except:
                     pass
             if courseperms:
-                allcommit = Homeworkcommit.objects.filter(coursehomework=homeworkdata).all()
-                data['allcommit'] = allcommit
+                allcommit = Homeworkcommit.objects.filter(coursehomework=homeworkdata, student=OuterRef('studentid'))
+                students = Student.objects.filter(
+                    studentid__in=Studentcourse.objects.filter(course=coursedata) \
+                        .values_list('student', flat=True)).order_by('studentid').only('name').annotate(
+                    score=Subquery(allcommit.values('score')[:1]),
+                    time=Subquery(allcommit.values('submittime')[:1]),
+                    submitid=Subquery(allcommit.values('id')[:1])
+                )
+                # data['allcommit'] = allcommit
+                data['students'] = students
         return render(request, 'homeworkinformation.html', data)
     elif request.GET.get('delhomeworkid'):
         if not courseperms:
@@ -244,14 +252,15 @@ def homework(request, courseid):
             homeworkdata.type = type
             homeworkdata.instruction = request.POST.get('instruction')
             attachments = request.FILES.getlist('attachment')
-            homeworkdata.weight = request.POST.get('weight')
-            homeworkdata.deal_base64img()
+            if attachments:
+                homeworkdata.weight = request.POST.get('weight')
+                homeworkdata.deal_base64img()
+                for ca in homeworkdata.attachment.exclude(title=None).all():
+                    ca.file.delete()
+                    ca.delete()
+                for file in attachments:
+                    homeworkdata.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
             homeworkdata.save()
-            for ca in homeworkdata.attachment.exclude(title=None).all():
-                ca.file.delete()
-                ca.delete()
-            for file in attachments:
-                homeworkdata.attachment.add(Homeworkfile.objects.create(file=file, title=file.name))
             return redirect(reverse('course:homework', args=[courseid]) + '?homeworkid=%d' % homeworkdata.id)
         else:
             return render(request, 'newhomework.html',
@@ -390,3 +399,12 @@ def studentcourse_selectdata(request, courseid):
         rows.append(ld)
     data = {'total': count, 'rows': rows}
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def get_homework_commit(request, commit_id):
+    commit = get_object_or_404(Homeworkcommit, pk=commit_id)
+    course = commit.coursehomework.course
+    courseperms = has_course_permission(request.user, course)
+    if not courseperms:
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+    return render(request, 'homework_commit.html', {'commit': commit})

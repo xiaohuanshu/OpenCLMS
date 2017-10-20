@@ -1,0 +1,35 @@
+<div class="row">
+    <div class="col-xs-12 homework_box">{{ commit.text|safe }}</div>
+</div>
+<div class="row"><br></div>
+<div class="row">
+    <div class="col-xs-12">
+        {% with resources=commit.attachment.all %}
+            {% if resources %}
+                <div class="col-xs-12">
+                    <ul class="list-group list-group-body col-xs-12 col-sm-6">
+                        {% for a in resources %}
+                            {% if a.title %}
+                                <li class="list-group-item">
+                                    <div class="row">
+                                        <div class="col-xs-8 text-left">{{ a.icon|safe }} {{ a.title }}</div>
+                                        <div class="col-xs-4 text-right">
+                                            {% if a.preview %}
+                                                <a data-previewurl="{{ a.preview }}"
+                                                   class="previewbutton"><i
+                                                        class="fa fa-eye">查看</i></a>
+                                            {% endif %}
+                                            <a href="{{ a.file.url }}"
+                                               download="{{ a.title }}"><i
+                                                    class="fa fa-download">下载</i></a>
+                                        </div>
+                                    </div>
+                                </li>
+                            {% endif %}
+                        {% endfor %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endwith %}
+    </div>
+</div>

@@ -20,6 +20,7 @@ urlpatterns = [
     url(r'^resource/upload$', views.resourceupload, name='resourceupload'),
     url(r'^resource/delete$', views.resourcedelete, name='resourcedelete'),
     url(r'^homework/(\d+)$', views.homework, name='homework'),
+    url(r'^homework_commit/(\d+)$', views.get_homework_commit, name='get_homework_commit'),
     url(r'^sendmessage/(\d+)$', views.sendmessage, name='sendmessage'),
     url(r'^settings/(\d+)', views.settings, name='settings'),
 

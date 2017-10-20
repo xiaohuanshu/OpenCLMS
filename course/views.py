@@ -266,7 +266,8 @@ def homework(request, courseid):
             return render(request, 'newhomework.html',
                           {'coursedata': coursedata, 'courseperms': courseperms, 'homework': homeworkdata})
     else:
-        homeworks = Coursehomework.objects.filter(course=coursedata).only('title', 'deadline').all()
+        homeworks = Coursehomework.objects.filter(course=coursedata).only('title', 'deadline') \
+            .order_by('-deadline').all()
         return render(request, 'homeworklist.html',
                       {'coursedata': coursedata, 'courseperms': courseperms,
                        'homeworks': homeworks, 'coursestudent': coursestudent})

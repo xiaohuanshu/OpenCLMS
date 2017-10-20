@@ -17,6 +17,11 @@
     {% endif %}
     <link href="{% static 'ownplugins/imgbox/imgbox.css' %}" media="all" rel="stylesheet"
           type="text/css"/>
+    <style>
+        .previewbutton {
+            cursor: pointer;
+        }
+    </style>
 {% endblock %}
 {% block page_js %}
     {% if coursestudent %}
@@ -63,6 +68,38 @@
                         <div class="col-xs-12 col-sm-12">
                             <p><span class="bold">标题</span>: {{ homework.title }}</p>
                         </div>
+                        {% if homework.instruction %}
+                            <div class="col-xs-12">
+                                {{ homework.instruction|safe }}
+                            </div>
+                        {% endif %}
+                        {% with resources=homework.attachment.all %}
+                            {% if resources %}
+                                <div class="col-xs-12">
+                                    <ul class="list-group list-group-body col-xs-12 col-sm-6">
+                                        {% for a in resources %}
+                                            {% if a.title %}
+                                                <li class="list-group-item">
+                                                    <div class="row">
+                                                        <div class="col-xs-8 text-left">{{ a.icon|safe }} {{ a.title }}</div>
+                                                        <div class="col-xs-4 text-right">
+                                                            {% if a.preview %}
+                                                                <a data-previewurl="{{ a.preview }}"
+                                                                   class="previewbutton"><i
+                                                                        class="fa fa-eye">查看</i></a>
+                                                            {% endif %}
+                                                            <a href="{{ a.file.url }}"
+                                                               download="{{ a.title }}"><i
+                                                                    class="fa fa-download">下载</i></a>
+                                                        </div>
+                                                    </div>
+                                                </li>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </ul>
+                                </div>
+                            {% endif %}
+                        {% endwith %}
                         <div class="col-xs-12 col-sm-6">
                             <p><span class="bold">截止日期 </span>:
                                 {{ homework.deadline|date:'Y-m-d H:i' }}{% if homework.isend %}
@@ -72,24 +109,6 @@
                             <p><span class="bold">类型 </span>: {{ homework.type|COURSE_HOMEWORK_TYPE }}
                             </p>
                         </div>
-                        {% if homework.instruction %}
-                            <div class="col-xs-12 col-sm-12">
-                                {{ homework.instruction|safe }}
-                            </div>
-                        {% endif %}
-                        {% with resources=homework.attachment.all %}
-                            {% if resources %}
-                                <div class="col-xs-12 col-sm-12">
-                                    <ul class="list-unstyled">
-                                        {% for a in resources %}
-                                            <li><a href="{{ a.file.url }}"
-                                                   download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
-                                            </li>
-                                        {% endfor %}
-                                    </ul>
-                                </div>
-                            {% endif %}
-                        {% endwith %}
                         {% if homework.type|COURSE_HOMEWORK_TYPE == '在线提交' %}
                             <div class="col-lg-12">
                                 <dl>
@@ -222,15 +241,30 @@
                                     <div class="form-group">
                                         {% with resources=commitdata.attachment.all %}
                                             {% if resources %}
-                                                <p class="text-red">(重新上传文件会删除所有已存在的文件)</p>
-                                                <label>已提交文件：</label>
-                                                <ul class="list-inline">
-                                                    {% for a in resources %}
-                                                        <li><a href="{{ a.file.url }}"
-                                                               download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
-                                                        </li>
-                                                    {% endfor %}
-                                                </ul>
+                                                <div class="col-xs-12">
+                                                    <p class="text-red">(重新上传文件会删除所有已存在的文件)</p>
+                                                    <ul class="list-group list-group-body col-xs-12 col-sm-6">
+                                                        {% for a in resources %}
+                                                            {% if a.title %}
+                                                                <li class="list-group-item">
+                                                                    <div class="row">
+                                                                        <div class="col-xs-8 text-left">{{ a.icon|safe }} {{ a.title }}</div>
+                                                                        <div class="col-xs-4 text-right">
+                                                                            {% if a.preview %}
+                                                                                <a data-previewurl="{{ a.preview }}"
+                                                                                   class="previewbutton"><i
+                                                                                        class="fa fa-eye">查看</i></a>
+                                                                            {% endif %}
+                                                                            <a href="{{ a.file.url }}"
+                                                                               download="{{ a.title }}"><i
+                                                                                    class="fa fa-download">下载</i></a>
+                                                                        </div>
+                                                                    </div>
+                                                                </li>
+                                                            {% endif %}
+                                                        {% endfor %}
+                                                    </ul>
+                                                </div>
                                             {% endif %}
                                         {% endwith %}
                                         <input id="fileupload" class="form-control" name="attachment" type="file"
@@ -248,17 +282,34 @@
                             <div class="row">
                                 <div class="col-xs-12">{{ commitdata.text|safe }}</div>
                             </div>
+                            <div class="row"><br></div>
                             <div class="row">
                                 <div class="col-xs-12">
                                     {% with resources=commitdata.attachment.all %}
                                         {% if resources %}
-                                            <ul class="list-inline">
-                                                {% for a in resources %}
-                                                    <li><a href="{{ a.file.url }}"
-                                                           download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
-                                                    </li>
-                                                {% endfor %}
-                                            </ul>
+                                            <div class="col-xs-12">
+                                                <ul class="list-group list-group-body col-xs-12 col-sm-6">
+                                                    {% for a in resources %}
+                                                        {% if a.title %}
+                                                            <li class="list-group-item">
+                                                                <div class="row">
+                                                                    <div class="col-xs-8 text-left">{{ a.icon|safe }} {{ a.title }}</div>
+                                                                    <div class="col-xs-4 text-right">
+                                                                        {% if a.preview %}
+                                                                            <a data-previewurl="{{ a.preview }}"
+                                                                               class="previewbutton"><i
+                                                                                    class="fa fa-eye">查看</i></a>
+                                                                        {% endif %}
+                                                                        <a href="{{ a.file.url }}"
+                                                                           download="{{ a.title }}"><i
+                                                                                class="fa fa-download">下载</i></a>
+                                                                    </div>
+                                                                </div>
+                                                            </li>
+                                                        {% endif %}
+                                                    {% endfor %}
+                                                </ul>
+                                            </div>
                                         {% endif %}
                                     {% endwith %}
                                 </div>
@@ -283,70 +334,104 @@
     <!-- page end-->
     {% if courseperms %}
         <div class="row">
-            {% for c in allcommit %}
-                <div class="col-md-12 col-lg-6 commit" data-homeworkcommitid="{{ c.id }}">
-                    <div class="box box-default collapsed-box">
-                        <div class="box-header with-border">
-                            <h3 class="box-title">{{ c.student.name }}({{ c.student.studentid }})</h3>
-
-                            <div class="box-tools pull-right">
-                                {% if c.score %}
-                                    <span class="badge bg-green score">{{ c.score }}</span>
-                                {% else %}
-                                    <span class="badge bg-gray-active score">未评分</span>
-                                {% endif %}
-                                <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
-                                        class="fa fa-plus"></i>
-                                </button>
-                            </div>
-                            <!-- /.box-tools -->
-                        </div>
-                        <!-- /.box-header -->
-                        <div class="box-body" style="display: none;">
-                            <div class="row">
-                                <div class="col-xs-12 homework_box">{{ c.text|safe }}</div>
-                            </div>
-                            <div class="row">
-                                <div class="col-xs-12">
-                                    {% with resources=c.attachment.all %}
-                                        {% if resources %}
-                                            <ul class="list-inline">
-                                                {% for a in resources %}
-                                                    <li><a href="{{ a.file.url }}"
-                                                           download="{{ a.title|default:'' }}">{{ a.icon|safe }} {{ a.title|default:'附件' }}</a>
-                                                    </li>
-                                                    {% if a.preview %}
-                                                        <i class="fa fa-fw fa-eye previewbutton" style="cursor:pointer"
-                                                           data-previewurl="{{ a.preview }}"></i>
+            <div class="col-xs-12 col-md-3">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">学生状态</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="row">
+                            <div class="col-xs-12">
+                                <table class="table table-striped">
+                                    <thead>
+                                    <tr>
+                                        <th>学生</th>
+                                        <th>分数</th>
+                                    </tr>
+                                    </thead>
+                                    <tbody>
+                                    {% for s in students %}
+                                        <tr>
+                                            <td>
+                                                {% if s.time %}
+                                                    <a style="cursor: pointer" class="homeworkLink"
+                                                       data-submitid="{{ s.submitid }}">{{ s.studentid }} {{ s.name }}</a>
+                                                {% else %}
+                                                    {{ s.studentid }} {{ s.name }}
+                                                {% endif %}
+                                            </td>
+                                            <td>
+                                                {% if s.time %}
+                                                    {% if s.score %}
+                                                        <span class="badge bg-green score">{{ s.score }}</span>
+                                                    {% else %}
+                                                        <span class="badge score">未评分</span>
                                                     {% endif %}
-                                                {% endfor %}
-                                            </ul>
-                                        {% endif %}
-                                    {% endwith %}
-                                </div>
+                                                {% else %}
+                                                    <span class="badge bg-gray-active score">未提交</span>
+                                                {% endif %}
+                                            </td>
+                                        </tr>
+                                    {% endfor %}
+
+                                    </tbody>
+                                </table>
                             </div>
-                            <div class="row">
-                                <div class="col-xs-6">
-                                    提交时间:{{ c.submittime|date:'Y-m-d H:i' }}
-                                    {% if homework.deadline < commitdata.submittime %}
-                                        <span class="badge bg-red">过期提交</span>
-                                    {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="col-xs-12 col-md-9">
+                {% for c in students %}
+                    {% if c.time %}
+                        <div class="col-md-12 commit" data-homeworkcommitid="{{ c.submitid }}">
+                            <div class="box box-default collapsed-box">
+                                <div class="box-header with-border">
+                                    <h3 class="box-title">{{ c.name }}({{ c.studentid }})</h3>
+
+                                    <div class="box-tools pull-right">
+                                        {% if c.score %}
+                                            <span class="badge bg-green score">{{ c.score }}</span>
+                                        {% else %}
+                                            <span class="badge bg-gray-active score">未评分</span>
+                                        {% endif %}
+                                        <button type="button" class="btn btn-box-tool" data-widget="collapse"><i
+                                                class="fa fa-plus"></i>
+                                        </button>
+                                    </div>
+                                    <!-- /.box-tools -->
                                 </div>
-                                <div class="col-xs-6">
-                                    <div class="input-group input-group-sm">
-                                        <input type="number" class="form-control scorenumber"
-                                               value="{{ c.score|default:'' }}">
-                                        <span class="input-group-btn">
+                                <!-- /.box-header -->
+                                <div class="box-body" style="display: none;">
+
+                                </div>
+                                <!-- /.box-body -->
+                                {% comment %}<div class="overlay">
+                                    <i class="fa fa-refresh fa-spin"></i>
+                                </div>{% endcomment %}
+                                <div class="box-footer">
+                                    <div class="col-xs-6">
+                                        提交时间:{{ c.time|date:'Y-m-d H:i' }}
+                                        {% if homework.deadline < c.time %}
+                                            <span class="badge bg-red">过期提交</span>
+                                        {% endif %}
+                                    </div>
+                                    <div class="col-xs-6">
+                                        <div class="input-group input-group-sm">
+                                            <input type="number" class="form-control scorenumber"
+                                                   value="{{ c.score|default:'' }}">
+                                            <span class="input-group-btn">
                       <button type="button" class="btn btn-primary sethomeworkscore">评分</button>
                     </span>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
+
                         </div>
-                        <!-- /.box-body -->
-                    </div>
-                </div>
-            {% endfor %}
+                    {% endif %}
+                {% endfor %}
+            </div>
         </div>
         <div class="modal fade modal-dialog-center top-modal-with-space" id="DeleteHomeworkModal" tabindex="-1"
              role="dialog"
@@ -471,7 +556,7 @@
                     });
                 });
             });
-            $(".previewbutton").click(function () {
+            $(document).on('click', '.previewbutton', function () {
                 $('#filepreview').modal('show');
                 previewurl = $(this).data('previewurl');
                 $('#filepreview').on('shown.bs.modal', function () {
@@ -505,6 +590,18 @@
                     drawRotated(img, "left");
                 });
             });
+            $(".homeworkLink").click(function () {
+                var submitid = $(this).data("submitid");
+                var $homework = $("[data-homeworkcommitid='" + submitid + "']")
+                $("html, body").animate({
+                    scrollTop: $homework.offset().top
+                }, {
+                    duration: 500, easing: "swing", callback: function () {
+                        $homework.boxWidget('expand');
+                    }
+                });
+
+            })
         </script>
     {% endif %}
 {% endblock %}

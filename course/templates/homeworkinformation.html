@@ -534,6 +534,29 @@
                     $.get($box.data('source'), function (response) {
                         $box.find('.box-body').html(response);
                         $box.data("loaded", true);
+                        $box.find('.box-body img').each(function () {
+                            wtext = "<div class=\"imgBox\"></div>";
+                            winner = "<div class=\"tool\">\n" +
+                                "    <a class=\"imgLeft\" title=\"向右转\"></a>\n" +
+                                "    <a class=\"imgRight\" title=\"向左转\"></a>\n" +
+                                "    <a class=\"viewImg\" href=\"" + $(this).attr("src") + "\" target=\"_blank\" title=\"查看原图\"></a>\n" +
+                                "  </div>";
+                            $(this).wrap(wtext);
+                            $(this).before(winner);
+                            var $imgBox = $(this).parent();
+                            $imgBox.hover(function () {
+                                $imgBox.addClass('js_hover');
+                            }, function () {
+                                $imgBox.removeClass('js_hover');
+                            });
+                            var img = $(this);
+                            $imgBox.find(".imgLeft").click(function () {
+                                drawRotated(img, "right");
+                            });
+                            $imgBox.find(".imgRight").click(function () {
+                                drawRotated(img, "left");
+                            });
+                        });
                     }).fail(function () {
                         toastr['error']("获取作业失败，请稍候再试", "获取失败");
                         $box.boxWidget('collapse');
@@ -582,30 +605,6 @@
                 });
                 $('#filepreview').on('hide.bs.modal', function () {
                     $('iframe').attr("src", '');
-                });
-            });
-
-            $(".homework_box img").each(function () {
-                wtext = "<div class=\"imgBox\"></div>";
-                winner = "<div class=\"tool\">\n" +
-                    "    <a class=\"imgLeft\" title=\"向右转\"></a>\n" +
-                    "    <a class=\"imgRight\" title=\"向左转\"></a>\n" +
-                    "    <a class=\"viewImg\" href=\"" + $(this).attr("src") + "\" target=\"_blank\" title=\"查看原图\"></a>\n" +
-                    "  </div>";
-                $(this).wrap(wtext);
-                $(this).before(winner);
-                var $imgBox = $(this).parent();
-                $imgBox.hover(function () {
-                    $imgBox.addClass('js_hover');
-                }, function () {
-                    $imgBox.removeClass('js_hover');
-                });
-                var img = $(this);
-                $imgBox.find(".imgLeft").click(function () {
-                    drawRotated(img, "right");
-                });
-                $imgBox.find(".imgRight").click(function () {
-                    drawRotated(img, "left");
                 });
             });
             $(".homeworkLink").click(function () {

@@ -1,109 +1,107 @@
 {% load center_extra %}
-
-
 <!-- Left side column. contains the logo and sidebar -->
 <aside class="main-sidebar">
-
     <!-- sidebar: style can be found in sidebar.less -->
     <section class="sidebar">
-
         <!-- Sidebar Menu -->
         <ul class="sidebar-menu" data-widget="tree">
-
-            <li class="{% nav_active request.path 'home' %}"><a href="{% url 'home' %}"><i class="fa fa-home"></i>
-                <span>首页</span></a></li>
+            <li class="{% nav_active request.path 'home' %}">
+                <a href="{% url 'home' %}">
+                    <i class="fa fa-home"></i><span>首页</span>
+                </a>
+            </li>
             {% if perms.course_viewlist %}
-                <li class="{% nav_menu_active request.path 'course' %}"><a href="{% url 'course:list' %}"><i
-                        class="fa fa-book"></i> <span>课程</span></a></li>
+                <li class="{% nav_menu_active request.path 'course' %}">
+                    <a href="{% url 'course:list' %}">
+                        <i class="fa fa-book"></i><span>课程</span>
+                    </a>
+                </li>
             {% endif %}
-
             {% if perms.checkin %}
                 <li class="treeview {% nav_menu_active request.path 'checkin' %}">
-                    <a href="#"><i class="fa fa-calendar-check-o"></i> <span>考勤</span> <i
-                            class="fa fa-angle-left pull-right"></i></a>
+                    <a href="#"><i class="fa fa-calendar-check-o"></i><span>考勤</span>
+                        <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class="{% nav_active request.path 'dashboard' %}"><a
-                                href="{% url 'checkin:dashboard_overview' %}"><i class="fa fa-circle-o"></i>全校总览</a>
+                        <li class="{% nav_active request.path 'dashboard' %}">
+                            <a href="{% url 'checkin:dashboard_overview' %}"><i class="fa fa-circle-o"></i>全校总览</a>
                         </li>
-                        <li class="{% nav_active request.path 'personal_data' %}"><a
-                                href="{% url 'checkin:personal_data' %}"><i class="fa fa-circle-o"></i>个人数据</a></li>
+                        <li class="{% nav_active request.path 'personal_data' %}">
+                            <a href="{% url 'checkin:personal_data' %}"><i class="fa fa-circle-o"></i>个人数据</a></li>
                         {% if perms.checkin_ask %}
-                            <li class="{% nav_active request.path 'askmanager' %}"><a
-                                    href="{% url 'checkin:askmanager' %}"><i class="fa fa-circle-o"></i>请假管理</a>
+                            <li class="{% nav_active request.path 'askmanager' %}">
+                                <a href="{% url 'checkin:askmanager' %}"><i class="fa fa-circle-o"></i>请假管理</a>
                             </li>
                         {% endif %}
                     </ul>
                 </li>
             {% endif %}
-
             {% if perms.wechat %}
                 <li class="treeview {% nav_menu_active request.path 'wechat' %}">
-                    <a href="#"><i class="fa fa-wechat"></i> <span>微信平台</span> <i
-                            class="fa fa-angle-left pull-right"></i></a>
+                    <a href="#"><i class="fa fa-wechat"></i> <span>微信平台</span>
+                        <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class=""><a href="{% url 'wechat:toqywechat' 'send_msg' %}" target="_blank"><i
-                                class="fa fa-circle-o"></i>信息发送</a></li>
-                        <li class=""><a href="{% url 'wechat:toqywechat' 'contact' %}" target="_blank"><i
-                                class="fa fa-circle-o"></i>通讯录</a></li>
+                        <li class=""><a href="{% url 'wechat:toqywechat' 'send_msg' %}" target="_blank">
+                            <i class="fa fa-circle-o"></i>信息发送</a></li>
+                        <li class=""><a href="{% url 'wechat:toqywechat' 'contact' %}" target="_blank">
+                            <i class="fa fa-circle-o"></i>通讯录</a></li>
                     </ul>
                 </li>
             {% endif %}
-
             {% if perms.school %}
                 <li class="treeview {% nav_menu_active request.path 'school' %}">
-                    <a href="#"><i class="fa fa-building"></i> <span>学校</span> <i
-                            class="fa fa-angle-left pull-right"></i></a>
+                    <a href="#"><i class="fa fa-building"></i> <span>学校</span>
+                        <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
                         {% if perms.school_student_view %}
-                            <li class="{% nav_active request.path 'studentlist' %}"><a
-                                    href="{% url 'school:studentlist' %}"><i class="fa fa-circle-o"></i>学生</a></li>
+                            <li class="{% nav_active request.path 'studentlist' %}">
+                                <a href="{% url 'school:studentlist' %}"><i class="fa fa-circle-o"></i>学生</a></li>
                         {% endif %}
                         {% if perms.school_teacher_view %}
-                            <li class="{% nav_active request.path 'teacherlist' %}"><a
-                                    href="{% url 'school:teacherlist' %}"><i class="fa fa-circle-o"></i>教师</a></li>
+                            <li class="{% nav_active request.path 'teacherlist' %}">
+                                <a href="{% url 'school:teacherlist' %}"><i class="fa fa-circle-o"></i>教师</a></li>
                         {% endif %}
                         {% if perms.school_class_view %}
-                            <li class="{% nav_active request.path 'classlist' %}"><a
-                                    href="{% url 'school:classlist' %}"><i class="fa fa-circle-o"></i>班级</a></li>
+                            <li class="{% nav_active request.path 'classlist' %}">
+                                <a href="{% url 'school:classlist' %}"><i class="fa fa-circle-o"></i>班级</a></li>
                         {% endif %}
                         {% if perms.school_major_view %}
-                            <li class="{% nav_active request.path 'majorlist' %}"><a
-                                    href="{% url 'school:majorlist' %}"><i class="fa fa-circle-o"></i>专业</a></li>
+                            <li class="{% nav_active request.path 'majorlist' %}">
+                                <a href="{% url 'school:majorlist' %}"><i class="fa fa-circle-o"></i>专业</a></li>
                         {% endif %}
                         {% if perms.school_department_view %}
-                            <li class="{% nav_active request.path 'departmentlist' %}"><a
-                                    href="{% url 'school:departmentlist' %}"><i class="fa fa-circle-o"></i>系部</a></li>
+                            <li class="{% nav_active request.path 'departmentlist' %}">
+                                <a href="{% url 'school:departmentlist' %}"><i class="fa fa-circle-o"></i>系部</a></li>
                         {% endif %}
                         {% if perms.school_administration_view %}
-                            <li class="{% nav_active request.path 'administrationlist' %}"><a
-                                    href="{% url 'school:administrationlist' %}"><i class="fa fa-circle-o"></i>行政部</a>
+                            <li class="{% nav_active request.path 'administrationlist' %}">
+                                <a href="{% url 'school:administrationlist' %}"><i class="fa fa-circle-o"></i>行政部</a>
                             </li>
                         {% endif %}
                         {% if perms.school_classroom_view %}
-                            <li class="{% nav_active request.path 'classroomlist' %}"><a
-                                    href="{% url 'school:classroomlist' %}"><i class="fa fa-circle-o"></i>教室</a></li>
+                            <li class="{% nav_active request.path 'classroomlist' %}">
+                                <a href="{% url 'school:classroomlist' %}"><i class="fa fa-circle-o"></i>教室</a></li>
                         {% endif %}
                         {% if perms.school_schoolterm_view %}
-                            <li class="{% nav_active request.path 'schoolterm' %}"><a
-                                    href="{% url 'school:schoolterm' %}"><i class="fa fa-circle-o"></i>学期</a></li>
+                            <li class="{% nav_active request.path 'schoolterm' %}">
+                                <a href="{% url 'school:schoolterm' %}"><i class="fa fa-circle-o"></i>学期</a></li>
                         {% endif %}
                         {% if perms.school_classtime_view %}
-                            <li class="{% nav_active request.path 'classtime' %}"><a
-                                    href="{% url 'school:classtime' %}"><i class="fa fa-circle-o"></i>上课时间</a></li>
+                            <li class="{% nav_active request.path 'classtime' %}">
+                                <a href="{% url 'school:classtime' %}"><i class="fa fa-circle-o"></i>上课时间</a></li>
                         {% endif %}
                     </ul>
                 </li>
             {% endif %}
             {% if perms.user %}
                 <li class="treeview {% nav_menu_active request.path 'user' %}">
-                    <a href="#"><i class="fa fa-users"></i> <span>用户</span> <i
-                            class="fa fa-angle-left pull-right"></i></a>
+                    <a href="#"><i class="fa fa-users"></i> <span>用户</span>
+                        <i class="fa fa-angle-left pull-right"></i></a>
                     <ul class="treeview-menu">
-                        <li class="{% nav_active request.path 'role' %}"><a href="{% url "user:role" %}"><i
-                                class="fa fa-circle-o"></i>角色</a></li>
+                        <li class="{% nav_active request.path 'role' %}"><a href="{% url "user:role" %}">
+                            <i class="fa fa-circle-o"></i>角色</a></li>
                         {% if perms.user_addpermission %}
-                            <li class="{% nav_active request.path 'addpermission' %}"><a
-                                    href="{% url "user:addpermission" %}"><i class="fa fa-circle-o"></i>权限</a></li>
+                            <li class="{% nav_active request.path 'addpermission' %}">
+                                <a href="{% url "user:addpermission" %}"><i class="fa fa-circle-o"></i>权限</a></li>
                         {% endif %}
                     </ul>
                 </li>

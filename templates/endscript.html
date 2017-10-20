@@ -1,6 +1,5 @@
 {% load static %}
 <!-- REQUIRED JS SCRIPTS -->
-
 <!-- jQuery 2.2.0 -->
 <script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
 <!-- Bootstrap 3.3.6 -->
@@ -9,8 +8,8 @@
 <script src="{% static 'plugins/pace/pace.min.js' %}"></script>
 <!-- AdminLTE App -->
 <script src="{% static 'js/adminlte.min.js' %}?2.4.2"></script>
-
-
-{% comment %}
-<script src="{% static 'js/jquery-migrate-1.3.0.js' %}"></script>
-{% endcomment %}
+<script>
+    if ($(window).width() <= 767) {
+        $('body').removeClass("sidebar-collapse");
+    }
+</script>

@@ -22,8 +22,8 @@ class Filemodel(models.Model):
                             '.ppt', '.pps', '.pptm', '.potm', '.ppam', '.potx', '.ppsm', 'doc']
         image_extension = ['.bmp', '.jpg', '.jpeg', '.png', '.gif']
         if extension in office_extension:
-            url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % (
-                urlquote("%s%s" % (settings.DOMAIN, self.file.url), safe=None))
+            url = "%s?url=%s" % (reverse('course:office_preview', args=[]), (
+                urlquote("%s%s" % (settings.DOMAIN, self.file.url), safe=None)))
             return url
         elif extension in image_extension:
             url = "%s?url=%s" % (reverse('course:imgview', args=[]), urlquote(self.file.url, safe=None))

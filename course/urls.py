@@ -30,5 +30,6 @@ urlpatterns = [
 
     url(r'^ics/(\d+).ics$', ics.ics, name='ics'),
     url(r'^ics/download$', ics.download, name='ics_download'),
+    url(r'^office_preview$', views.office_preview, name='office_preview'),
 
 ]

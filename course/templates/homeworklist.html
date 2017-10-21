@@ -26,190 +26,61 @@
                     </div>
                 </div>
                 <div class="box-body">
-                    <table class="table table-hover table-striped table-hover">
-                        <tbody>
-                        <tr>
-                            <th style="width: 10px;">#</th>
-                            <th>标题</th>
-                            <th>类型</th>
-                            <th>截止时间</th>
-                            {% if courseperms %}
-                                <th>完成比例</th>
-                            {% endif %}
-                            {% if coursestudent %}
-                                <th>分数</th>
-                                <th>状态</th>
-                            {% endif %}
-                        </tr>
-                        {% for homework in homeworks %}
+                    {% if homeworks %}
+                        <table class="table table-hover table-striped table-hover">
+                            <tbody>
                             <tr>
-                                <td>{{ forloop.counter }}</td>
-                                <td><a href="?homeworkid={{ homework.id }}">{{ homework.title }}</a></td>
-                                <td>{{ homework.type|COURSE_HOMEWORK_TYPE }}</td>
-                                <td>{{ homework.deadline|date:'Y-m-d H:i' }}</td>
+                                <th style="width: 10px;">#</th>
+                                <th>标题</th>
+                                <th>类型</th>
+                                <th>截止时间</th>
                                 {% if courseperms %}
-                                    <td>
-                                        {% if  homework.type|COURSE_HOMEWORK_TYPE == '在线提交' %}
-                                            <div class="progress progress-xs">
-                                                <div class="progress-bar progress-bar-success"
-                                                     style="width: {{ homework.commitprogress }}%"></div>
-                                            </div>
-                                        {% endif %}
-                                    </td>
+                                    <th>完成比例</th>
                                 {% endif %}
                                 {% if coursestudent %}
-                                    {% student_submit_homework coursestudent homework as studentsubmithomework %}
-                                    {% if studentsubmithomework %}
-                                        <td>{{ studentsubmithomework.score|default:'未评分' }}</td>
-                                        <td><span class="label label-success">已提交</span></td>
-                                    {% else %}
-                                        <td></td>
-                                        {% if  homework.type|COURSE_HOMEWORK_TYPE == '在线提交' %}
-                                            <td><span class="label label-warning">未提交</span></td>
-                                        {% else %}
-                                            <td></td>
-                                        {% endif %}
-                                    {% endif %}
+                                    <th>分数</th>
+                                    <th>状态</th>
                                 {% endif %}
                             </tr>
-                        {% endfor %}
-                        </tbody>
-                    </table>
-                    {% if courseperms %}
-                        <!-- modal -->
-                        <!-- change Modal -->
-                        <div class="modal modal-primary fade" id="changeconfirm" tabindex="-1" role="dialog"
-                             aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">×</span></button>
-                                        <h4 class="modal-title">确认更改?</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>请在上一个学期结束后再更改学期,否则将出现不可预计的后果</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-outline pull-left" data-dismiss="modal">
-                                            取消
-                                        </button>
-                                        <button type="button" class="btn btn-outline btn-change">确认</button>
-                                    </div>
-                                </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-                        <!-- change Modal  -->
-                        <!-- delete Modal -->
-                        <div class="modal modal-danger fade" id="deleteconfirm" tabindex="-1" role="dialog"
-                             aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <button type="button" class="close" data-dismiss="modal" aria-label="Close">
-                                            <span aria-hidden="true">&times;</span></button>
-                                        <h4 class="modal-title">Danger Modal</h4>
-                                    </div>
-                                    <div class="modal-body">
-                                        <p>请不要随意删除已经结束的学期</p>
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" class="btn btn-outline pull-left"
-                                                data-dismiss="modal">关闭
-                                        </button>
-                                        <button type="button" class="btn btn-outline btn-delete">删除</button>
-                                    </div>
-                                </div>
-                                <!-- /.modal-content -->
-                            </div>
-                            <!-- /.modal-dialog -->
-                        </div>
-                        <!-- delete Modal -->
+                            {% for homework in homeworks %}
+                                <tr>
+                                    <td>{{ forloop.counter }}</td>
+                                    <td><a href="?homeworkid={{ homework.id }}">{{ homework.title }}</a></td>
+                                    <td>{{ homework.type|COURSE_HOMEWORK_TYPE }}</td>
+                                    <td>{{ homework.deadline|date:'Y-m-d H:i' }}</td>
+                                    {% if courseperms %}
+                                        <td>
+                                            {% if  homework.type|COURSE_HOMEWORK_TYPE == '在线提交' %}
+                                                <div class="progress progress-xs">
+                                                    <div class="progress-bar progress-bar-success"
+                                                         style="width: {{ homework.commitprogress }}%"></div>
+                                                </div>
+                                            {% endif %}
+                                        </td>
+                                    {% endif %}
+                                    {% if coursestudent %}
+                                        {% student_submit_homework coursestudent homework as studentsubmithomework %}
+                                        {% if studentsubmithomework %}
+                                            <td>{{ studentsubmithomework.score|default:'未评分' }}</td>
+                                            <td><span class="label label-success">已提交</span></td>
+                                        {% else %}
+                                            <td></td>
+                                            {% if  homework.type|COURSE_HOMEWORK_TYPE == '在线提交' %}
+                                                <td><span class="label label-warning">未提交</span></td>
+                                            {% else %}
+                                                <td></td>
+                                            {% endif %}
+                                        {% endif %}
+                                    {% endif %}
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    {% else %}
+                        <h5>无作业</h5>
                     {% endif %}
                 </div>
             </div>
         </div>
     </div>
-
-
-
-
-{% endblock %}
-{% block page_script %}
-    {% if perms.school_schoolterm_modify %}
-        <script>
-            /*
-             $.fn.datepicker.dates['cn'] = {
-             days: ["周日", "周一", "周二", "周三", "周四", "周五", "周六", "周日"],
-             daysShort: ["日", "一", "二", "三", "四", "五", "六", "七"],
-             daysMin: ["日", "一", "二", "三", "四", "五", "六", "七"],
-             months: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-             monthsShort: ["一月", "二月", "三月", "四月", "五月", "六月", "七月", "八月", "九月", "十月", "十一月", "十二月"],
-             today: "今天",
-             clear: "清除"
-             };
-             $(function () {
-             $('.input-daterange input').eq(0).datepicker({
-             beforeShowDay: WorkingDates,
-             language: 'cn'
-             });
-             $('.input-daterange input').eq(1).datepicker({
-             language: 'cn'
-             });
-             function WorkingDates(date) {
-             var day = date.getDay()
-             if (day == 0) {
-             return true;
-             }
-             return false;
-             }
-
-             $('#termform').bootstrapValidator();
-             });
-             $(".termedit").each(function () {
-             $(this).click(function () {
-             var termid = $(this).attr("termid");
-             $('#schooltermModal .modal-title').text('学期编辑');
-             $('#schooltermModal input[name=termname]').val($('#term' + termid + ' .description').text());
-             $('#schooltermModal input[name=termyear]').val($('#term' + termid + ' .year').text());
-             $('#schooltermModal input[name=termstartdate]').val($('#term' + termid + ' .startdate').text());
-             $('#schooltermModal input[name=termenddate]').val($('#term' + termid + ' .enddate').text());
-             $('#schooltermModal input[name=termid]').val(termid);
-             $('#schooltermModal').modal('show');
-             })
-             });
-             $('#creatnewterm').click(function () {
-             var myDate = new Date();
-             $('#schooltermModal .modal-title').text('创建新学期');
-             $('#schooltermModal input[name=termname]').val('');
-             $('#schooltermModal input[name=termyear]').val(myDate.getFullYear());
-             $('#schooltermModal input[name=termstartdate]').val('');
-             $('#schooltermModal input[name=termenddate]').val('');
-             $('#schooltermModal input[name=termid]').val('');
-             $('#schooltermModal').modal('show');
-             })
-             $(".changeterm").each(function () {
-             $(this).click(function () {
-             var termid = $(this).attr("termid");
-             $('#changeconfirm .modal-title').text('确认修改当前学期为' + $('#term' + termid + ' .description').text() + "?");
-             $('#changeconfirm .btn-change').click(function () {
-             location.href = '?changeterm=' + termid;
-             })
-             $('#changeconfirm').modal('show');
-             })
-             });
-             $(".deleteterm").each(function () {
-             $(this).click(function () {
-             var termid = $(this).attr("termid");
-             $('#deleteconfirm .modal-title').text('删除' + $('#term' + termid + ' .description').text() + "学期?");
-             $('#deleteconfirm .btn-delete').click(function () {
-             location.href = '?deleteterm=' + termid;
-             })
-             $('#deleteconfirm').modal('show');
-             })
-             });*/
-        </script>
-    {% endif %}
 {% endblock %}

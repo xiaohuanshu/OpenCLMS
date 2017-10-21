@@ -8,6 +8,7 @@ from school.models import Student, Class, Department, Teacher, Major, Administra
 from wechat.contact import contact_helper
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
+from django.db.models import Q
 import urllib2
 import logging
 import datetime
@@ -18,10 +19,15 @@ logger = logging.getLogger(__name__)
 @shared_task(name='update_avatar_from_wechat')
 def update_avatar_from_wechat():
     counter = 0
-    users = User.objects.exclude(openid=None).all()
+    student_avaliable = Student.objects.filter(available=True).values_list('user', flat=True)
+    teacher_avaliable = Student.objects.filter(available=True).values_list('user', flat=True)
+    users = User.objects.filter(Q(id__in=student_avaliable) | Q(id__in=teacher_avaliable)).exclude(openid=None).all()
     for u in users:
         counter += 1
-        userinfo = wechat_client.user.get(u.openid)
+        try:
+            userinfo = wechat_client.user.get(u.openid)
+        except:
+            continue
         if 'avatar' not in userinfo:
             continue
         avatar_url = userinfo['avatar']

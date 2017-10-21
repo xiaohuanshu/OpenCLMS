@@ -2,17 +2,19 @@
 {% load center_extra %}
 {% load course_extra %}
 {% block title %}首页{% endblock %}
-
+{% block page_css %}
+    <style>
+    table {
+        border: 2px solid transparent !important;
+    }
+    </style>
+{% endblock %}
 {% block content %}
     <section class="panel">
         <header class="panel-heading">
             当前学期:{{ term.term }}
         </header>
-
     </section>
-
-
-
     <div class="row">
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
@@ -40,7 +42,6 @@
             <!-- /.info-box -->
         </div>
         <!-- /.col -->
-
         <!-- fix for small devices only -->
         <div class="clearfix visible-sm-block"></div>
 
@@ -71,22 +72,18 @@
         </div>
         <!-- /.col -->
     </div>
-
-
     <div class="row">
-
-
         <div class="col-md-12">
             <!-- Custom Tabs (Pulled to the right) -->
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
-                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期课程</a></li>
-                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周课程</a></li>
+                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期<d class="hidden-xs">课程</d></a></li>
+                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周<d class="hidden-xs">课程</d></a></li>
                     {% if uncommithomework %}
-                        <li><a href="#tab_1-1" data-toggle="tab" aria-expanded="false">今日课程</a></li>
-                        <li class="active"><a href="#tab_0-0" data-toggle="tab" aria-expanded="true">未交作业</a></li>
+                        <li><a href="#tab_1-1" data-toggle="tab" aria-expanded="false">今日<d class="hidden-xs">课程</d></a></li>
+                        <li class="active"><a href="#tab_0-0" data-toggle="tab" aria-expanded="true"><d class="hidden-xs">未交</d>作业</a></li>
                     {% else %}
-                        <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日课程</a></li>
+                        <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日<d class="hidden-xs">课程</d></a></li>
                     {% endif %}
                     <li class="pull-left header"><i class="fa fa-th"></i> 课程信息</li>
                 </ul>
@@ -101,12 +98,12 @@
                                         <td>
                                             <a href="{% url 'course:homework' uch.course.id %}?homeworkid={{ uch.id }}">{{ uch.title }}</a>
                                         </td>
-                                        <td>
+                                        <td class="hidden-xs">
                                             <a href="{% url 'course:information' uch.course.id %}">{{ uch.course.title }}</a>
                                         </td>
-                                        <td>{{ uch.type|COURSE_HOMEWORK_TYPE }}</td>
-                                        <td>{{ uch.deadline|date:'Y-m-d H:i' }}{% if uch.isend %}
-                                    <span class="badge bg-red">已过期</span>{% endif %}</td>
+                                        <td class="hidden-xs">{{ uch.type|COURSE_HOMEWORK_TYPE }}</td>
+                                        <td><d class="hidden-xs">{{ uch.deadline|date:'Y-m-d H:i' }}</d>
+                                            {% if uch.isend %}<span class="badge bg-red">已过期</span>{% endif %}</td>
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -130,8 +127,8 @@
                                             {% endif %}
                                         </td>
                                         <td>第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节</td>
-                                        <td>{{ lesson.classroom.location|default:'' }}</td>
-                                        <td>
+                                        <td class="hidden-xs">{{ lesson.classroom.location|default:'' }}</td>
+                                        <td class="hidden-xs">
                                             <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
                                     </tr>
@@ -156,8 +153,8 @@
                                         <td>{{ lesson.day|weekdeal }}
                                             第{{ lesson.time }}-{{ lesson.time|add:lesson.length|add:-1 }}节
                                         </td>
-                                        <td>{{ lesson.classroom.location|default:'' }}</td>
-                                        <td>
+                                        <td class="hidden-xs">{{ lesson.classroom.location|default:'' }}</td>
+                                        <td class="hidden-xs">
                                             <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
                                     </tr>
@@ -171,17 +168,19 @@
                     <!-- /.tab-pane -->
                     <div class="tab-pane" id="tab_3-2">
                         {% if termcourse %}
-                            <table class="table">
+                            <table class="table" style="table-layout:fixed;">
                                 <tbody>
                                 {% for course in termcourse %}
                                     <tr>
-                                        <td>{{ forloop.counter }}</td>
-                                        <td>
+                                        <td width="5%">{{ forloop.counter }}</td>
+                                        <td style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis">
                                             <a href="{% url 'course:information' course.id %}">{{ course.title }}</a>
                                         </td>
-                                        <td>{{ course.time }}</td>
-                                        <td>{{ course.location|default:'' }}</td>
-                                        <td>
+                                        <td style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis"
+                                            width="25%" class="hidden-xs">{{ course.time }}</td>
+                                        <td style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis"
+                                            width="25%" class="hidden-xs">{{ course.location|default:'' }}</td>
+                                        <td width="15%" class="hidden-xs">
                                             <small class="label label-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</small>
                                         </td>
                                     </tr>
@@ -200,10 +199,7 @@
         </div>
         <!-- /.col -->
     </div>
-
-
 {% endblock %}
-
 {% block page_script %}
 
 {% endblock %}

@@ -265,12 +265,12 @@
     {% endif %}
     <script>
         $(".previewbutton").click(function () {
-            $('#filepreview').modal('show');
             previewurl = $(this).data('previewurl');
             if ($(window).width() <= 767) {
                 window.location.href = previewurl;
                 return;
             }
+            $('#filepreview').modal('show');
             $('#filepreview').on('shown.bs.modal', function () {
                 $('iframe').attr("src", previewurl);
             });

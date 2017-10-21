@@ -22,6 +22,8 @@ def update_avatar_from_wechat():
     for u in users:
         counter += 1
         userinfo = wechat_client.user.get(u.openid)
+        if 'avatar' not in userinfo:
+            continue
         avatar_url = userinfo['avatar']
         img_temp = NamedTemporaryFile(delete=True)
         img_temp.write(urllib2.urlopen(avatar_url).read())

@@ -25,7 +25,7 @@ def home(request):
             id__in=commithomework).select_related('course').all()
 
     nowlessontime = getnowlessontime()
-    lesson = Lesson.objects.filter(course__in=termcourse, week=nowlessontime['week'])
+    lesson = Lesson.objects.filter(course__in=termcourse, week=nowlessontime['week']).order_by('week', 'day', 'time')
 
     return render(request, 'home.html',
                   {'term': getCurrentSchoolYearTerm(),

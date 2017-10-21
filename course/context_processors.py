@@ -14,14 +14,14 @@ def todaylesson(request):
                                          term=nowlessontime['term'],
                                          day=nowlessontime['day'],
                                          week=nowlessontime['week']
-                                         ).select_related('course').all()
+                                         ).select_related('course').order_by('time').all()
         else:
             studentcourse = Studentcourse.objects.filter(student__user=request.user).values_list('course', flat=True)
             lesson = Lesson.objects.filter(course__in=studentcourse,
                                            term=nowlessontime['term'],
                                            day=nowlessontime['day'],
                                            week=nowlessontime['week'])
-            data = lesson.select_related('course').all()
+            data = lesson.select_related('course').order_by('time').all()
         return {'todaylesson': data}
     else:
         return {}

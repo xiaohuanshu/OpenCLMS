@@ -409,3 +409,16 @@ def get_homework_commit(request, commit_id):
     if not courseperms:
         return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
     return render(request, 'homework_commit.html', {'commit': commit})
+
+
+def office_preview(request):
+    url = request.GET.get('url')
+    agent = request.META.get('HTTP_USER_AGENT', None)
+    if 'iPhone' in agent or 'iPad' in agent or 'iPod' in agent:
+        url = urlunquote(url)
+    else:
+        if url.endswith('.xlsx') or url.endswith('.xls'):
+            url = "https://sheet.zoho.com/sheet/view.do?url=%s" % url
+        else:
+            url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % url
+    return redirect(url)

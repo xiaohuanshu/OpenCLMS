@@ -10,13 +10,19 @@
                     <i class="fa fa-home"></i><span>首页</span>
                 </a>
             </li>
-            {% if perms.course_viewlist %}
-                <li class="{% nav_menu_active request.path 'course' %}">
-                    <a href="{% url 'course:list' %}">
-                        <i class="fa fa-book"></i><span>课程</span>
-                    </a>
-                </li>
-            {% endif %}
+            <li class="treeview {% nav_menu_active request.path 'course' %}">
+                <a href="#"><i class="fa fa-book"></i><span>课程</span>
+                    <i class="fa fa-angle-left pull-right"></i></a>
+                <ul class="treeview-menu">
+                    {% if perms.course_viewlist %}
+                        <li class="{% nav_active request.path 'list' %}">
+                            <a href="{% url 'course:list' %}"><i class="fa fa-circle-o"></i>全校课程</a>
+                        </li>
+                    {% endif %}
+                    <li class="{% nav_active request.path 'schedule' %}">
+                        <a href="{% url 'course:schedule' %}"><i class="fa fa-circle-o"></i>个人课表</a></li>
+                </ul>
+            </li>
             {% if perms.checkin %}
                 <li class="treeview {% nav_menu_active request.path 'checkin' %}">
                     <a href="#"><i class="fa fa-calendar-check-o"></i><span>考勤</span>

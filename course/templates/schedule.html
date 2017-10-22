@@ -5,6 +5,12 @@
 {% block page_css %}
     <link href="{% static 'ownplugins/schedule/css/calendar.min.css' %}" rel="stylesheet"/>
     <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
+    <style>
+        [class^="bg-"] {
+            opacity: .65;
+            filter: alpha(opacity=65)
+        }
+    </style>
 {% endblock %}
 {% block page_js %}
     <script src="{% static 'ownplugins/schedule/underscore/underscore-min.js' %}"></script>

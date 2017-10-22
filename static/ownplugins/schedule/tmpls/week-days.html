@@ -1,6 +1,6 @@
 <% _.each(events, function(event){ %>
 <a href="<%= event.url ? event.url : 'javascript:void(0)' %>" data-event-id="<%= event.id %>" class="cal-event-week event<%= event.id %>">
-	<div class="week-event cal-left<%= event.start_day %> day-highlight dh-<%= event['class'] %>" data-event-class="<%= event['class'] %>" style="top: <%= ((event.classtime_time-1) * 61)-1 %>px; height: <%= (event.classtime_length * 61)-1 %>px">
+	<div class="week-event cal-left<%= event.start_day %> day-highlight" data-event-class="<%= event['class'] %>" style="top: <%= ((event.classtime_time-1) * 61)-1 %>px; height: <%= (event.classtime_length * 61)-1 %>px;background-color: <%= event['class'] %>">
 		<b><%= event.title %></b><br>@<%= event.location %>
 	</div>
 </a>

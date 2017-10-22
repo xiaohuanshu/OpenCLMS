@@ -57,11 +57,12 @@
                 <!-- User Account Menu -->
                 <li class="dropdown user user-menu">
                     <!-- Menu Toggle Button -->
+                    {% if request.user.username %}
                     <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                         <!-- The user image in the navbar-->
                         <img src="{{ request.user.avatar.url }}" class="user-image" alt="User Image">
                         <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                        <span class="hidden-xs">{{ request.user.username|default:"未注册" }}</span>
+                        <span class="hidden-xs">{{ request.user.username }}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <!-- The user image in the menu -->
@@ -70,7 +71,7 @@
 
                             <p>
                                 {{ request.user.username|default:"未注册" }}
-                                <small>{{ request.user.email|default:"" }}</small>
+                                <small>{{ request.user.email }}</small>
                             </p>
                         </li>
                         <!-- Menu Body -->
@@ -98,6 +99,12 @@
                             </div>
                         </li>
                     </ul>
+                    {% else %}
+                        <a href="{% url 'user:register' %}">
+                        <img src="{{ request.user.avatar.url }}" class="user-image" alt="User Image">
+                        <span class="hidden-xs">请注册</span>
+                    </a>
+                    {% endif %}
                 </li>
             </ul>
         </div>

@@ -70,7 +70,7 @@
                             <img src="{{ request.user.avatar.url }}" class="img-circle" alt="User Image">
 
                             <p>
-                                {{ request.user.username|default:"未注册" }}
+                                {{ request.user.username }}
                                 <small>{{ request.user.email }}</small>
                             </p>
                         </li>
@@ -102,7 +102,7 @@
                     {% else %}
                         <a href="{% url 'user:register' %}">
                         <img src="{{ request.user.avatar.url }}" class="user-image" alt="User Image">
-                        <span class="hidden-xs">请注册</span>
+                        <span>请注册</span>
                     </a>
                     {% endif %}
                 </li>

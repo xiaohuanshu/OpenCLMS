@@ -1,0 +1,61 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% block title %}课表导入日历{% endblock %}
+{% block page_css %}
+{% endblock %}
+{% block page_js %}
+{% endblock %}
+
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            课表导入日历
+        </h1>
+    </section>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-xs-12">
+            <!-- Custom Tabs -->
+            <div class="nav-tabs-custom">
+                <ul class="nav nav-tabs">
+                    <li class="active"><a href="#iphone" data-toggle="tab">IOS导入</a></li>
+                    <li><a href="#windows" data-toggle="tab">Windows导入</a></li>
+                    <li><a href="#other" data-toggle="tab">其它</a></li>
+                </ul>
+                <div class="tab-content">
+                    <div class="tab-pane active" id="iphone">
+                        <h2>如何导入：</h2><br/>
+                        <a class="btn btn-large btn-info" href="{{ url }}" style="width: 100%;max-width: 500px">一键导入</a>
+                        <br/>
+                        <h2>功能介绍：</h2>
+                        <h4>1.在手机日历中快速查看课程表</h4>
+                        <img src="{% static 'img/ics/ios_calendar.png' %}" style="max-width: 100%">
+                        <h4>2.在通知中心、锁屏页面中快速查看最近课程</h4>
+                        <img src="{% static 'img/ics/ios_notification.png' %}" style="max-width: 100%">
+                        <p>需要在通知中心中添加“日历”插件(推荐使用“下个日程”插件)</p>
+                        <h4>3.Siri询问课表</h4>
+                        <img src="{% static 'img/ics/ios_siri.jpg' %}" style="max-width: 100%">
+                        <h4>4.日历课表自动与教务系统同步，保证课表实时性</h4>
+                        <p>只需导入一次，今后课程时间有变化会自动更新</p>
+                        <h2>如何删除：</h2>
+                        <p>设置-账户与密码-已订阅的日历-课程-删除日历</p>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="windows">
+                        <b>稍后推出</b>
+                    </div>
+                    <!-- /.tab-pane -->
+                    <div class="tab-pane" id="other">
+                        <b>稍后推出</b>
+                    </div>
+                    <!-- /.tab-pane -->
+                </div>
+                <!-- /.tab-content -->
+            </div>
+            <!-- nav-tabs-custom -->
+        </div>
+    </div>
+{% endblock %}
+{% block page_script %}
+{% endblock %}

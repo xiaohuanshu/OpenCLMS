@@ -19,6 +19,12 @@
     <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
 {% endblock %}
 {% block content %}
+    {% if 'iPhone' in request.META.HTTP_USER_AGENT %}
+        <div class="callout callout-warning" onclick="window.location.href='{% url 'course:ics_download' %}'">
+            <h4>导入课表到日历</h4>
+            <p>点击此处、一键导入课表到日历</p>
+        </div>
+    {% endif %}
     <div class="row">
         <div class="col-sm-12">
 

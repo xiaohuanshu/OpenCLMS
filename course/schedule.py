@@ -84,6 +84,7 @@ def schedule_data(request):
 
 
 def eventClass(index):
-    index = index % 6
-    color = ['event-success', 'event-special', 'event-inverse', 'event-info', 'event-warning', 'event-important']
+    index = index % 10
+    color = ['#84b6d4', '#7bd7f5', '#77c595', '#f9bf76', '#ea8e81',
+             '#e2e4ea', '#8adede', '#9896c6', '#ffb078', '#e87599']
     return color[index]

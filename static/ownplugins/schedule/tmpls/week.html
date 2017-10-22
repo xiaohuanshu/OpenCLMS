@@ -8,18 +8,23 @@
         <div class="cal-offset6 cal-column"></div>
         <div class="cal-row-fluid cal-row-head" style="padding-left: 20px">
             <% _.each(months, function(name) { %>
-                <div class="cal-cell1 <%= cal._getDayClass('week', start) %>" data-toggle="tooltip" title="<%= cal._getHolidayName(start) %>"><%= name %><br>
-                    <small><span data-cal-date="<%= start.getFullYear() %>-<%= start.getMonthFormatted() %>-<%= start.getDateFormatted() %>" data-cal-view="day"><%= start.getDate() %> <div><%= cal.locale['ms' + start.getMonth()] %></div></span></small>
-                </div>
-                <% start.setDate(start.getDate() + 1); %>
+            <div class="cal-cell1 <%= cal._getDayClass('week', start) %>" data-toggle="tooltip"
+                 title="<%= cal._getHolidayName(start) %>"><%= name %><br>
+                <small><span
+                        data-cal-date="<%= start.getFullYear() %>-<%= start.getMonthFormatted() %>-<%= start.getDateFormatted() %>"
+                        data-cal-view="day"><%= start.getDate() %> <div><%= cal.locale['ms' + start.getMonth()] %></div></span>
+                </small>
+            </div>
+            <% start.setDate(start.getDate() + 1); %>
             <% }) %>
         </div>
         <div class="cal-week-panel" style="margin-left: 20px">
             <%= cal._week() %>
         </div>
         <% _.each(classtime, function(ct,index){ %>
-            <div class="cal-row-fluid event-row">
-                <div class="cal-week-classtime-time-title"><%=index%></div>
-            </div>
+        <div class="cal-row-fluid event-row">
+            <div class="cal-week-classtime-time-title"><%=index%></div>
+        </div>
         <% }); %>
+    </div>
 </div>

@@ -105,4 +105,4 @@ def ics(request, userid):
 
 
 def download(request):
-    return redirect(reverse('course:ics', args=[request.user.id]))
+    return render(request, 'ics_introduce.html', {'url': reverse('course:ics', args=[request.user.id])})

@@ -30,7 +30,7 @@ def getqrstr(request, lessonid):
 
 def getcheckinnowdata(request, lessonid):
     lesson = Lesson.objects.get(id=lessonid)
-    checkindata = Checkin.objects.filter(lesson=lesson).only('student__studentid', 'status').all()
+    checkindata = Checkin.objects.filter(lesson=lesson).only('student__studentid', 'status', 'abnormal').all()
     checkinnowdata = []
     for cnd in checkindata:
         checkinnowdata.append({"studentid": cnd.student_id, "status": cnd.status, 'abnormal': cnd.abnormal})

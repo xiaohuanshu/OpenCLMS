@@ -77,7 +77,7 @@ def api(request):
 
         elif msg.event == 'click':
             if msg.key == '1200':
-                response = TextReply(content=u'地址：%s\n学生默认帐号:学号/身份证号\n教师默认帐号：职工号/职工号' % settings.DOMAIN,
+                response = TextReply(content=u'地址：%s\n学生默认帐号:学号/身份证号\n教师默认帐号:职工号/职工号' % settings.DOMAIN,
                                      message=msg)
 
     xml = response.render()

@@ -60,13 +60,13 @@ def api(request):
         if msg.event == 'subscribe':  # 关注事件
             response = EmptyReply()
 
-        elif msg.type == 'unsubscribe':
+        elif msg.event == 'unsubscribe':
             logger.info('wechat user %s unsubscribe' % msg.source)
             user = User.objects.get(openid=msg.source)
             user.checkinaccountabnormal = True
             user.save()
 
-        elif msg.type == 'location':
+        elif msg.event == 'location':
             nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
             user = User.objects.get(openid=msg.source)
             user.latitude = msg.latitude
@@ -75,9 +75,10 @@ def api(request):
             user.lastpositiontime = nowtime
             user.save()
 
-        elif msg.type == 'click':
+        elif msg.event == 'click':
             if msg.key == '1200':
-                response = TextReply(content=u'地址：%s\n学生默认用户名密码:学号/身份证号，教师默认用户名密码：职工号/职工号', message=msg)
+                response = TextReply(content=u'地址：%s\n学生默认帐号:学号/身份证号\n教师默认帐号：职工号/职工号' % settings.DOMAIN,
+                                     message=msg)
 
     xml = response.render()
     encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)

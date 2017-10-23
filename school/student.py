@@ -56,7 +56,7 @@ def data(request):
         ld = {'studentid': p.studentid,
               'name': p.name,
               'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
-              'idnumber': p.idnumber,
+              'idnumber': p.idnumber if request.user.has_perm('school_privacy') else u'无权查看',
               'schoolyear': (p.classid and [p.classid.schoolyear] or [None])[0],
               'class': (p.classid and [p.classid.name] or [None])[0],
               'major': (p.major and [p.major.name] or [None])[0],

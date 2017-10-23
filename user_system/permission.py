@@ -178,7 +178,7 @@ permission_data = [
                     '修改'
                 ]
             },
-        ], 'operator': [],
-        'operatordirection': []
+        ], 'operator': ['privacy'],
+        'operatordirection': ['隐私查看']
     },
 ]

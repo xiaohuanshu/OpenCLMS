@@ -215,7 +215,7 @@ def student_data(request, studentid):
                 totalscore += 100
             ld.update({'lesson%d' % item['offset']: item['status']})
         if len == 0:
-            ratio = 1
+            continue
         else:
             ratio = ratio / len
         if totalscore == 0:
@@ -286,9 +286,13 @@ def teacher_data(request, teacherid):
     rows = []
     for (k, v) in course.items():
         ld = {'courseid': v['courseid'], 'name': v['name'], 'schoolterm': v['schoolterm']}
-        # ld['data'] = []
+        length = 0
         for (key, item) in v['checkindata'].items():
+            if item['status'] is not None:
+                length += 1
             ld.update({'lesson%d' % item['offset']: item['status']})
+        if length == 0:
+            continue
         rows.append(ld)
 
     columns = [

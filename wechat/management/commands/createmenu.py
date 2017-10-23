@@ -33,15 +33,15 @@ class Command(BaseCommand):
                     'sub_button': [
                         {
                             'type': 'click',
-                            'name': u'设置',
+                            'name': u'电脑端地址',
                             'key': '1200'
                         },
                         {
                             'type': 'view',
-                            'name': u'教务系统',
-                            'url': 'http://221.218.249.116'
+                            'name': u'导入日历',
+                            'url': '%s/course/ics/download?simpleview=true' % settings.DOMAIN
                         }
                     ]
                 }
             ]})
-        print 'Successful!'
+        self.stdout.write('Successful!')

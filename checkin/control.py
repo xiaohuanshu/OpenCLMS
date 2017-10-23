@@ -33,7 +33,7 @@ def getcheckinnowdata(request, lessonid):
     checkindata = Checkin.objects.filter(lesson=lesson).only('student__studentid', 'status').all()
     checkinnowdata = []
     for cnd in checkindata:
-        checkinnowdata.append({"studentid": cnd.student_id, "status": cnd.status})
+        checkinnowdata.append({"studentid": cnd.student_id, "status": cnd.status, 'abnormal': cnd.abnormal})
     shoudnumber = lesson.shouldnumber
     actuallynumber = lesson.actuallynumber
     data = {'should': shoudnumber, 'actually': actuallynumber, 'rows': checkinnowdata}

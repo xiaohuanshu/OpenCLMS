@@ -101,6 +101,10 @@
             padding: 1px 10px;
             color: #fff;
         }
+
+        .bg-abnormal {
+            background-color: #f2dede !important;
+        }
     </style>
 {% endblock %}
 {% block body %}
@@ -333,6 +337,8 @@
         checkin_status_json ={{ checkin_status_json|safe }};
         {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
         checkin_status_style_json ={{ checkin_status_style_json|safe }};
+        {% CHECKIN_ABNORMAL_JSON as checkin_abnormal_json %}
+        checkin_abnormal_json ={{ checkin_abnormal_json|safe }};
 
         function shake(ele, cls, times) {
             var i = 0, t = false, o = ele.attr("class") + " ", c = "", times = times || 2;
@@ -459,7 +465,8 @@
 
         }
 
-        function changestudentstatus(studentid, status, toast) {
+        function changestudentstatus(studentid, status, toast, abnormal) {
+            abnormal = abnormal || null;
             var $slstudent = $("#sl" + studentid);
             $slstudent.find("td:eq(2) button").remove();
             $slstudent.find("td:eq(2) .btn-group").prepend(statushtml(status));
@@ -479,13 +486,21 @@
                 $slstudent.find("td:eq(3) i").addClass("fa-check");
                 $slstudent.data("status", status);
             }
+            if (abnormal !== null) {
+                $slstudent.addClass('bg-abnormal');
+            }
             if (typeof(toast) == "undefined" || toast == false) {
                 toast = false;
             } else {
                 toast = true;
             }
             if (toastEnable && student[studentid] != status && toast && checkin_status_json[status] != '未到') {
-                toastr.success($slstudent.children("td:eq(0)").text());
+                if (abnormal !== null) {
+                    toastr.warning(checkin_abnormal_json[abnormal], $slstudent.children("td:eq(0)").text()).css("width", "150px");
+                } else {
+                    toastr.success($slstudent.children("td:eq(0)").text());
+                }
+
             }
             student[studentid] = status;
             $slstudent.find(".btn-group li").show();
@@ -502,7 +517,7 @@
                         $('#actuallynumber').text(str.actually);
                         shake($("#actuallynumber"), "bg-warning", 3);
                         $.each(str.rows, function (n, value) {
-                            changestudentstatus(value.studentid, value.status, !first);
+                            changestudentstatus(value.studentid, value.status, !first, value.abnormal);
                         });
                     }
                 }
@@ -605,7 +620,7 @@
         });
         $(document).on('shown.bs.modal', '#StudentList', function () {
             $("#studentlistbody").niceScroll().resize();
-        })
+        });
         $(document).on('hide.bs.modal', '#StudentList', function () {
             $("#studentlistbody").niceScroll().hide();
         })

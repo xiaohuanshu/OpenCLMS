@@ -413,7 +413,7 @@ def get_homework_commit(request, commit_id):
 
 def office_preview(request):
     url = request.GET.get('url')
-    agent = request.META.get('HTTP_USER_AGENT', None)
+    agent = request.META.get('HTTP_USER_AGENT', '')
     if 'iPhone' in agent or 'iPad' in agent or 'iPod' in agent:
         url = urlunquote(url)
     else:

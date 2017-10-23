@@ -90,3 +90,9 @@ def CHECKIN_ABNORMAL(status):
         return u'帐号异常'
     elif status == CHECKIN_ABNORMAL_LOCATION:
         return u'位置异常'
+
+
+@register.assignment_tag
+def CHECKIN_ABNORMAL_JSON():
+    data = {CHECKIN_ABNORMAL_ACCOUNT: u"帐号异常", CHECKIN_ABNORMAL_LOCATION: u"位置异常"}
+    return json.dumps(data)

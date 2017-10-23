@@ -25,7 +25,7 @@ class Command(BaseCommand):
                 },
                 {
                     'type': 'view',
-                    'name': u'考勤系统',
+                    'name': u'首页',
                     'url': settings.DOMAIN
                 },
                 {

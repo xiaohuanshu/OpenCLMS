@@ -139,11 +139,12 @@
         // 异步加载数据
         $.get('{% url 'checkin:dashboard_today_data' %}', dataType = 'json').done(function (data) {
             // 填入数据
+            var course_checkin_count = data.course_status_data.arrive + data.course_status_data.ask + data.course_status_data.normal;
             $('#today_lessons').text(data.today_lessons);
             $('#today_start_checkin_lessons').text(data.today_start_checkin_lessons);
             $('#today_start_lessons').text(data.today_start_lessons);
             $('#student_all_count').text(data.student_all_count);
-            $('#student_ask').text(data.student_public_ask + data.student_private_ask + data.student_sick_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask + data.student_sick_ask, data.student_all_count) + ')');
+            $('#student_ask').text(data.student_public_ask + data.student_private_ask + data.student_sick_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask + data.student_sick_ask, course_checkin_count) + ')');
             $('#course_normal_count').text(data.course_normal_count);
             $('#course_late_count').text(data.course_late_count);
             $('#student_late_count').text(data.student_late_count + '(' + Percentage(data.student_late_count, data.student_all_count) + ')');
@@ -152,7 +153,7 @@
             $('#student_all_arrive').text(data.student_all_arrive + '(' + Percentage(data.student_all_arrive, data.student_all_count) + ')');
             $('#student_all_normal').text(data.student_all_normal + '(' + Percentage(data.student_all_normal, data.student_all_count) + ')');
             $('#student_normal_count').text(data.student_normal_count + '(' + Percentage(data.student_normal_count, data.student_all_count) + ')');
-            $('#student_arrive_ratio').text(Percentage(data.course_status_data.arrive, data.student_all_count));
+            $('#student_arrive_ratio').text(Percentage(data.course_status_data.arrive, course_checkin_count));
             course_status_chart.setOption({
                 title: {
                     text: '课程签到情况'

@@ -46,7 +46,7 @@ def today_data(request):
     today_start_checkin_lessons = today_start_lessons.filter(checkincount__gt=0)
     data['today_start_checkin_lessons'] = today_start_checkin_lessons.count()
     # course_status
-    course_status_data = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).aggregate(
+    course_status_data = Checkin.objects.filter(lesson__in=today_start_lessons).aggregate(
         normal=Count(Case(When(status=CHECKIN_STATUS_NORMAL, then=1))),
         private_ask=Count(Case(When(status=CHECKIN_STATUS_PRIVATE_ASK, then=1))),
         success=Count(Case(When(status=CHECKIN_STATUS_SUCCESS, then=1))),
@@ -63,35 +63,35 @@ def today_data(request):
 
     data['course_status_data'] = course_status_data
     # student_status
-    student_all_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).distinct('student').count()
-    student_all_arrive = Checkin.objects.filter(lesson__in=today_start_checkin_lessons). \
+    student_all_count = Checkin.objects.filter(lesson__in=today_start_lessons).distinct('student').count()
+    student_all_arrive = Checkin.objects.filter(lesson__in=today_start_lessons). \
         annotate(all=Count('status'), num=Count(Case(When(status=CHECKIN_STATUS_SUCCESS, then=1)))).filter(num=F('all'))
     student_all_arrive.query.group_by = 'student'
     student_all_arrive = student_all_arrive.count()
-    student_all_normal = Checkin.objects.filter(lesson__in=today_start_checkin_lessons). \
+    student_all_normal = Checkin.objects.filter(lesson__in=today_start_lessons). \
         annotate(all=Count('status'), num=Count(Case(When(status=CHECKIN_STATUS_NORMAL, then=1)))).filter(num=F('all'))
     student_all_normal.query.group_by = 'student'
     student_all_normal = student_all_normal.count()
-    student_public_ask = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    student_public_ask = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         status=CHECKIN_STATUS_PUBLIC_ASK).distinct('student').count()
-    student_private_ask = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    student_private_ask = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         status=CHECKIN_STATUS_PRIVATE_ASK).distinct('student').count()
-    student_sick_ask = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    student_sick_ask = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         status=CHECKIN_STATUS_SICK_ASK).distinct('student').count()
-    student_other = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).exclude(
+    student_other = Checkin.objects.filter(lesson__in=today_start_lessons).exclude(
         status__in=[CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_NORMAL, CHECKIN_STATUS_PUBLIC_ASK,
                     CHECKIN_STATUS_PRIVATE_ASK, CHECKIN_STATUS_SICK_ASK]).distinct('student').count()
-    student_late_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    student_late_count = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         Q(status=CHECKIN_STATUS_LATE) | Q(status=CHECKIN_STATUS_LATEEARLY)).distinct('student').count()
-    student_early_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    student_early_count = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_LATEEARLY)).distinct('student').count()
-    student_normal_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    student_normal_count = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         status=CHECKIN_STATUS_NORMAL).distinct('student').count()
-    course_late_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    course_late_count = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         Q(status=CHECKIN_STATUS_LATE) | Q(status=CHECKIN_STATUS_LATEEARLY)).count()
-    course_early_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    course_early_count = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_LATEEARLY)).count()
-    course_normal_count = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(
+    course_normal_count = Checkin.objects.filter(lesson__in=today_start_lessons).filter(
         status=CHECKIN_STATUS_EARLY).count()
     data.update({'student_all_arrive': student_all_arrive,
                  'student_all_normal': student_all_normal,
@@ -119,7 +119,7 @@ def today_data(request):
     department_lateearly_value = []
 
     for d in department_list:
-        res = Checkin.objects.filter(lesson__in=today_start_checkin_lessons, student__in=d.student_set.all()).aggregate(
+        res = Checkin.objects.filter(lesson__in=today_start_lessons, student__in=d.student_set.all()).aggregate(
             normal=Count(Case(When(status=CHECKIN_STATUS_NORMAL, then=1))),
             ask=Count(Case(When(status__in=[CHECKIN_STATUS_PRIVATE_ASK, CHECKIN_STATUS_PUBLIC_ASK
                 , CHECKIN_STATUS_SICK_ASK], then=1))),
@@ -158,7 +158,7 @@ def today_data(request):
                       Q(lesson__time__lte=cs[0], lesson__length__gte=cs[1] - F('lesson__time')) | \
                       Q(lesson__time__lte=cs[0], lesson__length__lte=cs[1] - F('lesson__time'),
                         lesson__length__gte=cs[0] - F('lesson__time'))
-        res = Checkin.objects.filter(lesson__in=today_start_checkin_lessons).filter(time_filter).aggregate(
+        res = Checkin.objects.filter(lesson__in=today_start_lessons).filter(time_filter).aggregate(
             normal=Count(Case(When(status=CHECKIN_STATUS_NORMAL, then=1))),
             ask=Count(Case(When(status__in=[CHECKIN_STATUS_PRIVATE_ASK, CHECKIN_STATUS_PUBLIC_ASK,
                                             CHECKIN_STATUS_SICK_ASK], then=1))),

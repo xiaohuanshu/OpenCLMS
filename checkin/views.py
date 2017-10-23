@@ -85,7 +85,7 @@ def lesson_data(request, lessonid):
 
     checkindata = Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).select_related(
         'student').select_related('student__classid').select_related('student__classid__department').select_related(
-        'student__classid__major').order_by('student__studentid').all()
+        'student__classid__major').order_by('abnormal', 'student__studentid').all()
     t['checkindata'] = checkindata
 
     askdata = Checkin.objects.filter(lesson=lesson, status__gt=10).select_related('student').select_related(

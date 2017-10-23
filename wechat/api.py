@@ -75,6 +75,10 @@ def api(request):
             user.lastpositiontime = nowtime
             user.save()
 
+        elif msg.type == 'click':
+            if msg.key == '1200':
+                response = TextReply(content=u'地址：%s\n学生默认用户名密码:学号/身份证号，教师默认用户名密码：职工号/职工号', message=msg)
+
     xml = response.render()
     encrypted_xml = crypto.encrypt_message(xml, nonce, timestamp)
     return HttpResponse(encrypted_xml, content_type="application/xml")

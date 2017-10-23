@@ -49,7 +49,7 @@ def data(request):
         ld = {'teacherid': p.teacherid,
               'name': p.name,
               'sex': (p.sex - 1 and [u'女'] or [u'男'])[0],
-              'idnumber': p.idnumber,
+              'idnumber': p.idnumber if request.user.has_perm('school_privacy') else u'无权查看',
               'department': ", ".join(department.name for department in p.department.all()),
               'administration': ", ".join(administration.name for administration in p.administration.all()),
               }

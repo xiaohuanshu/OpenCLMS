@@ -5,7 +5,7 @@ from celery import shared_task
 
 from school.function import getnowlessontime
 from course.models import Lesson, Coursehomework, Studentcourse
-from course.constant import LESSON_STATUS_NOW, LESSON_STATUS_END
+from course.constant import LESSON_STATUS_NOW, LESSON_STATUS_END, COURSE_HOMEWORK_TYPE_NOSUBMIT
 from wechat.client import wechat_client
 from django.conf import settings
 from django.db.models import Q, F
@@ -49,9 +49,13 @@ def send_homework_notification(homeworkid):
     for sc in studentcourses:
         if sc.student.user and sc.student.user.openid:
             userid.append(sc.student.user.openid)
+    if homework.type == COURSE_HOMEWORK_TYPE_NOSUBMIT:
+        description = "%s\n点击查看详情" % (homework.title)
+    else:
+        description = "%s\n点击提交或查看详情，电脑提交请访问%s" % (homework.title, settings.DOMAIN)
     article = {
         "title": "[%s]新作业!" % (course.title),
-        "description": "%s\n点击提交或查看详情，电脑提交请访问%s" % (homework.title, settings.DOMAIN),
+        "description": description,
         "url": "%s%s" % (settings.DOMAIN, reverse('course:homework', args=[course.id]) + '?homeworkid=%d' % homeworkid),
         "image": "%s/static/img/homework.png"
     }

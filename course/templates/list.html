@@ -170,7 +170,7 @@
                     if ($el.data("item") == "studentlist") {
                         window.location.href = '{% url 'course:studentcourse' 0 %}' + row.id;
                     } else if ($el.data("item") == "checkindata") {
-                        window.location.href = '{% url 'checkin:course_data' 0 %}' + row.id;
+                        window.location.href = '{% url 'course:course_data' 0 %}' + row.id;
                     }
                 }
             });

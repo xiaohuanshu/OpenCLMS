@@ -9,7 +9,7 @@ from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
 from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit
 from school.models import Student, Teacher
-from checkin.models import Scoreregulation
+from checkin.models import Scoreregulation, Checkin
 from django.db.models import ObjectDoesNotExist
 from constant import *
 from user_system.auth import permission_required
@@ -17,6 +17,7 @@ from school.function import getCurrentSchoolYearTerm
 import time
 from message import sendmessagetocoursestudent
 from course.tasks import send_homework_notification
+from checkin.constant import *
 
 
 def information(request, courseid):
@@ -422,3 +423,77 @@ def office_preview(request):
         else:
             url = "http://ow365.cn/?i=13968&furl=%s" % url
     return redirect(url)
+
+
+def course_data(request, courseid):
+    modify = False
+    if request.GET.get('mode', default=None) == 'modify':
+        modify = True
+    course = Course.objects.get(id=courseid)
+    if not (has_course_permission(request.user, course) or request.user.has_perm('checkin_view')):
+        return render(request, 'error.html', {'message': '没有权限'})
+    alllesson = Lesson.objects.filter(course=course).exclude(status=LESSON_STATUS_AWAIT).order_by(
+        'week',
+        'day',
+        'time').all()
+    columns = [
+        [{'field': 'name', 'title': u'学生', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
+         {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center',
+          'valign': 'middle', 'searchable': True, 'sortable': True},
+         {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+         {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+         {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'}], []]
+    # for i in range(0, count - 1):
+    #    columns.append({'field': 'lesson%d' % i, 'title': i + 1, 'formatter': 'identifierFormatter'})
+    for i, l in enumerate(alllesson):
+        if modify and l.status != LESSON_STATUS_AWAIT and l.status != LESSON_STATUS_CANCLE:
+            columns[1].append(
+                {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center',
+                 'editable': {'url': reverse('checkin:changecheckinstatus', args=[l.id])}})
+        else:
+            columns[1].append(
+                {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center', 'formatter': 'identifierFormatter',
+                 'cellStyle': 'cellStyle'})
+    studentdata = Studentcourse.objects.filter(course=course).select_related('student').order_by('student').all()
+    lessoncheckindata = []
+    '''for s in studentdata:
+        studentcheckindata[s.student.studentid] = {'studentid': s.student.studentid, 'name': s.student.name}
+    for l in alllesson:
+        checkin = Checkin.objects.filter(lesson=l).all()
+        for c in checkin:
+    '''
+    count = Checkin.objects.filter(lesson__course=course).distinct('lesson').count()
+    try:
+        scoreregulation = Scoreregulation.objects.get(course=course)
+    except ObjectDoesNotExist:
+        scoreregulation = Scoreregulation(course=course)
+    for s in studentdata:
+        studentcheckindata = {'studentid': s.student.studentid, 'name': s.student.name}
+        checkindata = Checkin.objects.filter(student=s.student, lesson__course=course).order_by(
+            'lesson__week',
+            'lesson__day',
+            'lesson__time').select_related(
+            'lesson').all()
+        ratio = 0.0
+        score = 0.0
+        totalscore = 0
+        for c in checkindata:
+            studentcheckindata['lesson%d' % (c.lesson.id)] = c.status
+            if c.status != CHECKIN_STATUS_NORMAL:
+                ratio += 1
+            score += scoreregulation.getscore(c.status)
+            totalscore += 100
+        if count == 0:
+            ratio = 1
+        else:
+            ratio = ratio / count
+        if totalscore == 0:
+            score = 100
+        else:
+            score = int((score / totalscore) * 100)
+        studentcheckindata['ratio'] = '%.1f%%' % (ratio * 100)
+        studentcheckindata['score'] = '%d' % (score)
+        lessoncheckindata.append(studentcheckindata)
+    data = {'header': json.dumps(columns), 'newrows': json.dumps(lessoncheckindata)}
+    return render(request, 'course_data.html', {'coursedata': course, 'data': data,
+                                                'courseperms': has_course_permission(request.user, course)})

@@ -20,7 +20,7 @@
     </li>
     {% if courseperms or perms.checkin_view %}
         <li role="presentation" class="{% nav_active request.path 'course_data' %}">
-            <a href="{% url 'checkin:course_data' coursedata.id %}">数据</a>
+            <a href="{% url 'course:course_data' coursedata.id %}">数据</a>
         </li>
         <li role="presentation" class="{% nav_active request.path 'studentcourse' %}">
             <a href="{% url 'course:studentcourse' coursedata.id %}">学生</a>

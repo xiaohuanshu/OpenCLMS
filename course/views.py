@@ -436,13 +436,19 @@ def course_data(request, courseid):
         'week',
         'day',
         'time').all()
+    allhomework = Coursehomework.objects.filter(course=course).exclude(type=COURSE_HOMEWORK_TYPE_NOSUBMIT) \
+        .order_by('deadline').all()
     columns = [
-        [{'field': 'name', 'title': u'学生', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
-         {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center',
-          'valign': 'middle', 'searchable': True, 'sortable': True},
-         {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
-         {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
-         {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'}], []]
+        [
+            {'field': 'name', 'title': u'学生', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
+            {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center',
+             'valign': 'middle', 'searchable': True, 'sortable': True},
+            {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+            {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+            {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'},
+            {'title': u'作业数据', 'colspan': allhomework.count(), 'align': 'center'}
+        ], []
+    ]
     # for i in range(0, count - 1):
     #    columns.append({'field': 'lesson%d' % i, 'title': i + 1, 'formatter': 'identifierFormatter'})
     for i, l in enumerate(alllesson):
@@ -454,8 +460,11 @@ def course_data(request, courseid):
             columns[1].append(
                 {'field': 'lesson%d' % l.id, 'title': i + 1, 'align': 'center', 'formatter': 'identifierFormatter',
                  'cellStyle': 'cellStyle'})
+    for i, l in enumerate(allhomework):
+        columns[1].append(
+            {'field': 'homework%d' % l.id, 'title': i + 1, 'align': 'center'})
     studentdata = Studentcourse.objects.filter(course=course).select_related('student').order_by('student').all()
-    lessoncheckindata = []
+    lessondata = []
     '''for s in studentdata:
         studentcheckindata[s.student.studentid] = {'studentid': s.student.studentid, 'name': s.student.name}
     for l in alllesson:
@@ -468,17 +477,19 @@ def course_data(request, courseid):
     except ObjectDoesNotExist:
         scoreregulation = Scoreregulation(course=course)
     for s in studentdata:
-        studentcheckindata = {'studentid': s.student.studentid, 'name': s.student.name}
+        studentdata = {'studentid': s.student.studentid, 'name': s.student.name}
+        homeworkdata = Homeworkcommit.objects.filter(student=s.student, coursehomework__in=allhomework).all()
+        for h in homeworkdata:
+            studentdata['homework%d' % (h.coursehomework_id)] = h.score if h.score else '未评'
         checkindata = Checkin.objects.filter(student=s.student, lesson__course=course).order_by(
             'lesson__week',
             'lesson__day',
-            'lesson__time').select_related(
-            'lesson').all()
+            'lesson__time').select_related('lesson').all()
         ratio = 0.0
         score = 0.0
         totalscore = 0
         for c in checkindata:
-            studentcheckindata['lesson%d' % (c.lesson.id)] = c.status
+            studentdata['lesson%d' % (c.lesson.id)] = c.status
             if c.status != CHECKIN_STATUS_NORMAL:
                 ratio += 1
             score += scoreregulation.getscore(c.status)
@@ -491,9 +502,9 @@ def course_data(request, courseid):
             score = 100
         else:
             score = int((score / totalscore) * 100)
-        studentcheckindata['ratio'] = '%.1f%%' % (ratio * 100)
-        studentcheckindata['score'] = '%d' % (score)
-        lessoncheckindata.append(studentcheckindata)
-    data = {'header': json.dumps(columns), 'newrows': json.dumps(lessoncheckindata)}
+        studentdata['ratio'] = '%.1f%%' % (ratio * 100)
+        studentdata['score'] = '%d' % (score)
+        lessondata.append(studentdata)
+    data = {'header': json.dumps(columns), 'newrows': json.dumps(lessondata)}
     return render(request, 'course_data.html', {'coursedata': course, 'data': data,
                                                 'courseperms': has_course_permission(request.user, course)})

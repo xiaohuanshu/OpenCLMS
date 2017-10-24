@@ -332,7 +332,7 @@
         </div>
     </div>
     <!-- page end-->
-    {% if courseperms %}
+    {% if courseperms and homework.type|COURSE_HOMEWORK_TYPE != '无需提交' %}
         <div class="row">
             <div class="col-xs-12 col-md-3">
                 <div class="box box-primary">

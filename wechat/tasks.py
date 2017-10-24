@@ -34,7 +34,8 @@ def update_avatar_from_wechat():
         img_temp = NamedTemporaryFile(delete=True)
         img_temp.write(urllib2.urlopen(avatar_url).read())
         img_temp.flush()
-        u.avatar.delete()
+        if u.avatar != 'avatar/default.png':
+            u.avatar.delete()
         u.avatar.save('%s.jpeg' % u.openid, File(img_temp))
     logger.info("[update_avatar_from_wechat]successful update %d avatar" % counter)
     return counter

@@ -15,7 +15,6 @@ urlpatterns = [
     url(r'^control/stopcheckin/(\d+)$', control.stopCheckin, name='stopcheckin'),
     url(r'^control/clearcheckin/(\d+)$', control.clearcheckin, name='clearcheckin'),
 
-    url(r'^data/course_data/(\d+)$', views.course_data, name='course_data'),
     url(r'^data/student_data/([^/]*)$', views.student_data, name='student_data'),
     url(r'^data/teacher_data/([^/]*)$', views.teacher_data, name='teacher_data'),
     url(r'^data/personal_data$', views.personaldata, name='personal_data'),

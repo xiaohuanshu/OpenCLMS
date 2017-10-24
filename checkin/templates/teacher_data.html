@@ -84,7 +84,7 @@
         var $table = $('#table');
 
         function identifierFormatter(value, row, index) {
-            var clickurl = "{% url 'checkin:course_data' 0 %}";
+            var clickurl = "{% url 'course:course_data' 0 %}";
             clickurl = clickurl.substring(0, clickurl.length - 1);
             return "<a href='" + clickurl + row.courseid + "'>" + value + "</a>";
         }

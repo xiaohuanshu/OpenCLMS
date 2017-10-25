@@ -305,3 +305,7 @@ def jumptolesson_data(request, courseid):
 def checkin_success_test(request):
     return render(request, 'checkin_success.html',
                   {'coursename': '计算机组成原理', 'status': 1, 'courseid': 1, 'checkinid': 1})
+
+
+def qrcode(request):
+    return render(request, 'qrcode.html')

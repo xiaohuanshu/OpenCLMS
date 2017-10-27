@@ -1,4 +1,4 @@
-from models import Studentcourse
+from models import Studentcourse, CourseMessage
 from wechat.client import wechat_client
 from django.conf import settings
 
@@ -14,4 +14,5 @@ def sendmessagetocoursestudent(course, message):
             errorsendstudentnames.append(sc.student.name)
     message = "[%s]\n%s" % (course.title, message)
     wechat_client.message.send_text(agent_id=settings.AGENTID, user_ids=userid, content=message)
+    CourseMessage.objects.create(course=course, message=message)
     return errorsendstudentnames

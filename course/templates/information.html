@@ -140,7 +140,7 @@
                                         {{ lesson.starttime|date:'Y-m-d H:i:s'|default:'还未开始' }}
                                     </td>
                                     <td class="hidden-xs lesson-endtime">
-                                        {{ lesson.endtime|date:'Y-m-d H:i:s'|default:'还未结束' }}
+                                        {{ lesson.endtime|date:'Y-m-d H:i:s'|default:'' }}
                                     </td>
                                     <td>
                                         <span class="label label-{{ lesson.status|LESSON_STATUS_STYLE }} lesson-status">{{ lesson.status|LESSON_STATUS }}</span>
@@ -267,6 +267,7 @@
             "showMethod": "fadeIn",
             "hideMethod": "fadeOut"
         };
+
         function changelessonstatus(lessonid, status) {
             var lessontr = $('.lessontr[data-lessonid=' + lessonid + ']');
             if (typeof(status) == "undefined") {
@@ -318,6 +319,7 @@
                 checkindata.eq(0).removeClass('btn-info').addClass('btn-warning').text('考勤数据');
             }
         }
+
         $(".lessontr").each(function () {
             var lessonid = $(this).data('lessonid');
             changelessonstatus(lessonid);
@@ -371,7 +373,7 @@
             });
             var $controlclear = $(this).find('.control-lessonclear');
             $controlclear.click(function () {
-                if(!confirm("此操作会清除全部考情数据并且设置课程为未开始状态，是否继续？")){
+                if (!confirm("此操作会清除全部考情数据并且设置课程为未开始状态，是否继续？")) {
                     return;
                 }
                 $.ajax({

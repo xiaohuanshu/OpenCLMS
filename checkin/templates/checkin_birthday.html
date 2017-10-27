@@ -243,14 +243,14 @@
 {% wxconfig request.get_full_path 'closeWindow,hideOptionMenu,getLocation' as wxc %}
 {{ wxc | safe }}
 <script>
-    window.onload = function(){
+    window.onload = function () {
         var birthday = $('#birthday');
         birthday.fadeIn('slow');
-        $('body').click(function () {
-            birthday.fadeOut('slow',function () {
+        $(document).on('touchstart', function () {
+            birthday.fadeOut('slow', function () {
                 $('#main').fadeIn('slow');
             });
-        })
+        });
     };
     wx.ready(function () {
         wx.hideOptionMenu();

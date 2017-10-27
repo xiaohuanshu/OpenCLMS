@@ -424,7 +424,8 @@ def office_preview(request):
         if url.endswith('.xlsx') or url.endswith('.xls'):
             url = "https://sheet.zoho.com/sheet/view.do?url=%s" % url
         else:
-            url = "http://ow365.cn/?i=13968&furl=%s" % url
+            url.replace('a.ngrok.idv.tw', 'checkin.imwork.net')  # for gengdan temporarily
+            url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % url
     return redirect(url)
 
 

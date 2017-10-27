@@ -68,12 +68,16 @@ def api(request):
 
         elif msg.event == 'location':
             nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
-            user = User.objects.get(openid=msg.source)
-            user.latitude = msg.latitude
-            user.longitude = msg.longitude
-            user.accuracy = msg.precision
-            user.lastpositiontime = nowtime
-            user.save()
+            try:
+                user = User.objects.get(openid=msg.source)
+            except User.DoesNotExist:
+                pass
+            else:
+                user.latitude = msg.latitude
+                user.longitude = msg.longitude
+                user.accuracy = msg.precision
+                user.lastpositiontime = nowtime
+                user.save()
 
         elif msg.event == 'click':
             if msg.key == '1200':

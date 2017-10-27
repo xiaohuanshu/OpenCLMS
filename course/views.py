@@ -7,7 +7,8 @@ from django.utils.http import urlunquote
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
-from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit
+from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit, \
+    CourseMessage
 from school.models import Student, Teacher
 from checkin.models import Scoreregulation, Checkin
 from django.db.models import ObjectDoesNotExist
@@ -105,7 +106,9 @@ def resource(request, courseid):
 
 def sendmessage(request, courseid):
     coursedata = Course.objects.get(id=courseid)
-    data = {'coursedata': coursedata, 'courseperms': has_course_permission(request.user, coursedata)}
+    messages = CourseMessage.objects.filter(course=coursedata).order_by('-time').all()
+    data = {'coursedata': coursedata, 'courseperms': has_course_permission(request.user, coursedata),
+            'messages': messages}
     if request.META['REQUEST_METHOD'] == 'POST':
         message = request.POST.get('message')
         errorsendstudentnames = sendmessagetocoursestudent(coursedata, message)

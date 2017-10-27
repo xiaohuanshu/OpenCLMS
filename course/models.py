@@ -348,3 +348,9 @@ class Homeworkcommit(Dealbase64imgmodel):
     class Meta:
         unique_together = ["coursehomework", "student"]
         db_table = 'HomeworkCommit'
+
+
+class CourseMessage(models.Model):
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid')
+    message = models.TextField(blank=True, null=True)
+    time = models.DateTimeField(auto_now_add=True)

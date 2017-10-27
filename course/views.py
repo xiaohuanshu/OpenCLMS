@@ -18,6 +18,7 @@ from school.function import getCurrentSchoolYearTerm
 import time
 from message import sendmessagetocoursestudent
 from course.tasks import send_homework_notification
+from django.utils.http import urlquote
 from checkin.constant import *
 
 
@@ -425,7 +426,9 @@ def office_preview(request):
             url = "https://sheet.zoho.com/sheet/view.do?url=%s" % url
         else:
             url.replace('a.ngrok.idv.tw', 'checkin.imwork.net')  # for gengdan temporarily
-            url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % url
+            url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % \
+                  urlquote(url, safe=None)
+            print url
     return redirect(url)
 
 

@@ -129,8 +129,13 @@ def ck(request, qr_str):
         if re['error'] != 0:
             return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title,
                                                   'wechatclose': True})
-        if student.idnumber[10:14] == datetime.datetime.now().strftime('%m%d'):
+        nowdate = datetime.datetime.now().strftime('%m%d')
+        if student.idnumber[10:14] == nowdate:
             template = 'checkin_birthday.html'
+        elif nowdate == '1101':
+            template = 'checkin_halloween.html'
+        elif nowdate == '1123':  # 2017
+            template = 'checkin_halloween.html'
         else:
             template = 'checkin_success.html'
         return render(request, template,

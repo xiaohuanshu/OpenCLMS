@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+{% load static %}
+{% load checkin_extra %}
+<head>
+    <meta charset="utf-8">
+    <meta content="maximum-scale=1, user-scalable=no" name="viewport">
+    <title>签到成功</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/thanksgiving.css' %}">
+
+</head>
+<body>
+<div id="birthday"><div class="JT"><div class="JT-leg JT-leg_left"><div class="JT-leg-shin"></div><div class="JT-leg-foot JT-leg-foot-left"></div></div><div class="JT-leg JT-leg_right"><div class="JT-leg-shin"></div><div class="JT-leg-foot JT-leg-foot-right"></div></div><div class="JT-bounce"><div class="JT-rock"><div class="JT-shake"><div class="JT-feathers"><div class="JT-feather JT-feather-0"></div><div class="JT-feather JT-feather-1"></div><div class="JT-feather JT-feather-2"></div><div class="JT-feather JT-feather-3"></div><div class="JT-feather JT-feather-4"></div><div class="JT-feather JT-feather-9"></div><div class="JT-feather JT-feather-8"></div><div class="JT-feather JT-feather-7"></div><div class="JT-feather JT-feather-6"></div><div class="JT-feather JT-feather-5"></div></div><div class="JT-bod"></div><div class="JT-sign">THANKS</div></div><div class="JT-head"></div><div class="JT-eye JT-eye-right"><div class="JT-eye-iris"></div></div><div class="JT-eye JT-eye-left"><div class="JT-eye-iris"></div></div><div class="JT-beak"></div><div class="JT-hat"><div class="JT-hat-brim"></div><div class="JT-hat-pipe"></div></div></div></div></div></div>
+<div class="container" style="display: none;" id="main">
+    <div class="row text-center">
+        <div class="col-sm-6 col-sm-offset-3">
+            <br><br>
+            <h2 style="color:#0fad00">签到成功</h2>
+            <img src="{% static 'img/success.png' %}" width="30%">
+            <h3>{{ coursename }}</h3>
+            <p style="font-size:20px;color:#5C5C5C;">{{ studentname }}同学，祝你感恩节快乐~</p>
+            <p style="font-size:20px;color:#5C5C5C;">状态为：{{ status|CHECKIN_STATUS }}</p>
+            <br><br>
+            <br><br>
+            <a href="{% url 'home' %}" class="btn btn-default">进入主页</a>
+            <a href="{% url 'course:information' courseid %}" class="btn btn-default">查看课程</a>
+            <a href="{% url 'checkin:personal_data' %}" class="btn btn-default">个人数据</a>
+            <p></p>
+            <br><br>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
+<script language="JavaScript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{% load wechat_extra %}
+{% wxconfig request.get_full_path 'closeWindow,hideOptionMenu,getLocation' as wxc %}
+{{ wxc | safe }}
+<script>
+    window.onload = function () {
+        var birthday = $('#birthday');
+        birthday.fadeIn('slow');
+        $(document).on('touchstart', function () {
+            birthday.fadeOut('slow', function () {
+                $("meta[content='maximum-scale=1, user-scalable=no']").attr('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+                $('#main').fadeIn('slow');
+            });
+        });
+    };
+    wx.ready(function () {
+        wx.hideOptionMenu();
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                $.get("{% url 'checkin:get_position' %}", {
+                    checkinid: {{ checkinid }},
+                    latitude: res.latitude,
+                    longitude: res.longitude,
+                    accuracy: res.accuracy
+                });
+            }
+        });
+    });
+</script>
+</html>

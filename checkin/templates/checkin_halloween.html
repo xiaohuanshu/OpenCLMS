@@ -1,0 +1,65 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+{% load static %}
+{% load checkin_extra %}
+<head>
+    <meta charset="utf-8">
+    <meta content="maximum-scale=1, user-scalable=no" name="viewport">
+    <title>签到成功</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+    <link rel="stylesheet" href="{% static 'css/halloween.css' %}">
+</head>
+<body>
+<div id="birthday"><div class="message"><h1>Happy Halloween</h1></div><div class="b-layers"><div class="b1"><div class="blocks"><div class="block block-1"><div class="pumpkins"><div class="pumpkin"><div class="p-eye"></div><div class="p-nose"></div><div class="p-teeth"></div></div><div class="pumpkin"><div class="p-eye"></div><div class="p-nose"></div><div class="p-teeth"></div></div></div></div><div class="block block-2"><div class="roof"></div><div class="mid"><div class="windows"><div class="win"></div><div class="win"></div><div class="win"></div></div></div></div><div class="block block-3"><div class="tower"><div class="windows"><div class="win"></div><div class="win"></div></div></div></div><div class="block block-4"></div><div class="block block-5"></div><div class="block block-6"></div></div></div><div class="b2"></div><div class="b3"></div><div class="b4"><div class="bats"><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div><div class="haloween-bat"><div class="h-left-wing"><div class="l-wing"></div></div><div class="h-bat-body"><div class="h-bt"></div><div class="h-bt"></div></div><div class="h-right-wing"><div class="r-wing"></div></div></div></div><div class="moon"></div></div></div></div>
+<div class="container" style="display: none;" id="main">
+    <div class="row text-center">
+        <div class="col-sm-6 col-sm-offset-3">
+            <br><br>
+            <h2 style="color:#0fad00">签到成功</h2>
+            <img src="{% static 'img/success.png' %}" width="30%">
+            <h3>{{ coursename }}</h3>
+            <p style="font-size:20px;color:#fcf8e3;">{{ studentname }}同学，祝你万圣节快乐~</p>
+            <p style="font-size:20px;color:#fcf8e3;">状态为：{{ status|CHECKIN_STATUS }}</p>
+            <br><br>
+            <br><br>
+            <a href="{% url 'home' %}" class="btn btn-default">进入主页</a>
+            <a href="{% url 'course:information' courseid %}" class="btn btn-default">查看课程</a>
+            <a href="{% url 'checkin:personal_data' %}" class="btn btn-default">个人数据</a>
+            <p></p>
+            <br><br>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
+<script language="JavaScript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{% load wechat_extra %}
+{% wxconfig request.get_full_path 'closeWindow,hideOptionMenu,getLocation' as wxc %}
+{{ wxc | safe }}
+<script>
+    window.onload = function () {
+        var birthday = $('#birthday');
+        birthday.fadeIn('slow');
+        $(document).on('touchstart', function () {
+            birthday.fadeOut('slow', function () {
+                $("meta[content='maximum-scale=1, user-scalable=no']").attr('content', 'width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no');
+                $('#main').fadeIn('slow');
+            });
+        });
+    };
+    wx.ready(function () {
+        wx.hideOptionMenu();
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                $.get("{% url 'checkin:get_position' %}", {
+                    checkinid: {{ checkinid }},
+                    latitude: res.latitude,
+                    longitude: res.longitude,
+                    accuracy: res.accuracy
+                });
+            }
+        });
+    });
+</script>
+</html>

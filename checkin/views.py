@@ -303,7 +303,7 @@ def jumptolesson_data(request, courseid):
 
 
 def checkin_success_test(request):
-    return render(request, 'checkin_birthday.html',
+    return render(request, 'checkin_halloween.html',
                   {'coursename': '计算机组成原理', 'status': 1, 'courseid': 1, 'checkinid': 1})
 
 

@@ -132,10 +132,10 @@ def ck(request, qr_str):
         nowdate = datetime.datetime.now().strftime('%m%d')
         if student.idnumber[10:14] == nowdate:
             template = 'checkin_birthday.html'
-        elif nowdate == '1101':
+        elif nowdate == '1031':
             template = 'checkin_halloween.html'
         elif nowdate == '1123':  # 2017
-            template = 'checkin_halloween.html'
+            template = 'checkin_thanksgiving.html'
         else:
             template = 'checkin_success.html'
         return render(request, template,

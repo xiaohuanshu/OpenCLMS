@@ -1,11 +1,13 @@
 # coding=utf-8
-from models import Lesson, Homeworkcommit
+from models import Lesson, Homeworkcommit, Course, Studentcourse
+from school.models import Student
 from constant import *
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render
 import json
 from course.auth import has_course_permission
+from django.db.models import F
 
 
 def startLesson(request):
@@ -87,3 +89,16 @@ def sethomeworkscore(request):
     homeworkcommit.score = score
     homeworkcommit.save()
     return HttpResponse(json.dumps({'error': 0, 'score': score, 'message': '评分成功'}), content_type="application/json")
+
+
+def setperformance_score(request, courseid):
+    course = Course.objects.get(id=courseid)
+    student = Student.objects.get(studentid=request.GET.get('studentid'))
+    score = request.GET.get('score')
+    if not has_course_permission(request.user, course):
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+    sc = Studentcourse.objects.get(student=student, course=course)
+    sc.performance_score += int(score)
+    sc.save()
+    return HttpResponse(json.dumps({'error': 0, 'message': '加分成功', 'performance_score': sc.performance_score}),
+                        content_type="application/json")

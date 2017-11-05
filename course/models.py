@@ -281,6 +281,7 @@ class Lesson(models.Model):
 class Studentcourse(models.Model):
     student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
     course = models.ForeignKey(Course, models.CASCADE, db_column='courseid', related_name='courses')
+    performance_score = models.SmallIntegerField(default=0)
 
     class Meta:
         db_table = 'StudentCourse'

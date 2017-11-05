@@ -391,6 +391,8 @@
                             toastr['success'](data.message, "操作成功");
                             changelessonstatus(lessonid, data.newstatus);
                             $('#lesson_tag').hide();
+                            localStorage.removeItem(lessonid + '_pointTable');
+                            localStorage.removeItem(lessonid + '_candidates');
                             //showpanelforunclosedlesson();
                         }
                     }, error: function (XMLHttpRequest, textStatus) {

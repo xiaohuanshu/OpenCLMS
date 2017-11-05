@@ -6,8 +6,11 @@
 {% block page_js %}
     <script src="{% static 'plugins/select2/select2.min.js' %}"></script>
     <script src="{% static 'plugins/echarts/echarts.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table-contextmenu/dist/bootstrap-table-contextmenu.min.js' %}"></script>
 {% endblock %}
 {% block page_css %}
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
     <link rel="stylesheet" href="{% static 'plugins/select2/select2.min.css' %}">
     <style>
         .select2-selection {
@@ -120,6 +123,10 @@
                         <i class="fa fa-trash"></i> 清除全部数据
                     </a>
                 {% endif %}
+                <a class="btn btn-app" data-toggle="modal" href="#pointman">
+                    <span class="badge bg-green">新</span>
+                    <i class="fa fa-hand-stop-o"></i> 随机点人
+                </a>
                 <a class="btn btn-app" data-toggle="modal" href="#LessonAskModal">
                     <i class="fa fa-medkit"></i> 请假录入
                 </a>
@@ -194,65 +201,12 @@
                     <ul class="nav nav-tabs">
                         <li class="active"><a href="#tab_1" data-toggle="tab">应到学生</a></li>
                         <li><a href="#tab_2" data-toggle="tab">请假学生</a></li>
+                        <li class="pull-right"><input class="form-control" type="text" placeholder="搜索" id="listsearch">
+                        </li>
                     </ul>
                     <div class="tab-content">
                         <div class="tab-pane active" id="tab_1">
-                            <table class="table table-striped">
-                                <thead>
-                                <tr>
-                                    <th>姓名</th>
-                                    <th>学号</th>
-                                    <th>班级</th>
-                                    <th>专业</th>
-                                    <th>系所</th>
-                                    <th>状态</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {% for s in checkindata %}
-                                    <tr id="sl{{ s.student.studentid }}" data-studentid="{{ s.student.studentid }}"
-                                        data-status="{{ s.status }}">
-                                        <td>{{ s.student.name }}</td>
-                                        <td>{{ s.student.studentid }}</td>
-                                        <td>{{ s.student.classid.name }}</td>
-                                        <td>{{ s.student.classid.major.name }}</td>
-                                        <td>{{ s.student.classid.department.name }}</td>
-                                        <td>
-                                            <div class="btn-group">
-                                                <button data-toggle="dropdown"
-                                                        class="btn dropdown-toggle btn-xs bg-{{ s.status | CHECKIN_STATUS_STYLE }}"
-                                                        type="button"
-                                                        aria-expanded="false">{{ s.status | CHECKIN_STATUS }}
-                                                </button>
-                                                {% if not lessondata.checkinnow %}
-                                                    <ul role="menu" class="dropdown-menu dropdown-menu-right"
-                                                        style="min-width:70px;">
-                                                        <li>
-                                                            <a class="set-success">正常</a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="set-late">迟到</a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="set-early">早退</a>
-                                                        </li>
-                                                        <li>
-                                                            <a class="set-normal">未到</a>
-                                                        </li>
-                                                    </ul>
-                                                {% endif %}
-                                            </div>
-                                            {% if s.abnormal %}
-                                                <span class="badge bg-red" data-toggle="tooltip"
-                                                      title="{{ s.abnormal|CHECKIN_ABNORMAL }}"><i
-                                                        class="fa fa-fw fa-exclamation"></i></span>
-                                            {% endif %}
-                                        </td>
-                                    </tr>
-                                {% endfor %}
-
-                                </tbody>
-                            </table>
+                            <table id="studentlist"></table>
                         </div>
                         <!-- /.tab-pane -->
                         <div class="tab-pane" id="tab_2">
@@ -352,6 +306,35 @@
             </div>
         </div>
     </div>
+    <div class="modal fade modal-dialog-center top-modal-with-space" id="pointman" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">随机点人</h4>
+                    </div>
+                    <div class="modal-body">
+                        <div class="row" style="text-align: center;padding-bottom: 10px">
+                            <button class="btn btc-lg btn-info" type="button" style="width: 97%" id="pointBtn">点人
+                            </button>
+                        </div>
+                        <div class="row text-center" style="text-align:-webkit-center;">
+                            <div style="width: 97%">
+                                <table id="pointTable"></table>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="modal-footer">
+                        <p class="help-block pull-left">优先选择异常考勤，一轮中学生不会重复</p>
+                        <input type="checkbox" id="speech" checked>语音读名
+                        <button data-dismiss="modal" class="btn btn-default" type="button">关闭</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
     <div class="modal fade modal-dialog-center top-modal-with-space" id="clearthisdata" tabindex="-1" role="dialog"
          aria-hidden="true">
         <div class="modal-dialog">
@@ -401,6 +384,20 @@
         </div>
     </div>
 
+    <ul id="status-context-menu" class="dropdown-menu" style="min-width:70px;">
+        <li data-item="set-success">
+            <a>正常</a>
+        </li>
+        <li data-item="set-late">
+            <a>迟到</a>
+        </li>
+        <li data-item="set-early">
+            <a>早退</a>
+        </li>
+        <li data-item="set-normal">
+            <a>未到</a>
+        </li>
+    </ul>
 {% endblock %}
 
 {% block page_script %}
@@ -449,6 +446,11 @@
         var checkin_status_json ={{ checkin_status_json|safe }};
         {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
         var checkin_status_style_json ={{ checkin_status_style_json|safe }};
+        {% CHECKIN_ABNORMAL_JSON as checkin_abnormal_json %}
+        checkin_abnormal_json ={{ checkin_abnormal_json|safe }};
+
+        $studentList = $('#studentlist');
+        $pointTable = $('#pointTable');
 
         function changestatus(studentid, status) {
             $.ajax({
@@ -462,23 +464,26 @@
                     if (value.error && value.error != 0) {
                         alert(value.message);
                     } else {
-                        $("#sl" + studentid).data("status", value.status);
-                        //$("#sl" + studentid + " td:eq(5) button").removeClass("btn-danger");
-                        //$("#sl" + studentid + " td:eq(5) button").removeClass("btn-success");
-                        $("#sl" + studentid + " td:eq(5) button").attr("class", "btn dropdown-toggle btn-xs bg-" + checkin_status_style_json[value.status]);
-                        $("#sl" + studentid + " td:eq(5) button").text(checkin_status_json[value.status]);
+                        var tableRow = $studentList.bootstrapTable('getRowByUniqueId', studentid);
+                        tableRow.status = value.status;
+                        $studentList.bootstrapTable('updateByUniqueId', {id: studentid, row: tableRow});
+                        var pointTableRow = $pointTable.bootstrapTable('getRowByUniqueId', studentid);
+                        if (pointTableRow) {
+                            pointTableRow.setsuccess = true;
+                            $pointTable.bootstrapTable('updateByUniqueId', {id: studentid, row: tableRow});
+                        }
                         if (value.status >= 10) {
                             $('.info-box-number').eq(0).text($('.info-box-number').eq(0).text() - 1);
                             $('.info-box-number').eq(2).text(parseInt($('.info-box-number').eq(2).text()) + 1);
                             str = '<tr id="sl' + value.studentid + '" data-studentid="' + value.studentid + '" data-status="' + value.status + '">' +
-                                '<td>' + $("#sl" + studentid + " td:eq(0)").text() + '</td>' +
+                                '<td>' + tableRow.name + '</td>' +
                                 '<td>' + value.studentid + '</td>' +
-                                '<td>' + $("#sl" + studentid + " td:eq(2)").text() + '</td>' +
-                                '<td>' + $("#sl" + studentid + " td:eq(3)").text() + '</td>' +
-                                '<td>' + $("#sl" + studentid + " td:eq(4)").text() + '</td>' +
+                                '<td>' + tableRow.class + '</td>' +
+                                '<td>' + '</td>' +
+                                '<td>' + '</td>' +
                                 '</tr>';
                             $('#ask_table_body').append(str);
-                            $("#sl" + studentid).remove();
+                            $studentList.bootstrapTable('removeByUniqueId', studentid);
                         }
                     }
                 },
@@ -488,18 +493,223 @@
             });
         }
 
+        function addscore(studentid, score) {
+            $.ajax({
+                contentType: "application/json; charset=utf-8",
+                url: '{% url 'course:control.setperformance_score' lessondata.course_id %}',
+                data: {
+                    'studentid': studentid,
+                    'score': score
+                },
+                success: function (value) {
+                    if (value.error && value.error != 0) {
+                        alert(value.message);
+                    } else {
+                        var tableRow = $studentList.bootstrapTable('getRowByUniqueId', studentid);
+                        tableRow.score = value.performance_score;
+                        $studentList.bootstrapTable('updateByUniqueId', {id: studentid, row: tableRow});
+                        var pointTableRow = $pointTable.bootstrapTable('getRowByUniqueId', studentid);
+                        if (pointTableRow) {
+                            pointTableRow.score = value.performance_score;
+                            $pointTable.bootstrapTable('updateByUniqueId', {id: studentid, row: tableRow});
+                        }
+                    }
+                },
+                error: function () {
 
-        $(".set-late").click(function () {
-            changestatus($(this).parents('tr').data("studentid"), 'late');
+                }
+            });
+        }
+
+        function scoreFormatter(value, row, index) {
+            buttonHTML = '<div class="pull-right">' +
+                '<button type="button" class="btn btn-default btn-xs btn-score" data-studentid=' + row.studentid + ' data-score="1">+</button>' +
+                '<button type="button" class="btn btn-default btn-xs btn-score" data-studentid=' + row.studentid + ' data-score="-1">-</button>' +
+                '</div>';
+            if (!value) {
+                value = 0;
+            }
+            return value + buttonHTML;
+        }
+
+        $(document).on('click', '.btn-score', function () {
+            addscore($(this).data("studentid"), $(this).data("score"));
         });
-        $(".set-success").bind('click', function () {
-            changestatus($(this).parents('tr').data("studentid"), 'success');
+
+        $(document).on('click', '.set-normal', function () {
+            changestatus($(this).data("studentid"), 'delete');
         });
-        $(".set-early").bind('click', function () {
-            changestatus($(this).parents('tr').data("studentid"), 'early');
+
+        function statusFormatter(value, row, index) {
+            html = '<div class="btn-group">\n' +
+                '<button data-toggle="dropdown"\n' +
+                'class="btn dropdown-toggle status-button btn-xs bg-' + checkin_status_style_json[value] + '\n' +
+                'type="button"\n' +
+                'aria-expanded="false">' + checkin_status_json[value] + '\n' +
+                '</button>\n' +
+                '</div>\n';
+            if (row.abnormal) {
+                html = html + '<span class="badge bg-red" data-toggle="tooltip"\n' +
+                    'title="' + checkin_abnormal_json[row.abnormal] + '"><i\n' +
+                    'class="fa fa-fw fa-exclamation"></i></span>\n';
+            }
+            return html;
+        }
+
+        $studentList.bootstrapTable({
+            columns: [{
+                field: 'name',
+                title: '姓名'
+            }, {
+                field: 'studentid',
+                title: '学号'
+            }, {
+                field: 'class',
+                title: '班级'
+            }, {
+                field: 'score',
+                title: '表现加分',
+                formatter: scoreFormatter
+            }, {
+                field: 'status',
+                title: '状态',
+                formatter: statusFormatter
+            }],
+            data: {{ students|safe }},
+            idField: 'studentid',
+            uniqueId: 'studentid',
+            contextMenu: '#status-context-menu',
+            contextMenuButton: '.status-button',
+            search: true,
+            onContextMenuItem: function (row, $el) {
+                if ($el.data("item") === "set-late") {
+                    changestatus(row.studentid, 'late');
+                } else if ($el.data("item") === "set-success") {
+                    changestatus(row.studentid, 'success');
+                } else if ($el.data("item") === "set-early") {
+                    changestatus(row.studentid, 'early');
+                } else if ($el.data("item") === "set-normal") {
+                    changestatus(row.studentid, 'delete');
+                }
+            },
+            onPostBody: function () {
+                $('.fixed-table-toolbar').remove();
+            }
         });
-        $(".set-normal").bind('click', function () {
-            changestatus($(this).parents('tr').data("studentid"), 'delete');
+
+        function setnormalFormatter(value, row, index) {
+            if (row.setsuccess) {
+                html = '<button type="button" class="btn btn-default btn-xs" disabled>设置成功</button>';
+            } else {
+                html = '<button type="button" class="btn btn-default btn-xs set-normal" data-studentid=' + row.studentid + '>此人未到</button>';
+            }
+            if (row.abnormal) {
+                html = html + '<span class="badge bg-red" data-toggle="tooltip"\n' +
+                    'title="' + checkin_abnormal_json[row.abnormal] + '"><i\n' +
+                    'class="fa fa-fw fa-exclamation"></i></span>\n';
+            }
+            return html;
+        }
+
+        var pointTable_local = localStorage.getItem('{{ lessondata.id }}_pointTable');
+
+        if (!pointTable_local) {
+            pointTable_local = [];
+        } else {
+            pointTable_local = JSON.parse(pointTable_local);
+        }
+
+        $pointTable.bootstrapTable({
+            columns: [{
+                field: 'name',
+                title: '姓名'
+            }, {
+                field: 'studentid',
+                title: '学号'
+            }, {
+                field: 'score',
+                title: '表现加分',
+                formatter: scoreFormatter
+            }, {
+                field: 'setnormal',
+                title: '考勤',
+                formatter: setnormalFormatter
+            }],
+            data: pointTable_local,
+            idField: 'studentid',
+            uniqueId: 'studentid',
+            pagination: true,
+            onlyInfoPagination: true,
+            pageSize: 5,
+            formatNoMatches: function () {
+                return '本节课还没有点名'
+            },
+            formatDetailPagination: function (totalRows) {
+                return '本节课已点' + totalRows + '人'
+            },
+            onPreBody: function (data) {
+                if (data.length !== 0) {
+                    localStorage.setItem('{{ lessondata.id }}_pointTable', JSON.stringify(data));
+                }
+            },
+            rowStyle: function (row, index) {
+                if (index===0){
+                    return {classes:'success'};
+                }else{
+                    return {}
+                }
+            }
+        });
+
+        function isabnormal(element) {
+            return element.abnormal;
+        }
+
+        function isnotabnormal(element) {
+            return !element.abnormal;
+        }
+
+        $('#pointBtn').click(function () {
+            var allnumbers = $studentList.bootstrapTable('getData').filter(function (element) {
+                return ['正常', '迟到'].indexOf(checkin_status_json[element.status]) !== -1;
+            });
+            if (allnumbers.length === 0) {
+                alert("所有人都没到，无法点名");
+                return;
+            }
+            var candidates;
+            candidates = localStorage.getItem('{{ lessondata.id }}_candidates');
+            if (candidates) {
+                candidates = JSON.parse(candidates);
+            } else {
+                candidates = [];
+            }
+            if (candidates.length === 0) {
+                if ($pointTable.bootstrapTable('getData').length === 0) {
+                    //初始化异常数据
+                    candidates = allnumbers.filter(isabnormal);
+                } else if ($pointTable.bootstrapTable('getData').filter(isnotabnormal).length === 0) {
+                    candidates = allnumbers.filter(isnotabnormal);
+                }
+                if (candidates.length === 0) {
+                    candidates = allnumbers;
+                }
+            }
+            var luckey_num = Math.round(Math.random() * (candidates.length - 1));
+            var luckey = candidates[luckey_num];  //随机抽取一个值
+            if ($('#speech').is(':checked')) {
+                var utterThis = new window.SpeechSynthesisUtterance(luckey.name);
+                window.speechSynthesis.speak(utterThis);
+            }
+            $pointTable.bootstrapTable('removeByUniqueId', luckey.studentid);
+            $pointTable.bootstrapTable('insertRow', {index: 0, row: luckey});
+            candidates.splice(luckey_num, 1);
+            localStorage.setItem('{{ lessondata.id }}_candidates', JSON.stringify(candidates));
+        });
+
+
+        $("#listsearch").keyup(function () {
+            $studentList.bootstrapTable('resetSearch', $(this).val());
         });
 
         $(".set_ask").bind('click', function () {
@@ -560,5 +770,12 @@
             templateResult: formatRepo, // omitted for brevity, see the source of this page
             templateSelection: formatRepoSelection // omitted for brevity, see the source of this page
         });
+
+        $(document).ready(function () {
+            if (!('speechSynthesis' in window)) {
+                $('#speech').removeAttr("checked");
+                $('#speech').attr("disabled", true);
+            }
+        })
     </script>
 {% endblock %}

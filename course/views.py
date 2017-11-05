@@ -444,6 +444,7 @@ def course_data(request, courseid):
         'time').all()
     allhomework = Coursehomework.objects.filter(course=course).exclude(type=COURSE_HOMEWORK_TYPE_NOSUBMIT) \
         .order_by('deadline').all()
+    homework_count = allhomework.count()
     columns = [
         [
             {'field': 'name', 'title': u'学生', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
@@ -452,9 +453,11 @@ def course_data(request, courseid):
             {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'},
-            {'title': u'作业数据', 'colspan': allhomework.count(), 'align': 'center'}
         ], []
     ]
+    if homework_count > 0:
+        columns[0].append({'title': u'作业数据', 'colspan': homework_count, 'align': 'center'})
+
     # for i in range(0, count - 1):
     #    columns.append({'field': 'lesson%d' % i, 'title': i + 1, 'formatter': 'identifierFormatter'})
     for i, l in enumerate(alllesson):
@@ -469,6 +472,7 @@ def course_data(request, courseid):
     for i, l in enumerate(allhomework):
         columns[1].append(
             {'field': 'homework%d' % l.id, 'title': i + 1, 'align': 'center'})
+
     studentdata = Studentcourse.objects.filter(course=course).select_related('student').order_by('student').all()
     lessondata = []
     '''for s in studentdata:

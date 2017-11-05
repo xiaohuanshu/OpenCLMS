@@ -452,6 +452,7 @@ def course_data(request, courseid):
              'valign': 'middle', 'searchable': True, 'sortable': True},
             {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
+            {'field': 'performance_score', 'title': u'表现分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'title': u'签到数据', 'colspan': alllesson.count(), 'align': 'center'},
         ], []
     ]
@@ -514,6 +515,7 @@ def course_data(request, courseid):
             score = int((score / totalscore) * 100)
         studentdata['ratio'] = '%.1f%%' % (ratio * 100)
         studentdata['score'] = '%d' % (score)
+        studentdata['performance_score'] = '%d' % (s.performance_score)
         lessondata.append(studentdata)
     data = {'header': json.dumps(columns), 'newrows': json.dumps(lessondata)}
     return render(request, 'course_data.html', {'coursedata': course, 'data': data,

@@ -14,7 +14,7 @@ from django.shortcuts import redirect, HttpResponse, HttpResponseRedirect
 from course.auth import has_course_permission
 from function import generateqrstr
 import datetime
-from django.db.models import Count, Case, When, Q
+from django.db.models import Count, Case, When, Q, OuterRef, Subquery
 from django.core.cache import cache
 from django.conf import settings
 from django.db.models import Prefetch
@@ -83,10 +83,20 @@ def lesson_data(request, lessonid):
         checkinrecord = checkinrecord.order_by('time').all()
         t['checkinrecord'] = checkinrecord
 
+    sc = Studentcourse.objects.filter(course=lesson.course, student=OuterRef('student'))
     checkindata = Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).select_related(
-        'student').select_related('student__classid').select_related('student__classid__department').select_related(
-        'student__classid__major').order_by('abnormal', 'student__studentid').all()
-    t['checkindata'] = checkindata
+        'student').select_related('student__classid').order_by('abnormal', 'student__studentid').annotate(
+        score=Subquery(sc.values('performance_score')[:1])).only('student_id','student__name','student__classid__name','status','abnormal')
+    students = []
+    for c in checkindata:
+        students.append({'studentid': c.student_id,
+                         'name': c.student.name,
+                         'class': c.student.classid.name,
+                         'score': c.score,
+                         'status':c.status,
+                         'abnormal':c.abnormal,
+                         })
+    t['students'] = json.dumps(students)
 
     askdata = Checkin.objects.filter(lesson=lesson, status__gt=10).select_related('student').select_related(
         'student__classid').select_related('student__classid__department').select_related(

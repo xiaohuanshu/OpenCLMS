@@ -2,16 +2,30 @@
 {% load static %}
 {% load checkin_extra %}
 {% load center_extra %}
+{% load course_extra %}
 {% block page_js %}
     <script src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
+    {% if perms.checkin_view %}
+        <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/libs/FileSaver/FileSaver.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/libs/js-xlsx/xlsx.core.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/libs/html2canvas/html2canvas.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/tableExport.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    {% endif %}
 {% endblock %}
 {% block page_css %}
+    {% if perms.checkin_view %}
+        <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    {% endif %}
 {% endblock %}
 {% block title %}今日总览{% endblock %}
 {% block beforecontent %}
     <section class="content-header">
         <h1>
             今日总览
+            <small><b id="wait">0</b>s后自动刷新</small>
         </h1>
     </section>
 {% endblock %}
@@ -102,15 +116,53 @@
         </div>
 
     </div>
+    {% if perms.checkin_view %}
+        <div class="row">
+            <div class="col-sm-12">
+                <div class="box box-primary">
+                    <div class="box-header">
+                        <h3 class="box-title">课程列表</h3>
+                    </div>
+                    <div class="box-body">
+                        <div class="adv-table">
+                            <table id="table"
+                                   data-toggle="table"
+                                   data-search="true"
+                                   data-show-refresh="true"
+                                   data-show-toggle="true"
+                                   data-show-columns="true"
+                                   data-show-export="true"
+                                   data-minimum-count-columns="2"
+                                   data-pagination="true"
+                                   data-id-field="id"
+                                   data-page-size="10"
+                                   data-page-list="[5,10, 25, 50, 100, ALL]"
+                                   data-side-pagination="client"
+                                   data-url="{% url 'checkin:dashboard_lesson_data' %}"
+                                   data-striped="true"
+                                   data-export-types="['excel','doc','png']"
+                            >
+
+                            </table>
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endif %}
 
 {% endblock %}
 
 {% block page_script %}
     <script>
+        $table = $("#table");
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         var checkin_status_json ={{ checkin_status_json|safe }};
         {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
         var checkin_status_style_json ={{ checkin_status_style_json|safe }};
+        {% LESSON_STATUS_JSON as lesson_status_json %}
+        var lesson_status_json ={{ lesson_status_json|safe }};
         colorList = {
             '正常': "#00a65a",
             '到达': "#37a600",
@@ -136,302 +188,402 @@
         var course_time_status_chart = echarts.init(document.getElementById('course_time_status_chart'));
         var student_status_chart = echarts.init(document.getElementById('student_status_chart'));
         var department_status_chart = echarts.init(document.getElementById('department_status_chart'));
+
         // 异步加载数据
-        $.get('{% url 'checkin:dashboard_today_data' %}', dataType = 'json').done(function (data) {
-            // 填入数据
-            var course_checkin_count = data.course_status_data.arrive + data.course_status_data.ask + data.course_status_data.normal;
-            $('#today_lessons').text(data.today_lessons);
-            $('#today_start_checkin_lessons').text(data.today_start_checkin_lessons);
-            $('#today_start_lessons').text(data.today_start_lessons);
-            $('#student_all_count').text(data.student_all_count);
-            $('#student_ask').text(data.student_public_ask + data.student_private_ask + data.student_sick_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask + data.student_sick_ask, course_checkin_count) + ')');
-            $('#course_normal_count').text(data.course_normal_count);
-            $('#course_late_count').text(data.course_late_count);
-            $('#student_late_count').text(data.student_late_count + '(' + Percentage(data.student_late_count, data.student_all_count) + ')');
-            $('#student_early_count').text(data.student_early_count + '(' + Percentage(data.student_early_count, data.student_all_count) + ')');
-            $('#course_early_count').text(data.course_early_count);
-            $('#student_all_arrive').text(data.student_all_arrive + '(' + Percentage(data.student_all_arrive, data.student_all_count) + ')');
-            $('#student_all_normal').text(data.student_all_normal + '(' + Percentage(data.student_all_normal, data.student_all_count) + ')');
-            $('#student_normal_count').text(data.student_normal_count + '(' + Percentage(data.student_normal_count, data.student_all_count) + ')');
-            $('#student_arrive_ratio').text(Percentage(data.course_status_data.arrive, course_checkin_count));
-            course_status_chart.setOption({
-                title: {
-                    text: '课程签到情况'
-                },
-                tooltip: {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b}: {c} ({d}%)"
-                },
-                itemStyle: {
-                    normal: {
-                        color: function (params) {
-                            return colorList[params.name];
-                        }
-                    }
-                },
-                series: [
-                    {
-                        name: '到达比例',
-                        type: 'pie',
-                        selectedMode: 'single',
-                        radius: [0, '30%'],
-
-                        label: {
-                            normal: {
-                                show: false
-                            }
-                        },
-                        labelLine: {
-                            normal: {
-                                show: false
-                            }
-                        },
-                        data: [
-                            {value: data.course_status_data.arrive, name: '到达'},
-                            {value: data.course_status_data.normal, name: '未到'},
-                            {value: data.course_status_data.ask, name: '请假'}
-                        ]
+        function getdata() {
+            $.get('{% url 'checkin:dashboard_today_data' %}', dataType = 'json').done(function (data) {
+                // 填入数据
+                var course_checkin_count = data.course_status_data.arrive + data.course_status_data.ask + data.course_status_data.normal;
+                $('#today_lessons').text(data.today_lessons);
+                $('#today_start_checkin_lessons').text(data.today_start_checkin_lessons);
+                $('#today_start_lessons').text(data.today_start_lessons);
+                $('#student_all_count').text(data.student_all_count);
+                $('#student_ask').text(data.student_public_ask + data.student_private_ask + data.student_sick_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask + data.student_sick_ask, course_checkin_count) + ')');
+                $('#course_normal_count').text(data.course_normal_count);
+                $('#course_late_count').text(data.course_late_count);
+                $('#student_late_count').text(data.student_late_count + '(' + Percentage(data.student_late_count, data.student_all_count) + ')');
+                $('#student_early_count').text(data.student_early_count + '(' + Percentage(data.student_early_count, data.student_all_count) + ')');
+                $('#course_early_count').text(data.course_early_count);
+                $('#student_all_arrive').text(data.student_all_arrive + '(' + Percentage(data.student_all_arrive, data.student_all_count) + ')');
+                $('#student_all_normal').text(data.student_all_normal + '(' + Percentage(data.student_all_normal, data.student_all_count) + ')');
+                $('#student_normal_count').text(data.student_normal_count + '(' + Percentage(data.student_normal_count, data.student_all_count) + ')');
+                $('#student_arrive_ratio').text(Percentage(data.course_status_data.arrive, course_checkin_count));
+                course_status_chart.setOption({
+                    title: {
+                        text: '课程签到情况'
                     },
-                    {
-                        name: '状态比例',
-                        type: 'pie',
-                        radius: ['40%', '55%'],
-
-                        data: [
-                            {value: data.course_status_data.success, name: '正常'},
-                            {value: data.course_status_data.late, name: '迟到'},
-                            {value: data.course_status_data.early, name: '早退'},
-                            {value: data.course_status_data.lateearly, name: '迟&早'},
-                            {value: data.course_status_data.normal, name: '未到'},
-                            {value: data.course_status_data.public_ask, name: '公假'},
-                            {value: data.course_status_data.sick_ask, name: '病假'},
-                            {value: data.course_status_data.private_ask, name: '事假'}
-                        ]
-                    }
-                ]
-            });
-            course_time_status_chart.setOption({
-                title: {
-                    text: '上课时间数据'
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-                    }
-                },
-                itemStyle: {
-                    normal: {
-                        color: function (params) {
-                            return colorList[params.seriesName];
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b}: {c} ({d}%)"
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                return colorList[params.name];
+                            }
                         }
-                    }
-                },
-                grid: {},
-                xAxis: [
-                    {
-                        type: 'category',
-                        data: data.class_times
-                    }
-                ],
-                yAxis: [
-                    {
-                        type: 'value'
-                    }
-                ],
-                series: [
-                    {
-                        name: '未到',
-                        type: 'bar',
-                        data: data.coursetime_normal_value,
-                        markLine: {
-                            lineStyle: {
+                    },
+                    series: [
+                        {
+                            name: '到达比例',
+                            type: 'pie',
+                            selectedMode: 'single',
+                            radius: [0, '30%'],
+
+                            label: {
                                 normal: {
-                                    type: 'dashed'
+                                    show: false
+                                }
+                            },
+                            labelLine: {
+                                normal: {
+                                    show: false
                                 }
                             },
                             data: [
-                                [{type: 'min'}, {type: 'max'}]
+                                {value: data.course_status_data.arrive, name: '到达'},
+                                {value: data.course_status_data.normal, name: '未到'},
+                                {value: data.course_status_data.ask, name: '请假'}
+                            ]
+                        },
+                        {
+                            name: '状态比例',
+                            type: 'pie',
+                            radius: ['40%', '55%'],
+
+                            data: [
+                                {value: data.course_status_data.success, name: '正常'},
+                                {value: data.course_status_data.late, name: '迟到'},
+                                {value: data.course_status_data.early, name: '早退'},
+                                {value: data.course_status_data.lateearly, name: '迟&早'},
+                                {value: data.course_status_data.normal, name: '未到'},
+                                {value: data.course_status_data.public_ask, name: '公假'},
+                                {value: data.course_status_data.sick_ask, name: '病假'},
+                                {value: data.course_status_data.private_ask, name: '事假'}
                             ]
                         }
+                    ]
+                });
+                course_time_status_chart.setOption({
+                    title: {
+                        text: '上课时间数据'
                     },
-                    {
-                        name: '请假',
-                        type: 'bar',
-                        stack: '广告',
-                        data: data.coursetime_ask_value
-                    },
-                    {
-                        name: '到达',
-                        type: 'bar',
-                        data: data.coursetime_arrive_value
-                    },
-                    {
-                        name: '正常',
-                        type: 'bar',
-                        barWidth: 5,
-                        stack: '到达',
-                        data: data.coursetime_success_value
-                    },
-                    {
-                        name: '迟到',
-                        type: 'bar',
-                        stack: '到达',
-                        data: data.coursetime_late_value
-                    },
-                    {
-                        name: '早退',
-                        type: 'bar',
-                        stack: '到达',
-                        data: data.coursetime_early_value
-                    },
-                    {
-                        name: '迟&早',
-                        type: 'bar',
-                        stack: '到达',
-                        data: data.coursetime_lateearly_value
-                    }
-                ]
-            });
-            student_status_chart.setOption({
-                title: {
-                    text: '学生全天情况'
-                },
-                tooltip: {
-                    trigger: 'item',
-                    formatter: "{a} <br/>{b}: {c} ({d}%)"
-                },
-                itemStyle: {
-                    normal: {
-                        color: function (params) {
-                            return colorList[params.name];
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
                         }
-                    }
-                },
-                series: [
-                    {
-                        name: '比例',
-                        type: 'pie',
-                        selectedMode: 'single',
-                        radius: [0, '60%'],
-                        data: [
-                            {value: data.student_other, name: '其他'},
-                            {value: data.student_all_arrive, name: '全勤'},
-                            {value: data.student_all_normal, name: '全旷'},
-                            {value: data.student_public_ask, name: '公假'},
-                            {value: data.student_sick_ask, name: '病假'},
-                            {value: data.student_private_ask, name: '事假'},
-                        ]
-                    }
-                ]
-            });
-            department_status_chart.setOption({
-                title: {
-                    text: '各系学生情况'
-                },
-                tooltip: {
-                    trigger: 'axis',
-                    axisPointer: {            // 坐标轴指示器，坐标轴触发有效
-                        type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
-                    }
-                },
-                grid: {
-                    x: '15%'
-                },
-                legend: {
-                    data: ['未到', '请假', '正常', '迟到', '早退', '迟&早']
-                },
-                itemStyle: {
-                    normal: {
-                        color: function (params) {
-                            return colorList[params.seriesName];
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                return colorList[params.seriesName];
+                            }
                         }
-                    }
-                },
-                xAxis: {
-                    type: 'value'
-                },
-                yAxis: {
-                    type: 'category',
-                    data: data.department_list
-                },
-                series: [
-                    {
-                        name: '未到',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'insideRight'
-                            }
-                        },
-                        data: data.department_normal_value
                     },
-                    {
-                        name: '请假',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'insideRight'
+                    grid: {},
+                    xAxis: [
+                        {
+                            type: 'category',
+                            data: data.class_times
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value'
+                        }
+                    ],
+                    series: [
+                        {
+                            name: '未到',
+                            type: 'bar',
+                            data: data.coursetime_normal_value,
+                            markLine: {
+                                lineStyle: {
+                                    normal: {
+                                        type: 'dashed'
+                                    }
+                                },
+                                data: [
+                                    [{type: 'min'}, {type: 'max'}]
+                                ]
                             }
                         },
-                        data: data.department_ask_value
+                        {
+                            name: '请假',
+                            type: 'bar',
+                            stack: '广告',
+                            data: data.coursetime_ask_value
+                        },
+                        {
+                            name: '到达',
+                            type: 'bar',
+                            data: data.coursetime_arrive_value
+                        },
+                        {
+                            name: '正常',
+                            type: 'bar',
+                            barWidth: 5,
+                            stack: '到达',
+                            data: data.coursetime_success_value
+                        },
+                        {
+                            name: '迟到',
+                            type: 'bar',
+                            stack: '到达',
+                            data: data.coursetime_late_value
+                        },
+                        {
+                            name: '早退',
+                            type: 'bar',
+                            stack: '到达',
+                            data: data.coursetime_early_value
+                        },
+                        {
+                            name: '迟&早',
+                            type: 'bar',
+                            stack: '到达',
+                            data: data.coursetime_lateearly_value
+                        }
+                    ]
+                });
+                student_status_chart.setOption({
+                    title: {
+                        text: '学生全天情况'
                     },
-                    {
-                        name: '正常',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'insideRight'
-                            }
-                        },
-                        data: data.department_success_value
+                    tooltip: {
+                        trigger: 'item',
+                        formatter: "{a} <br/>{b}: {c} ({d}%)"
                     },
-                    {
-                        name: '迟到',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'insideRight'
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                return colorList[params.name];
                             }
-                        },
-                        data: data.department_late_value
+                        }
                     },
-                    {
-                        name: '早退',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'insideRight'
-                            }
-                        },
-                        data: data.department_early_value
+                    series: [
+                        {
+                            name: '比例',
+                            type: 'pie',
+                            selectedMode: 'single',
+                            radius: [0, '60%'],
+                            data: [
+                                {value: data.student_other, name: '其他'},
+                                {value: data.student_all_arrive, name: '全勤'},
+                                {value: data.student_all_normal, name: '全旷'},
+                                {value: data.student_public_ask, name: '公假'},
+                                {value: data.student_sick_ask, name: '病假'},
+                                {value: data.student_private_ask, name: '事假'},
+                            ]
+                        }
+                    ]
+                });
+                department_status_chart.setOption({
+                    title: {
+                        text: '各系学生情况'
                     },
-                    {
-                        name: '迟&早',
-                        type: 'bar',
-                        stack: '总量',
-                        label: {
-                            normal: {
-                                show: true,
-                                position: 'insideRight'
+                    tooltip: {
+                        trigger: 'axis',
+                        axisPointer: {            // 坐标轴指示器，坐标轴触发有效
+                            type: 'shadow'        // 默认为直线，可选为：'line' | 'shadow'
+                        }
+                    },
+                    grid: {
+                        x: '15%'
+                    },
+                    legend: {
+                        data: ['未到', '请假', '正常', '迟到', '早退', '迟&早']
+                    },
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                return colorList[params.seriesName];
                             }
+                        }
+                    },
+                    xAxis: {
+                        type: 'value'
+                    },
+                    yAxis: {
+                        type: 'category',
+                        data: data.department_list
+                    },
+                    series: [
+                        {
+                            name: '未到',
+                            type: 'bar',
+                            stack: '总量',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: data.department_normal_value
                         },
-                        data: data.department_lateearly_value
-                    }
-                ]
+                        {
+                            name: '请假',
+                            type: 'bar',
+                            stack: '总量',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: data.department_ask_value
+                        },
+                        {
+                            name: '正常',
+                            type: 'bar',
+                            stack: '总量',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: data.department_success_value
+                        },
+                        {
+                            name: '迟到',
+                            type: 'bar',
+                            stack: '总量',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: data.department_late_value
+                        },
+                        {
+                            name: '早退',
+                            type: 'bar',
+                            stack: '总量',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: data.department_early_value
+                        },
+                        {
+                            name: '迟&早',
+                            type: 'bar',
+                            stack: '总量',
+                            label: {
+                                normal: {
+                                    show: true,
+                                    position: 'insideRight'
+                                }
+                            },
+                            data: data.department_lateearly_value
+                        }
+                    ]
+                });
             });
-        });
+        }
 
-
+        var wait = document.getElementById('wait');
+        setInterval(function () {
+            var time = wait.innerHTML;
+            if (time === '0') {
+                getdata();
+                wait.innerHTML = '12';
+            } else {
+                --wait.innerHTML;
+            }
+        }, 1000);
+        {% if perms.checkin_view %}
+            function titleFormatter(value, row, index) {
+                var clickurl = "{% url 'checkin:lesson_data' 0 %}";
+                clickurl = clickurl.substring(0, clickurl.length - 1);
+                return "<a href='" + clickurl + row.id + "'>" + value + "</a>";
+            }
+            function statusFormatter(value, row, index) {
+                return lesson_status_json[value];
+            }
+            $table.bootstrapTable({
+                columns: [{
+                    field: 'time',
+                    title: '节次'
+                }, {
+                    field: 'location',
+                    title: '地点'
+                }, {
+                    field: 'serialnumber',
+                    title: '课程编号',
+                    visible: false
+                }, {
+                    field: 'title',
+                    title: '课程名称',
+                    formatter: titleFormatter
+                }, {
+                    field: 'status',
+                    title: '状态',
+                    formatter: statusFormatter
+                }, {
+                    field: 'starttime',
+                    title: '开始时间',
+                    visible: false,
+                    searchable: false
+                }, {
+                    field: 'endtime',
+                    title: '结束时间',
+                    visible: false,
+                    searchable: false
+                }, {
+                    field: 'checkincount',
+                    title: '考勤次数',
+                    visible: false,
+                    searchable: false
+                }, {
+                    field: 'teacher',
+                    title: '教师'
+                }, {
+                    field: 'teach_class',
+                    title: '班级'
+                }, {
+                    field: 'should',
+                    title: '应到',
+                    sortable: true,
+                    searchable: false
+                }, {
+                    field: 'actually',
+                    title: '实到',
+                    sortable: true,
+                    searchable: false
+                }, {
+                    field: 'late',
+                    title: '迟到',
+                    sortable: true,
+                    searchable: false
+                }, {
+                    field: 'early',
+                    title: '早退',
+                    sortable: true,
+                    searchable: false
+                }, {
+                    field: 'lateearly',
+                    title: '迟&早',
+                    sortable: true,
+                    searchable: false
+                }, {
+                    field: 'ask',
+                    title: '请假',
+                    sortable: true,
+                    visible: false,
+                    searchable: false
+                }, {
+                    field: 'attendance',
+                    title: '到课率',
+                    sortable: true,
+                    searchable: false
+                }]
+            });
+        {% endif %}
     </script>
 {% endblock %}

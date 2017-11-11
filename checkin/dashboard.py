@@ -8,8 +8,9 @@ from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from course.constant import *
 import json
+import datetime
 from django.shortcuts import HttpResponse, HttpResponseRedirect
-from django.db.models import Count, Case, When, Q, F
+from django.db.models import Count, Case, When, Q, F, OuterRef, Subquery, IntegerField
 from school.models import Classtime, Department
 from django.views.decorators.cache import cache_page
 
@@ -183,3 +184,50 @@ def today_data(request):
                  'coursetime_arrive_value': coursetime_arrive_value})
 
     return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+def lesson_data(request):
+    now_lesson_time = getnowlessontime()
+    now_week = now_lesson_time['week']
+    now_day = now_lesson_time['day']
+    now_time = now_lesson_time['time']
+    now_term = now_lesson_time['term']
+    today_lessons = Lesson.objects.filter(week=now_week, day=now_day, term=now_term)
+    checkindata = Checkin.objects.filter(lesson=OuterRef('id')).values('lesson_id').annotate(count=Count('*')).values(
+        'count')
+    today_lessons = today_lessons.select_related('course').select_related('classroom')
+    today_lessons = today_lessons.annotate(
+        actually=Subquery(checkindata.filter(
+            status__in=[CHECKIN_STATUS_EARLY, CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_LATE, CHECKIN_STATUS_LATEEARLY]),
+            output_field=IntegerField()),
+        late=Subquery(checkindata.filter(status=CHECKIN_STATUS_LATE), output_field=IntegerField()),
+        early=Subquery(checkindata.filter(status=CHECKIN_STATUS_EARLY), output_field=IntegerField()),
+        late_early=Subquery(checkindata.filter(status=CHECKIN_STATUS_LATEEARLY), output_field=IntegerField()),
+        should=Subquery(checkindata, output_field=IntegerField()),
+        ask=Subquery(checkindata.filter(status__gte=10), output_field=IntegerField()),
+    )
+
+    rows = []
+    for p in today_lessons.all():
+        ld = {
+            'id': p.id,
+            'serialnumber': p.course.serialnumber,
+            'title': p.course.title,
+            'time': "%d-%d" % (p.time, p.time + p.length - 1),
+            'location': p.classroom.location,
+            'teacher': ",".join(p.course.teachers.values_list('name', flat=True)),
+            'teach_class': p.course.teachclass.name if p.course.teachclass else None,
+            'should': p.should if p.isnow() or p.isend() else p.shouldnumbers,
+            'actually': p.actually,
+            'late': p.late,
+            'early': p.early,
+            'late_early': p.late_early,
+            'asknumber': p.asknumber if p.checkincount else p.ask,
+            'attendance': "%.2f%%" % (p.actually / p.shouldnumber * 100) if p.actually else None,
+            'checkincount': p.checkincount,
+            'status': p.status,
+            'starttime': datetime.datetime.strftime(p.starttime, '%Y-%m-%d %I:%M %p') if p.starttime else None,
+            'endtime': datetime.datetime.strftime(p.endtime, '%Y-%m-%d %I:%M %p') if p.endtime else None,
+        }
+        rows.append(ld)
+    return HttpResponse(json.dumps(rows), content_type="application/json")

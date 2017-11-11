@@ -217,7 +217,7 @@ def lesson_data(request):
             'location': p.classroom.location,
             'teacher': ",".join(p.course.teachers.values_list('name', flat=True)),
             'teach_class': p.course.teachclass.name if p.course.teachclass else None,
-            'should': p.should if p.isnow() or p.isend() else p.shouldnumbers,
+            'should': p.should if p.isnow() or p.isend() else p.shouldnumber,
             'actually': p.actually,
             'late': p.late,
             'early': p.early,

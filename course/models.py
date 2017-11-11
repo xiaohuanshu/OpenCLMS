@@ -151,7 +151,7 @@ class Lesson(models.Model):
             checkindata = Checkin.objects.filter(lesson=self)
             asknumber = checkindata.filter(status__gt=10).count()
         else:
-            starttime, endtime = self.getTime()
+            starttime, endtime = self.getTime
             starttime = time.strftime('%Y-%m-%d %H:%M:%S', starttime)
             endtime = time.strftime('%Y-%m-%d %H:%M:%S', endtime)
             students = Studentcourse.objects.filter(course=self.course).values_list('student', flat=True)

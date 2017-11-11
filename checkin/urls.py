@@ -30,6 +30,7 @@ urlpatterns = [
     url(r'^dashboard/overview', dashboard.overview, name='dashboard_overview'),
     url(r'^dashboard/today$', dashboard.today, name='dashboard_today'),
     url(r'^dashboard/today_data', dashboard.today_data, name='dashboard_today_data'),
+    url(r'^dashboard/lesson_data', dashboard.lesson_data, name='dashboard_lesson_data'),
 
     url(r'^checkin_success_test', views.checkin_success_test, name='checkin_success_test'),
     url(r'^qrcode$', views.qrcode, name='qrcode'),

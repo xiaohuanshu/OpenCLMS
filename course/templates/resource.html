@@ -18,6 +18,13 @@
                 width: 300px;
             }
 
+            @media (max-width: 768px) {
+                .file-box {
+                    float: left;
+                    width: 100%;
+                }
+            }
+
             .file {
                 border: 1px solid #e7eaec;
                 padding: 0;
@@ -46,7 +53,7 @@
                 padding: 10px;
                 background-color: #f8f8f8;
                 border-top: 1px solid #e7eaec;
-                width: 280px;
+                width: 100%;
                 overflow: hidden;
                 white-space: nowrap;
                 text-overflow: ellipsis;
@@ -97,6 +104,11 @@
                 <div class="row">
                     <div class="col-lg-12">
                         {% if resources %}
+                            {% if 'Mobile' in request.META.HTTP_USER_AGENT %}
+                                <div class="callout callout-warning">
+                                    <p>资源文件可在电脑端下载</p>
+                                </div>
+                            {% endif %}
                             {% for resource in resources %}
                                 <div class="file-box">
                                     <div class="file">
@@ -124,7 +136,7 @@
                                         {% endif %}
                                         <div class="file-name">
                                             <a href="{{ resource.file.url }}" download="{{ resource.title }}">
-                                                {{ resource.title }}
+                                                <i class="fa fa-download"></i>{{ resource.title }}
                                             </a>
                                             <br>
                                             <small>添加日期: {{ resource.uploadtime|date:'Y-m-d' }}</small>

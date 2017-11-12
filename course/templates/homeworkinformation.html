@@ -136,13 +136,16 @@
                     </div>
                     {% if not commitdata.score %}
                         <div class="box-body">
+                            {% if 'Mobile' in request.META.HTTP_USER_AGENT %}
+                                <span class="text-danger">手机上交作业不方便？在电脑上也可以提交</span>
+                            {% endif %}
                             <form role="form" class="form-horizontal" id="form" method="post"
                                   enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="box-body">
                                     <div class="form-group">
                                         <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor">
-                                            <div class="btn-group">
+                                            <div class="btn-group hidden-xs">
                                                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                                                    title="文字大小"><i class="fa fa-text-height"></i>&nbsp;<b
                                                         class="caret"></b></a>
@@ -152,7 +155,7 @@
                                                     <li><a data-edit="fontSize 1" class="fs-One">小</a></li>
                                                 </ul>
                                             </div>
-                                            <div class="btn-group">
+                                            <div class="btn-group hidden-xs">
                                                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                                                    title="文字背景颜色"><i class="fa fa-paint-brush"></i>&nbsp;<b
                                                         class="caret"></b></a>
@@ -165,7 +168,7 @@
                                                     <li><a data-edit="backColor #FFFF00">黄色</a></li>
                                                 </ul>
                                             </div>
-                                            <div class="btn-group">
+                                            <div class="btn-group hidden-xs">
                                                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                                                    title="文字颜色"><i class="fa fa-font"></i>&nbsp;<b
                                                         class="caret"></b></a>
@@ -194,12 +197,12 @@
                                                    title="列表"><i class="fa fa-list-ul"></i></a>
                                                 <a class="btn btn-default" data-edit="insertorderedlist"
                                                    title="数字列表"><i class="fa fa-list-ol"></i></a>
-                                                <a class="btn btn-default" data-edit="outdent"
+                                                <a class="btn btn-default hidden-xs" data-edit="outdent"
                                                    title="减少缩进 (Shift+Tab)"><i class="fa fa-outdent"></i></a>
-                                                <a class="btn btn-default" data-edit="indent" title="增加缩进 (Tab)"><i
+                                                <a class="btn btn-default hidden-xs" data-edit="indent" title="增加缩进 (Tab)"><i
                                                         class="fa fa-indent"></i></a>
                                             </div>
-                                            <div class="btn-group">
+                                            <div class="btn-group hidden-xs">
                                                 <a class="btn btn-default" data-edit="justifyleft"
                                                    title="左对齐 (Ctrl/Cmd+L)"><i class="fa fa-align-left"></i></a>
                                                 <a class="btn btn-default" data-edit="justifycenter"
@@ -209,24 +212,24 @@
                                                 <a class="btn btn-default" data-edit="justifyfull"
                                                    title="自适应 (Ctrl/Cmd+J)"><i class="fa fa-align-justify"></i></a>
                                             </div>
-                                            <div class="btn-group">
+                                            <div class="btn-group hidden-xs">
                                                 <a class="btn btn-default dropdown-toggle" data-toggle="dropdown"
                                                    title="超链接"><i class="fa fa-link"></i></a>
                                                 <div class="dropdown-menu input-append">
                                                     <input placeholder="URL" type="text" data-edit="createLink"/>
                                                     <button class="btn" type="button">添加</button>
                                                 </div>
-                                            </div>
-                                            <div class="btn-group">
                                                 <a class="btn btn-default" data-edit="unlink" title="移除链接"><i
                                                         class="fa fa-unlink"></i></a>
+                                            </div>
+                                            <div class="btn-group">
                                                 <span class="btn btn-default" title="插入图片 (可直接拖拽)"
                                                       id="pictureBtn"> <i class="fa fa-picture-o"></i>
 							<input class="imgUpload" type="file" data-role="magic-overlay" data-target="#pictureBtn"
                                    data-edit="insertImage"/>
 						</span>
                                             </div>
-                                            <div class="btn-group">
+                                            <div class="btn-group hidden-xs">
                                                 <a class="btn btn-default" data-edit="undo" title="撤销 (Ctrl/Cmd+Z)"><i
                                                         class="fa fa-undo"></i></a>
                                                 <a class="btn btn-default" data-edit="redo" title="重做 (Ctrl/Cmd+Y)"><i
@@ -273,7 +276,7 @@
                                 </div>
 
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-info pull-right">保存</button>
+                                    <button type="submit" class="btn btn-info pull-right">提交</button>
                                 </div>
                             </form>
                         </div>

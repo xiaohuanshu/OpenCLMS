@@ -2,12 +2,13 @@
 # Create your tasks here
 from celery import shared_task, chain
 from school.models import Student, Class, Teacher, Department, Administration, Teachertoadministration, \
-    Teachertodepartment, Major
+    Teachertodepartment, Major, Classroom
 from zhengfang.models import Jsxxb, Xsjbxxb, Xsxkb, JxrwbviewXy2, Bjdmb
 import logging
+import datetime
 from django.db.models import ObjectDoesNotExist, Q
 from school.function import getCurrentSchoolYearTerm
-from course.models import Course, Studentcourse
+from course.models import Course, Studentcourse, StudentExam
 from wechat.tasks import sync_wechat
 
 logger = logging.getLogger(__name__)
@@ -24,7 +25,8 @@ def sync_zhengfang(continuous=None):
           sync_teacher.s(),
           sync_course.s(),
           sync_studentcourse.s(),
-          sync_wechat.s()
+          sync_wechat.s(),
+          sync_studentexam.s()
           )()
 
 
@@ -241,4 +243,55 @@ def sync_studentcourse(continuous=None):
         Studentcourse.objects.filter(course=course).all().delete()
         Studentcourse.objects.bulk_create(student_course_list)
     logger.info("[sync_studentcourse]Finished count:%d,coursenotfound:%d,studentnotfound:%d" % (
+        count, coursenotfound, studentnotfound))
+
+
+@shared_task(name='sync_studentexam')
+def sync_studentexam(continuous=None):
+    count = 0
+    coursenotfound = 0
+    studentnotfound = 0
+    now_term = getCurrentSchoolYearTerm()['term']
+
+    z_exams = Xsxkb.objects.using('zhengfang').filter(xkkh__startswith='(' + now_term + ')-') \
+        .exclude(kssj=None).exclude(jsmc=None).all()
+
+    for z_exam in z_exams:
+        count += 1
+        location, _ = Classroom.objects.get_or_create(location=z_exam.jsmc)
+        starttime = datetime.datetime.strptime(
+            (u"%s %s" % (z_exam.kssj.split('(')[0], z_exam.kssj[z_exam.kssj.index("(") + 1:z_exam.kssj.index("-")])
+             ).encode("utf-8"), "%Y年%m月%d日 %H:%M")
+        endtime = datetime.datetime.strptime(
+            (u"%s %s" % (z_exam.kssj.split('(')[0], z_exam.kssj[z_exam.kssj.index("-") + 1:z_exam.kssj.index(")")])
+             ).encode("utf-8"), "%Y年%m月%d日 %H:%M")
+
+        serialnumber = z_exam.xkkh
+        try:
+            course = Course.objects.get(serialnumber=serialnumber)
+        except ObjectDoesNotExist:
+            coursenotfound += 1
+            continue
+        try:
+            student = Student.objects.get(studentid=z_exam.xh)
+        except ObjectDoesNotExist:
+            studentnotfound += 1
+            continue
+
+        studentexam, created = StudentExam.objects.get_or_create(course=course, student=student,
+                                                                 defaults={
+                                                                     'starttime': starttime,
+                                                                     'endtime': endtime,
+                                                                     'location': location,
+                                                                     'seat': z_exam.zwh
+                                                                 })
+        if not created:
+            if starttime != studentexam.starttime or endtime != studentexam.endtime or \
+                            location != studentexam.location or z_exam.zwh != studentexam.seat:
+                studentexam.starttime = starttime
+                studentexam.endtime = endtime
+                studentexam.location = location
+                studentexam.seat = z_exam.zwh
+                studentexam.save()
+    logger.info("[sync_studentexam]Finished count:%d,coursenotfound:%d,studentnotfound:%d" % (
         count, coursenotfound, studentnotfound))

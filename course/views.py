@@ -8,7 +8,7 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
 from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit, \
-    CourseMessage
+    CourseMessage, StudentExam
 from school.models import Student, Teacher
 from checkin.models import Scoreregulation, Checkin
 from django.db.models import ObjectDoesNotExist
@@ -520,3 +520,28 @@ def course_data(request, courseid):
     data = {'header': json.dumps(columns), 'newrows': json.dumps(lessondata)}
     return render(request, 'course_data.html', {'coursedata': course, 'data': data,
                                                 'courseperms': has_course_permission(request.user, course)})
+
+
+def student_exam(request, studentid):
+    student = Student.objects.get(studentid=studentid)
+    if not (student.user == request.user or request.user.has_perm('school_student_view')):
+        return render(request, 'error.html', {'message': '没有权限'})
+    schoolterm = getCurrentSchoolYearTerm()['term']
+    exams = StudentExam.objects.filter(student=student, course__schoolterm=schoolterm) \
+        .select_related('course', 'location').all()
+    data = []
+    for exam in exams:
+        data.append({
+            'title': exam.course.title,
+            'time': exam.starttime.strftime("%Y-%m-%d(%H:%M-") + exam.endtime.strftime("%H:%M)"),
+            'seat': exam.seat,
+            'location': exam.location.location,
+            'id': exam.course_id
+        })
+    return render(request, 'studentexam.html', {'data': json.dumps(data), 'student': student})
+
+
+def personalexam(request):
+    if request.user.isteacher:
+        return render(request, 'error.html', {'message': '教师无法查看'})
+    return student_exam(request, request.user.academiccode)

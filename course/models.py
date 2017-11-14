@@ -288,6 +288,19 @@ class Studentcourse(models.Model):
         unique_together = ["student", "course"]
 
 
+class StudentExam(models.Model):
+    student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid')
+    starttime = models.DateTimeField(null=True)
+    endtime = models.DateTimeField(null=True)
+    location = models.ForeignKey('school.Classroom', models.SET_NULL, null=True)
+    seat = models.CharField(max_length=4, blank=True, null=True)
+
+    class Meta:
+        db_table = 'StudentExam'
+        unique_together = ["student", "course"]
+
+
 def get_courseresource_path(instance, filename):
     return 'courseresource/%d/%s' % (instance.course.id, filename)
 

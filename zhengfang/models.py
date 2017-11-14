@@ -37,6 +37,9 @@ class Jsxxb(models.Model):  # 教师信息表
 class Xsxkb(models.Model):  # 学生选课表
     xkkh = models.CharField(max_length=35, primary_key=True)  # 选课课号
     xh = models.CharField(max_length=20, blank=True, null=True)  # 学号
+    kssj = models.CharField(max_length=45, blank=True, null=True)  # 考试时间
+    jsmc = models.CharField(max_length=20, blank=True, null=True)  # 考试地点
+    zwh = models.CharField(max_length=4, blank=True, null=True)  # 考试座位
 
     class Meta:
         managed = False

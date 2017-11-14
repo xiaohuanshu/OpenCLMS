@@ -21,6 +21,10 @@
                     {% endif %}
                     <li class="{% nav_active request.path 'schedule' %}">
                         <a href="{% url 'course:schedule' %}"><i class="fa fa-circle-o"></i>个人课表</a></li>
+                    {% if request.user.isstudent %}
+                        <li class="{% nav_active request.path 'personal_exam' %}">
+                            <a href="{% url 'course:personal_exam' %}"><i class="fa fa-circle-o"></i>考试安排</a></li>
+                    {% endif %}
                 </ul>
             </li>
             {% if perms.checkin %}

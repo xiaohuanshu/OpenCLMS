@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from course.models import Course, Studentcourse
+from course.models import Course, Studentcourse, StudentExam
 from django.core.urlresolvers import reverse
 from icalendar import Calendar, Event
 from datetime import datetime, timedelta
@@ -76,7 +76,29 @@ def course_event(course):
     return events
 
 
-def generate_ics(courses):
+def exam_event(exam):
+    uid = "%d-exam" % (exam.course.id)
+    url = "%s%s" % (settings.DOMAIN, reverse('course:information', args=[exam.course.id]))
+    event = Event()
+    location = exam.location.location
+    starttime = exam.starttime
+    endtime = exam.endtime
+    tzinfo = pytz.timezone(settings.TIME_ZONE)
+    starttime.replace(tzinfo=tzinfo)
+    endtime.replace(tzinfo=tzinfo)
+
+    event['uid'] = uid
+    event.add('summary', u"(考试)" + exam.course.title)
+    event.add('dtstart', starttime)
+    event.add('dtend', endtime)
+    event.add('url', url)
+    event.add('location', location)
+    event.add('description', u"座位:" + exam.seat)
+
+    return event
+
+
+def generate_ics(courses, exams):
     cal = Calendar()
     cal.add('X-WR-CALNAME', '课程')
     cal.add('version', '2.0')
@@ -85,6 +107,8 @@ def generate_ics(courses):
             continue
         for ce in course_event(course):
             cal.add_component(ce)
+    for exam in exams:
+        cal.add_component(exam_event(exam))
     return cal.to_ical()
 
 
@@ -93,15 +117,19 @@ def ics(request, userid):
     agent = request.META.get('HTTP_USER_AGENT', None)
     if agent and "MicroMessenger" in agent:
         return render(request, 'openinbrowser.html')
+    schoolterm = getCurrentSchoolYearTerm()['term']
     if user.isteacher:
         teacher = user.teacher_set.get()
-        course = teacher.course_set.filter(schoolterm=getCurrentSchoolYearTerm()['term']).all()
+        course = teacher.course_set.filter(schoolterm=schoolterm).all()
+        exams = []
     else:
         student = user.student_set.get()
-        termcourse = Studentcourse.objects.filter(student=student, course__schoolterm=getCurrentSchoolYearTerm()[
-            'term']).values_list('course', flat=True)
+        termcourse = Studentcourse.objects.filter(student=student, course__schoolterm=schoolterm) \
+            .values_list('course', flat=True)
         course = Course.objects.filter(id__in=termcourse).all()
-    return HttpResponse(generate_ics(course), content_type="text/calendar")
+        exams = StudentExam.objects.filter(student=student, course__schoolterm=schoolterm) \
+            .select_related('course', 'location').all()
+    return HttpResponse(generate_ics(course, exams), content_type="text/calendar")
 
 
 def download(request):

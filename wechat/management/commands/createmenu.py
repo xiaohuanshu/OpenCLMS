@@ -40,6 +40,11 @@ class Command(BaseCommand):
                             'type': 'view',
                             'name': u'导入日历',
                             'url': '%s/course/ics/download?simpleview=true' % settings.DOMAIN
+                        },
+                        {
+                            'type': 'view',
+                            'name': u'考试安排',
+                            'url': '%s/course/personalexam?simpleview=true' % settings.DOMAIN
                         }
                     ]
                 }

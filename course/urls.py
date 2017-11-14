@@ -34,4 +34,7 @@ urlpatterns = [
     url(r'^ics/download$', ics.download, name='ics_download'),
     url(r'^office_preview$', views.office_preview, name='office_preview'),
 
+    url(r'^student_exam/([^/]*)$', views.student_exam, name='student_exam'),
+    url(r'^personalexam$', views.personalexam, name='personal_exam'),
+
 ]

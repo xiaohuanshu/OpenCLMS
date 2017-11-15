@@ -45,6 +45,9 @@
         function titleFormatter(value, row, index) {
             var clickurl = "{% url 'course:information' 0 %}";
             clickurl = clickurl.substring(0, clickurl.length - 1);
+            if (row.id === null){
+                return value;
+            }
             return "<a href='" + clickurl + row.id + "'>" + value + "</a>";
         }
 

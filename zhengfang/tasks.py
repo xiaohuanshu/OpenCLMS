@@ -249,9 +249,12 @@ def sync_studentcourse(continuous=None):
 @shared_task(name='sync_studentexam')
 def sync_studentexam(continuous=None):
     count = 0
-    coursenotfound = 0
     studentnotfound = 0
     now_term = getCurrentSchoolYearTerm()['term']
+    # 考虑到从教务系统同步数据时，存在课程不在考勤系统的情况
+    # 所以不在考勤系统中的课程的考试信息，课程都设为Null
+    # 为了方便同步，每次同步时，先删除所有为空的课程
+    StudentExam.objects.filter(course=None).delete()
 
     z_exams = Xsxkb.objects.using('zhengfang').filter(xkkh__startswith='(' + now_term + ')-') \
         .exclude(kssj=None).exclude(jsmc=None).all()
@@ -270,8 +273,7 @@ def sync_studentexam(continuous=None):
         try:
             course = Course.objects.get(serialnumber=serialnumber)
         except ObjectDoesNotExist:
-            coursenotfound += 1
-            continue
+            course = None
         try:
             student = Student.objects.get(studentid=z_exam.xh)
         except ObjectDoesNotExist:
@@ -293,5 +295,5 @@ def sync_studentexam(continuous=None):
                 studentexam.location = location
                 studentexam.seat = z_exam.zwh
                 studentexam.save()
-    logger.info("[sync_studentexam]Finished count:%d,coursenotfound:%d,studentnotfound:%d" % (
-        count, coursenotfound, studentnotfound))
+    logger.info("[sync_studentexam]Finished count:%d,studentnotfound:%d" % (
+        count, studentnotfound))

@@ -290,7 +290,7 @@ class Studentcourse(models.Model):
 
 class StudentExam(models.Model):
     student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
-    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid')
+    course = models.ForeignKey(Course, models.CASCADE, db_column='courseid', null=True)
     starttime = models.DateTimeField(null=True)
     endtime = models.DateTimeField(null=True)
     location = models.ForeignKey('school.Classroom', models.SET_NULL, null=True)

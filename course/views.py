@@ -527,7 +527,7 @@ def student_exam(request, studentid):
     if not (student.user == request.user or request.user.has_perm('school_student_view')):
         return render(request, 'error.html', {'message': '没有权限'})
     schoolterm = getCurrentSchoolYearTerm()['term']
-    exams = StudentExam.objects.filter(student=student, course__schoolterm=schoolterm) \
+    exams = StudentExam.objects.filter(student=student).filter(Q(course__schoolterm=schoolterm) | Q(course=None)) \
         .select_related('course', 'location').all()
     data = []
     week_day_dict = {
@@ -541,7 +541,7 @@ def student_exam(request, studentid):
     }
     for exam in exams:
         data.append({
-            'title': exam.course.title,
+            'title': exam.course.title if exam.course else '未知课程',
             'time': exam.starttime.strftime("%Y-%m-%d(%H:%M-") + exam.endtime.strftime("%H:%M) ") + week_day_dict[
                 exam.starttime.weekday()],
             'seat': exam.seat,

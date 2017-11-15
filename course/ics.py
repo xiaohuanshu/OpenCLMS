@@ -10,7 +10,7 @@ from user_system.models import User
 from django.shortcuts import get_object_or_404, render
 import pytz
 from django.http import HttpResponse
-from django.shortcuts import redirect
+from django.db.models import Q
 
 
 def get_lesson_time(term, week, day, time, length):
@@ -77,9 +77,11 @@ def course_event(course):
 
 
 def exam_event(exam):
-    uid = "%d-exam" % (exam.course.id)
-    url = "%s%s" % (settings.DOMAIN, reverse('course:information', args=[exam.course.id]))
     event = Event()
+    uid = "%d-exam" % (exam.course.id if exam.course else exam.id)
+    if exam.course:
+        url = "%s%s" % (settings.DOMAIN, reverse('course:information', args=[exam.course.id]))
+        event.add('url', url)
     location = exam.location.location
     starttime = exam.starttime
     endtime = exam.endtime
@@ -88,10 +90,9 @@ def exam_event(exam):
     endtime.replace(tzinfo=tzinfo)
 
     event['uid'] = uid
-    event.add('summary', u"(考试)" + exam.course.title)
+    event.add('summary', u"(考试)" + exam.course.title if exam.course else '考试')
     event.add('dtstart', starttime)
     event.add('dtend', endtime)
-    event.add('url', url)
     event.add('location', location)
     event.add('description', u"座位:" + exam.seat)
 
@@ -127,7 +128,7 @@ def ics(request, userid):
         termcourse = Studentcourse.objects.filter(student=student, course__schoolterm=schoolterm) \
             .values_list('course', flat=True)
         course = Course.objects.filter(id__in=termcourse).all()
-        exams = StudentExam.objects.filter(student=student, course__schoolterm=schoolterm) \
+        exams = StudentExam.objects.filter(student=student).filter(Q(course__schoolterm=schoolterm) | Q(course=None)) \
             .select_related('course', 'location').all()
     return HttpResponse(generate_ics(course, exams), content_type="text/calendar")
 

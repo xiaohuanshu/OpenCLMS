@@ -136,7 +136,7 @@ def sync_teacher(continuous=None):
             Teachertodepartment.objects.filter(teacher=data).delete()
             Teachertodepartment(teacher=data, department=department).save()
             if z_teacher.ks is not None and z_teacher.ks != '' and z_teacher.ks != ' ':
-                administration = Administration.objects.get(name=z_teacher.ks)
+                administration, _ = Administration.objects.get_or_create(name=z_teacher.ks)
                 Teachertoadministration.objects.filter(teacher=data).delete()
                 Teachertoadministration(teacher=data, administration=administration).save()
             data.available = True

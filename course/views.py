@@ -530,10 +530,20 @@ def student_exam(request, studentid):
     exams = StudentExam.objects.filter(student=student, course__schoolterm=schoolterm) \
         .select_related('course', 'location').all()
     data = []
+    week_day_dict = {
+        0: '星期一',
+        1: '星期二',
+        2: '星期三',
+        3: '星期四',
+        4: '星期五',
+        5: '星期六',
+        6: '星期天',
+    }
     for exam in exams:
         data.append({
             'title': exam.course.title,
-            'time': exam.starttime.strftime("%Y-%m-%d(%H:%M-") + exam.endtime.strftime("%H:%M)"),
+            'time': exam.starttime.strftime("%Y-%m-%d(%H:%M-") + exam.endtime.strftime("%H:%M) ") + week_day_dict[
+                exam.starttime.weekday()],
             'seat': exam.seat,
             'location': exam.location.location,
             'id': exam.course_id

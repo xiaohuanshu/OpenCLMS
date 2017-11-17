@@ -85,9 +85,17 @@
         checkin_status_style_json ={{ checkin_status_style_json|safe }};
         {% CHECKIN_STATUS_JSON as checkin_status_json %}
         checkin_status_json ={{ checkin_status_json|safe }};
+        checkin_status_choices = {};
+        for (var c in checkin_status_json) { //禁止选择“取消”状态
+            if (checkin_status_json[c] !== '取消') {
+                checkin_status_choices[c] = checkin_status_json[c];
+            }
+        }
+
         function identifierFormatter(value, row, index) {
             return checkin_status_json[value];
         }
+
         function cellStyle(value, row, index) {
             if (value == null) {
                 return {}
@@ -96,12 +104,13 @@
                 classes: 'bg-' + checkin_status_style_json[value]
             };
         }
+
         $.fn.editable.defaults.mode = 'inline';
         $.fn.editable.defaults.type = 'select';
         $.fn.editable.defaults.emptytext = '无';
         $.fn.editable.defaults.showbuttons = false;
         $.fn.editable.defaults.ajaxOptions = {type: 'get', dataType: 'json'};
-        $.fn.editable.defaults.source = checkin_status_json;
+        $.fn.editable.defaults.source = checkin_status_choices;
         $.fn.editable.defaults.success = function (response) {
             if (response.error) {
                 return response.message;

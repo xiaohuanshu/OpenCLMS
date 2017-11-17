@@ -574,11 +574,23 @@
             changestatus($("#control-studentid").val(), 'success');
             $("#control-studentid").val("");
         });
+
         $(document).ready(function () {
             generateqr();
             setInterval(qraction, 1000);
             reflashdata(true);
-            setInterval(reflashdata, 5000);
+            reflashInterval = setInterval(reflashdata, 5000);
+            // window 失去焦点，降低轮询
+            window.onblur = function () {
+                clearInterval(reflashInterval);
+                reflashInterval = setInterval(reflashdata, 60000);
+            };
+            // window 获得焦点，加快轮询
+            window.onfocus = function () {
+                reflashdata();
+                clearInterval(reflashInterval);
+                reflashInterval = setInterval(reflashdata, 5000);
+            };
             $(".changestatus").bind('click', function () {
                 var status = $(this).parents('tr').data("status");
                 if (checkin_status_json[status] != '未到') {

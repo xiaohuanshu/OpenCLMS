@@ -199,7 +199,8 @@
                                                    title="数字列表"><i class="fa fa-list-ol"></i></a>
                                                 <a class="btn btn-default hidden-xs" data-edit="outdent"
                                                    title="减少缩进 (Shift+Tab)"><i class="fa fa-outdent"></i></a>
-                                                <a class="btn btn-default hidden-xs" data-edit="indent" title="增加缩进 (Tab)"><i
+                                                <a class="btn btn-default hidden-xs" data-edit="indent"
+                                                   title="增加缩进 (Tab)"><i
                                                         class="fa fa-indent"></i></a>
                                             </div>
                                             <div class="btn-group hidden-xs">
@@ -245,7 +246,7 @@
                                         {% with resources=commitdata.attachment.all %}
                                             {% if resources %}
                                                 <div class="col-xs-12">
-                                                    <p class="text-red">(重新上传文件会删除所有已存在的文件)</p>
+                                                    <p class="text-red" id="reupload_flag">(重新上传文件会删除所有已存在的文件)</p>
                                                     <ul class="list-group list-group-body col-xs-12 col-sm-6">
                                                         {% for a in resources %}
                                                             {% if a.title %}
@@ -481,10 +482,14 @@
                 overlay.css('opacity', 0).css('position', 'absolute').offset(target.offset()).width(target.outerWidth()).height(target.outerHeight());
             });
             $("#editor").wysiwyg();
-            $('#form').submit(function () {
-                $('#text').val($('#editor').html())
-            });
             $fileupload = $("#fileupload");
+            $('#form').submit(function () {
+                $('#text').val($('#editor').html());
+                if ($('#text').val() === '' && $fileupload.fileinput('getFilesCount') === 0 && $("#reupload_flag").length === 0) {
+                    alert("作业内容为空");
+                    return false;
+                }
+            });
             $fileupload.fileinput({
                 language: "zh",
                 theme: "explorer",

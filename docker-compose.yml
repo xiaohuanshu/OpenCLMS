@@ -1,0 +1,71 @@
+version: '2'
+services:
+  web:
+    restart: always
+    build: .
+    expose:
+      - "8000"
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - web_media:/usr/src/app/media
+      - web_logs:/usr/src/app/logs
+    env_file: .env
+    command: uwsgi --ini /usr/src/app/uwsgi_example.ini
+
+  nginx:
+    restart: always
+    build:
+      context: .
+      dockerfile: docker/nginx/Dockerfile
+    ports:
+      - "80:80"
+    volumes:
+      - web_logs:/var/log/nginx
+    volumes_from:
+      - web
+    links:
+      - web:web
+
+  postgres:
+    restart: always
+    image: postgres:latest
+    ports:
+      - "5432:5432"
+    volumes:
+      - pgdata:/var/lib/postgresql/data/
+
+  redis:
+    restart: always
+    image: redis:latest
+    ports:
+      - "6379:6379"
+    volumes:
+      - redisdata:/data
+
+  celery:
+    restart: always
+    build: .
+    links:
+      - postgres:postgres
+      - redis:redis
+    volumes:
+      - web_media:/usr/src/app/media
+      - web_logs:/usr/src/app/logs
+    env_file: .env
+    command: celery -A checkinsystem worker -B -s logs/celerybeat-schedule
+
+volumes:
+  web_media:
+    external:
+      name: web_media
+  web_logs:
+    external:
+      name: web_logs
+  redisdata:
+    external:
+      name: redisdata
+  pgdata:
+    external:
+      name: pgdata

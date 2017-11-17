@@ -1,0 +1,27 @@
+server {
+    listen 80;
+    server_name example.org;
+    charset utf-8;
+    client_max_body_size 200M;
+
+    location /static {
+        alias /usr/src/app/static;
+        expires 1h;
+    }
+
+    location /media {
+        alias /usr/src/app/media;
+        expires 30d;
+    }
+
+    location /favicon.ico {
+        root /usr/src/app/static;
+        expires 30d;
+    }
+
+    location / {
+        include uwsgi_params;
+        uwsgi_pass web:8000;
+    }
+
+}

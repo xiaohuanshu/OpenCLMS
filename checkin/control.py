@@ -103,8 +103,8 @@ def changecheckinstatus(request, lessonid):
 
 def ck(request, qr_str):
     agent = request.META.get('HTTP_USER_AGENT', None)
-    if "MicroMessenger" not in agent:
-        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'请在微信中打开此链接'})
+    if "wxwork" in agent or "MicroMessenger" not in agent:
+        return render(request, 'error.html', {'message': u'签到失败', 'submessage': u'请在微信中扫码签到'})
     lessonid = cache.get("qr%s" % (qr_str), default=None)
     if not lessonid:
         return render(request, 'error.html',

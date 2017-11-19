@@ -133,7 +133,7 @@ def student_checkin(student, lesson, abnormal=None):
     except ObjectDoesNotExist:
         checkin = Checkin(lesson=lesson, student=student)
     # checkindata.seatid = seatid
-    nowtime = time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())
+    nowtime = datetime.datetime.now()
     if checkin.status > 10:  # ASK
         return {'error': 101, 'message': '学生已经请假'}
     if not checkin.time:

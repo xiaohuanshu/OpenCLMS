@@ -450,6 +450,7 @@ def course_data(request, courseid):
             {'field': 'name', 'title': u'学生', 'rowspan': 2, 'align': 'center', 'valign': 'middle', 'searchable': True},
             {'field': 'studentid', 'title': u'学号', 'rowspan': 2, 'align': 'center',
              'valign': 'middle', 'searchable': True, 'sortable': True},
+            {'field': 'class', 'title': u'班级', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'field': 'ratio', 'title': u'出勤率', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'field': 'score', 'title': u'考勤分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
             {'field': 'performance_score', 'title': u'表现分数', 'rowspan': 2, 'align': 'center', 'valign': 'middle'},
@@ -474,7 +475,8 @@ def course_data(request, courseid):
         columns[1].append(
             {'field': 'homework%d' % l.id, 'title': i + 1, 'align': 'center'})
 
-    studentdata = Studentcourse.objects.filter(course=course).select_related('student').order_by('student').all()
+    studentdata = Studentcourse.objects.filter(course=course).select_related('student') \
+        .select_related('student__classid').order_by('student').all()
     lessondata = []
     '''for s in studentdata:
         studentcheckindata[s.student.studentid] = {'studentid': s.student.studentid, 'name': s.student.name}
@@ -488,7 +490,7 @@ def course_data(request, courseid):
     except ObjectDoesNotExist:
         scoreregulation = Scoreregulation(course=course)
     for s in studentdata:
-        studentdata = {'studentid': s.student.studentid, 'name': s.student.name}
+        studentdata = {'studentid': s.student.studentid, 'name': s.student.name, 'class': s.student.classid.name}
         homeworkdata = Homeworkcommit.objects.filter(student=s.student, coursehomework__in=allhomework).all()
         for h in homeworkdata:
             studentdata['homework%d' % (h.coursehomework_id)] = h.score if h.score else '未评'

@@ -20,6 +20,7 @@ from message import sendmessagetocoursestudent
 from course.tasks import send_homework_notification
 from django.utils.http import urlquote
 from checkin.constant import *
+from django.core.exceptions import ValidationError
 
 
 def information(request, courseid):
@@ -173,8 +174,11 @@ def homework(request, courseid):
             instruction = request.POST.get('instruction')
             attachments = request.FILES.getlist('attachment')
             weight = request.POST.get('weight')
-            homework = Coursehomework.objects.create(title=title, deadline=deadline, type=type, weight=weight,
-                                                     course=coursedata)
+            try:
+                homework = Coursehomework.objects.create(title=title, deadline=deadline, type=type, weight=weight,
+                                                         course=coursedata)
+            except ValidationError:
+                return render(request, 'error.html', {'message': '截止日期格式错误'})
             homework.instruction = instruction
             homework.deal_base64img()
             homework.save()

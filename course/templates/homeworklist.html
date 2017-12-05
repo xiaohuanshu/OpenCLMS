@@ -45,7 +45,7 @@
                             {% for homework in homeworks %}
                                 <tr>
                                     <td>{{ forloop.counter }}</td>
-                                    <td><a href="?homeworkid={{ homework.id }}">{{ homework.title }}</a></td>
+                                    <td><a href="?homeworkid={{ homework.id }}">{{ homework.title|default:"无标题" }}</a></td>
                                     <td>{{ homework.type|COURSE_HOMEWORK_TYPE }}</td>
                                     <td>{{ homework.deadline|date:'Y-m-d H:i' }}</td>
                                     {% if courseperms %}

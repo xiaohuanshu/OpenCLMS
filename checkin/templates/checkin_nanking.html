@@ -1,0 +1,66 @@
+<!DOCTYPE html>
+<html lang="zh-cmn-Hans">
+{% load static %}
+{% load checkin_extra %}
+<head>
+    <meta charset="utf-8">
+    <meta content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no" name="viewport">
+    <title>签到成功</title>
+    <link rel="stylesheet" href="{% static 'bootstrap/css/bootstrap.min.css' %}">
+</head>
+<body background="{% static 'img/nanking.jpg' %}"
+      style=" background-repeat:no-repeat;background-size:100%;background-attachment: fixed;background-color: black">
+<div id="birthday" style="margin-top: 50%;display: none">
+    <img src="{% static 'img/nanking2.png' %}" width="100%">
+</div>
+<div class="container" style="display: none;" id="main">
+    <div class="row text-center">
+        <div class="col-sm-6 col-sm-offset-3">
+            <br><br>
+            <h2 style="color:#0fad00">签到成功</h2>
+            <img src="{% static 'img/success.png' %}" width="30%">
+            <h3 style="color:#d7d7d7;">{{ coursename }}</h3>
+            <p style="font-size:20px;color:#ffffff;">{{ studentname }}同学，勿忘国耻，振兴中华</p>
+            <p style="font-size:20px;color:#ffffff;">状态为：{{ status|CHECKIN_STATUS }}</p>
+            <br><br>
+            <br><br>
+            <a href="{% url 'home' %}" class="btn btn-default">进入主页</a>
+            <a href="{% url 'course:information' courseid %}" class="btn btn-default">查看课程</a>
+            <a href="{% url 'checkin:personal_data' %}" class="btn btn-default">个人数据</a>
+            <p></p>
+            <br><br>
+        </div>
+    </div>
+</div>
+</body>
+<script src="{% static 'plugins/jQuery/jQuery-2.2.3.min.js' %}"></script>
+<script language="JavaScript" src="http://res.wx.qq.com/open/js/jweixin-1.0.0.js"></script>
+{% load wechat_extra %}
+{% wxconfig request.get_full_path 'closeWindow,hideOptionMenu,getLocation' as wxc %}
+{{ wxc | safe }}
+<script>
+    window.onload = function () {
+        var birthday = $('#birthday');
+        birthday.fadeIn('slow');
+        $(document).on('touchstart', function () {
+            birthday.fadeOut('slow', function () {
+                $('#main').fadeIn('slow');
+            });
+        });
+    };
+    wx.ready(function () {
+        wx.hideOptionMenu();
+        wx.getLocation({
+            type: 'wgs84',
+            success: function (res) {
+                $.get("{% url 'checkin:get_position' %}", {
+                    checkinid: {{ checkinid }},
+                    latitude: res.latitude,
+                    longitude: res.longitude,
+                    accuracy: res.accuracy
+                });
+            }
+        });
+    });
+</script>
+</html>

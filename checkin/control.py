@@ -136,6 +136,8 @@ def ck(request, qr_str):
             template = 'checkin_halloween.html'
         elif nowdate == '1123':  # 2017
             template = 'checkin_thanksgiving.html'
+        elif nowdate == '1213':
+            template = 'checkin_nanking.html'
         else:
             template = 'checkin_success.html'
         return render(request, template,

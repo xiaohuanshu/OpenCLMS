@@ -86,15 +86,16 @@ def lesson_data(request, lessonid):
     sc = Studentcourse.objects.filter(course=lesson.course, student=OuterRef('student'))
     checkindata = Checkin.objects.filter(lesson=lesson).exclude(status__gt=10).select_related(
         'student').select_related('student__classid').order_by('abnormal', 'student__studentid').annotate(
-        score=Subquery(sc.values('performance_score')[:1])).only('student_id','student__name','student__classid__name','status','abnormal')
+        score=Subquery(sc.values('performance_score')[:1])).only('student_id', 'student__name',
+                                                                 'student__classid__name', 'status', 'abnormal')
     students = []
     for c in checkindata:
         students.append({'studentid': c.student_id,
                          'name': c.student.name,
                          'class': c.student.classid.name,
                          'score': c.score,
-                         'status':c.status,
-                         'abnormal':c.abnormal,
+                         'status': c.status,
+                         'abnormal': c.abnormal,
                          })
     t['students'] = json.dumps(students)
 
@@ -313,8 +314,8 @@ def jumptolesson_data(request, courseid):
 
 
 def checkin_success_test(request):
-    return render(request, 'checkin_halloween.html',
-                  {'coursename': '计算机组成原理', 'status': 1, 'courseid': 1, 'checkinid': 1})
+    return render(request, 'checkin_nanking.html',
+                  {'coursename': '计算机组成原理', 'status': 1, 'courseid': 1, 'checkinid': 1, 'studentname': "闫璟"})
 
 
 def qrcode(request):

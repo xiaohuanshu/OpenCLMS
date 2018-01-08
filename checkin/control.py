@@ -213,6 +213,16 @@ def stopCheckin(request, lessonid):
     return redirect(reverse('checkin:lesson_data', args=[lesson.id]))
 
 
+def switch_to_add(request, lessonid):
+    lesson = Lesson.objects.get(id=lessonid)
+    if not has_course_permission(request.user, lesson.course):
+        return render(request, 'error.html', {'message': '没有权限'})
+    if lesson.status == LESSON_STATUS_CHECKIN:
+        lesson.status = LESSON_STATUS_CHECKIN_ADD
+    lesson.save()
+    return redirect(reverse('checkin:qrcheckin', args=[lesson.id]))
+
+
 def addask(request):
     student = request.GET.getlist('students[]', default=False)
     starttime = datetime.datetime.strptime(request.GET.get('starttime', default=False), "%Y-%m-%d %I:%M %p")

@@ -486,7 +486,7 @@ def lesson_data(request):
     today_lessons = Lesson.objects.filter(week=now_week, day=now_day, term=now_term)
     checkindata = Checkin.objects.filter(lesson=OuterRef('id')).values('lesson_id').annotate(count=Count('*')).values(
         'count')
-    today_lessons = today_lessons.select_related('course').select_related('classroom')
+    today_lessons = today_lessons.select_related('course').select_related('classroom').select_related('course__department')
     today_lessons = today_lessons.annotate(
         actually=Subquery(checkindata.filter(
             status__in=[CHECKIN_STATUS_EARLY, CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_LATE, CHECKIN_STATUS_LATEEARLY]),
@@ -508,6 +508,7 @@ def lesson_data(request):
             'location': p.classroom.location,
             'teacher': ",".join(p.course.teachers.values_list('name', flat=True)),
             'teach_class': p.course.teachclass.name if p.course.teachclass else None,
+            'department': p.course.department.name if p.course.department else None,
             'should': p.should if p.isnow() or p.isend() else p.shouldnumber,
             'actually': p.actually,
             'late': p.late,

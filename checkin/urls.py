@@ -14,6 +14,7 @@ urlpatterns = [
     url(r'^control/startcheckin/(\d+)$', control.startCheckin, name='startcheckin'),
     url(r'^control/stopcheckin/(\d+)$', control.stopCheckin, name='stopcheckin'),
     url(r'^control/clearcheckin/(\d+)$', control.clearcheckin, name='clearcheckin'),
+    url(r'^control/switch_to_add/(\d+)$', control.switch_to_add, name='switch_to_add'),
 
     url(r'^data/student_data/([^/]*)$', views.student_data, name='student_data'),
     url(r'^data/teacher_data/([^/]*)$', views.teacher_data, name='teacher_data'),

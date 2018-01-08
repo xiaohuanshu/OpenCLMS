@@ -115,7 +115,9 @@
     <div class="checkin-box">
         <div class="lesson-header">
             {{ lessondata.course.title }}
-            {% if checkintype %}<span class="label label-info label-mini">{{ checkintype }}</span>{% endif %}
+            {% if checkintype %}
+                <span class="label label-info label-mini" id="checkintype">{{ checkintype }}</span>
+            {% endif %}
         </div>
         <div class="checkin-box-body">
             <div class="row">
@@ -275,6 +277,15 @@
                                     </div>
                                 </div>
                                 <div class="row"><br/></div>
+                                {% if not checkintype %}
+                                    <div class="row">
+                                        <div class="col-sm-12 text-center">
+                                            <a data-toggle="modal" href="#CheckinSwitchModal">
+                                                <button type="button" class="btn btn-info btn-block">转为补签模式</button>
+                                            </a>
+                                        </div>
+                                    </div>
+                                {% endif %}
                                 <div class="row">
                                     <div class="col-sm-12 text-center">
                                         <a href="{% url 'checkin:clearcheckin' lessondata.id %}?deletethis=1">
@@ -301,16 +312,38 @@
                 <div class="modal-content">
                     <div class="modal-header">
                         <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                        <h4 class="modal-title">操作提示</h4>
+                        <h4 class="modal-title">是否关闭签到?</h4>
                     </div>
                     <div class="modal-body">
 
-                        确认关闭签到?
+                        确认关闭此次签到?
 
                     </div>
                     <div class="modal-footer">
                         <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
                         <a href="{% url 'checkin:stopcheckin' lessondata.id %}">
+                            <button class="btn btn-warning" type="button"> 确认</button>
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="modal fade" id="CheckinSwitchModal" tabindex="-1" role="dialog"
+         aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">切换至补签模式?</h4>
+                    </div>
+                    <div class="modal-body">
+                        <p>补签模式下，新签入的学生为迟到状态</p>
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <a href="{% url 'checkin:switch_to_add' lessondata.id %}">
                             <button class="btn btn-warning" type="button"> 确认</button>
                         </a>
                     </div>
@@ -339,6 +372,9 @@
         checkin_status_style_json ={{ checkin_status_style_json|safe }};
         {% CHECKIN_ABNORMAL_JSON as checkin_abnormal_json %}
         checkin_abnormal_json ={{ checkin_abnormal_json|safe }};
+        lesson_start_time = Date.parse(new Date('{{ lessondata.get_datetime.0|date:'c' }}'));
+        switch_alert = (Date.parse(new Date()) < lesson_start_time) && !($("#checkintype:contains('补签')").length() > 0);
+        close_alert = Date.parse(new Date()) < (lesson_start_time + 900000);
 
         function shake(ele, cls, times) {
             var i = 0, t = false, o = ele.attr("class") + " ", c = "", times = times || 2;
@@ -442,6 +478,16 @@
                     time = {{ refreshtime }};
                     generateqr();
                     countdown(time);
+                    if (switch_alert && Date.parse(new Date()) >= lesson_start_time) {
+                        switch_alert = false;
+                        $('#CheckinSwitchModal').find(".modal-body").text("已到达上课时间，是否切换至补签模式，补签模式下，新签入的学生为迟到状态");
+                        $('#CheckinSwitchModal').modal('show');
+                    }
+                    if (close_alert && Date.parse(new Date()) >= (lesson_start_time + 900000)) {
+                        close_alert = false;
+                        $('#CheckinCloseModal').find(".modal-body").text("开课已超过15分钟，是否关闭签到？");
+                        $('#CheckinCloseModal').modal('show');
+                    }
                     clearInterval(loadingtimeid);
                 } else {
                     if (time == 0) {

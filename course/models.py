@@ -115,8 +115,7 @@ class Lesson(models.Model):
     checkincount = models.SmallIntegerField(null=True)
 
     @cached_property
-    def getTime(self):
-        # allowcheckinbeforetime = 10
+    def get_datetime(self):
         classtime = getClassTime()
         termtime = getTermDate(self.term)
         thistermtime = datetime.datetime.strptime(str(termtime[0]), '%Y-%m-%d')
@@ -128,7 +127,11 @@ class Lesson(models.Model):
                                                       seconds=coursestarttime.second)
         endtime = thistermtime + datetime.timedelta(hours=courseendtime.hour, minutes=courseendtime.minute,
                                                     seconds=courseendtime.second)
-        # allowstarttime = starttime - datetime.timedelta(minutes=allowcheckinbeforetime)
+        return [starttime, endtime]
+
+    @cached_property
+    def getTime(self):
+        starttime, endtime = self.get_datetime
         return [starttime.timetuple(), endtime.timetuple()]
 
     @cached_property

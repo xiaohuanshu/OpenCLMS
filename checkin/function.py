@@ -150,7 +150,7 @@ def student_checkin(student, lesson, abnormal=None):
             checkin.status = CHECKIN_STATUS_LATE
     elif lesson.status == LESSON_STATUS_CHECKIN_AGAIN:
         if checkin.laststatus == CHECKIN_STATUS_NORMAL:
-            checkin.status = CHECKIN_STATUS_LATE
+            return {'error': 101, 'message': '再签模式不能新签入'}
         elif checkin.laststatus == CHECKIN_STATUS_LATE:
             checkin.status = CHECKIN_STATUS_LATE
         elif checkin.laststatus == CHECKIN_STATUS_EARLY:

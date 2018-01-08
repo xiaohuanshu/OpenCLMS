@@ -1,0 +1,262 @@
+{% extends 'base.html' %}
+{% load static %}
+{% load checkin_extra %}
+{% load center_extra %}
+{% load course_extra %}
+{% block page_js %}
+    <script src="{% static 'plugins/echarts/echarts.min.js' %}"></script>
+    {% if perms.checkin_view %}
+        <script src="{% static 'plugins/bootstrap-table/bootstrap-table.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/libs/FileSaver/FileSaver.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/libs/js-xlsx/xlsx.core.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/libs/html2canvas/html2canvas.min.js' %}"></script>
+        <script src="{% static 'plugins/tableExport/tableExport.min.js' %}"></script>
+        <script src="{% static 'plugins/bootstrap-table/extensions/export/bootstrap-table-export.min.js' %}"></script>
+    {% endif %}
+{% endblock %}
+{% block page_css %}
+    {% if perms.checkin_view %}
+        <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    {% endif %}
+{% endblock %}
+{% block title %}学期总览{% endblock %}
+{% block beforecontent %}
+    <section class="content-header">
+        <h1>
+            学期总览
+        </h1>
+    </section>
+{% endblock %}
+{% block content %}
+    {% include 'dashboard_nav.html' %}
+    <div class="row">
+        <div class="col-xs-12">
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="col-md-9">
+                        <div id="course_time_status_chart" style="width: 100%;height:600px;"></div>
+                    </div>
+                    <div class="col-md-3">
+                        <table class="table">
+                            <tbody>
+                            <tr>
+                                <td>全校课程:</td>
+                                <td id="term_lessons">1000</td>
+                            </tr>
+                            <tr>
+                                <td>开课总数:</td>
+                                <td id="term_start_lessons">1000</td>
+                            </tr>
+                            <tr>
+                                <td>签到课程:</td>
+                                <td id="term_start_checkin_lessons">900</td>
+                            </tr>
+                            <tr>
+                                <td>上课人数:</td>
+                                <td id="student_all_count">900</td>
+                            </tr>
+                            <tr>
+                                <td>到达率</td>
+                                <td id="student_arrive_ratio">(90%)</td>
+                            </tr>
+                            <tr>
+                                <td>学期请假</td>
+                                <td id="student_ask">555(5%)</td>
+                            </tr>
+                            <tr>
+                                <td>旷课次数</td>
+                                <td id="course_normal_count">555</td>
+                            </tr>
+                            <tr>
+                                <td>旷课人数</td>
+                                <td id="student_normal_count">555(5%)</td>
+                            </tr>
+                            <tr>
+                                <td>迟到次数</td>
+                                <td id="course_late_count">555</td>
+                            </tr>
+                            <tr>
+                                <td>迟到人数</td>
+                                <td id="student_late_count">555(%5)</td>
+                            </tr>
+                            <tr>
+                                <td>早退次数</td>
+                                <td id="course_early_count">555</td>
+                            </tr>
+                            <tr>
+                                <td>早退人数</td>
+                                <td id="student_early_count">555(%5)</td>
+                            </tr>
+                            <tr>
+                                <td>全勤人数</td>
+                                <td id="student_all_arrive">555(%5)</td>
+                            </tr>
+                            <tr>
+                                <td>全旷人数</td>
+                                <td id="student_all_normal">555(%5)</td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+{% endblock %}
+
+{% block page_script %}
+    <script>
+        $table = $("#table");
+        {% CHECKIN_STATUS_JSON as checkin_status_json %}
+        var checkin_status_json ={{ checkin_status_json|safe }};
+        {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
+        var checkin_status_style_json ={{ checkin_status_style_json|safe }};
+        {% LESSON_STATUS_JSON as lesson_status_json %}
+        var lesson_status_json ={{ lesson_status_json|safe }};
+        colorList = {
+            '正常': "#00a65a",
+            '到达': "#37a600",
+            '到达率': "#37a600",
+            '未到': "#888b90",
+            '请假': "#0073b7",
+            '公假': "#0098e2",
+            '事假': "#003757",
+            '病假': "#004d77",
+            '迟到': "#d81b60",
+            '早退': "#f012be",
+            '迟&早': "#605ca8",
+            '全勤': "#00a65a",
+            '全旷': "#888b90",
+            '其他': "#a8a529"
+        };
+
+        function Percentage(num, total) {
+            return (Math.round(num / total * 10000) / 100.00 + "%");// 小数点后两位百分比
+
+        }
+
+        var course_time_status_chart = echarts.init(document.getElementById('course_time_status_chart'));
+
+        // 异步加载数据
+        function getdata() {
+            $.get('{% url 'checkin:dashboard_term_data' %}', dataType = 'json').done(function (data) {
+                // 填入数据
+                var course_checkin_count = data.course_status_data.arrive + data.course_status_data.ask + data.course_status_data.normal;
+                $('#term_lessons').text(data.term_lessons);
+                $('#term_start_checkin_lessons').text(data.term_start_checkin_lessons);
+                $('#term_start_lessons').text(data.term_start_lessons);
+                $('#student_all_count').text(data.student_all_count);
+                $('#student_ask').text(data.student_public_ask + data.student_private_ask + data.student_sick_ask + '(' + Percentage(data.student_public_ask + data.student_private_ask + data.student_sick_ask, course_checkin_count) + ')');
+                $('#course_normal_count').text(data.course_normal_count);
+                $('#course_late_count').text(data.course_late_count);
+                $('#student_late_count').text(data.student_late_count + '(' + Percentage(data.student_late_count, data.student_all_count) + ')');
+                $('#student_early_count').text(data.student_early_count + '(' + Percentage(data.student_early_count, data.student_all_count) + ')');
+                $('#course_early_count').text(data.course_early_count);
+                $('#student_all_arrive').text(data.student_all_arrive + '(' + Percentage(data.student_all_arrive, data.student_all_count) + ')');
+                $('#student_all_normal').text(data.student_all_normal + '(' + Percentage(data.student_all_normal, data.student_all_count) + ')');
+                $('#student_normal_count').text(data.student_normal_count + '(' + Percentage(data.student_normal_count, data.student_all_count) + ')');
+                $('#student_arrive_ratio').text(Percentage(data.course_status_data.arrive, course_checkin_count));
+                course_time_status_chart.setOption({
+                    title: {
+                        text: '学期考勤数据'
+                    },
+                    legend: {
+                        data: ['正常', '未到', '请假', '迟到', '早退', '迟&早']
+                    },
+                    toolbox: {
+                        show: true,
+                        feature: {
+                            dataView: {show: true, readOnly: false},
+                            saveAsImage: {show: true}
+                        }
+                    },
+                    calculable: true,
+                    xAxis: [
+                        {
+                            type: 'category',
+                            boundaryGap: false,
+                            data: data.xAxis
+                        }
+                    ],
+                    yAxis: [
+                        {
+                            type: 'value',
+                            name: '人数'
+                        },
+                        {
+                            type: 'value',
+                            name: '百分比',
+                            min: 0,
+                            max: 100,
+                            axisLabel: {
+                                formatter: '{value}%'
+                            }
+                        }
+                    ],
+                    tooltip: {
+                        trigger: 'axis'
+                    },
+                    dataZoom: {
+                        show: true,
+                        start: 70
+                    },
+                    series: [
+                        {
+                            name: '正常',
+                            type: 'bar',
+                            stack: '总量',
+                            data: data.termtime_success_value
+                        },
+                        {
+                            name: '未到',
+                            type: 'bar',
+                            stack: '总量',
+                            data: data.termtime_normal_value
+                        },
+                        {
+                            name: '请假',
+                            type: 'bar',
+                            stack: '总量',
+                            data: data.termtime_ask_value
+                        },
+                        {
+                            name: '迟到',
+                            type: 'bar',
+                            stack: '总量',
+                            data: data.termtime_late_value
+                        },
+                        {
+                            name: '早退',
+                            type: 'bar',
+                            stack: '总量',
+                            data: data.termtime_early_value
+                        },
+                        {
+                            name: '迟&早',
+                            type: 'bar',
+                            stack: '总量',
+                            data: data.termtime_lateearly_value
+                        },
+                        {
+                            name: '到达率',
+                            type: 'line', yAxisIndex: 1,
+                            data: data.termtime_arrive_ratio
+                        }
+                    ],
+                    itemStyle: {
+                        normal: {
+                            color: function (params) {
+                                return colorList[params.seriesName];
+                            }
+                        }
+                    }
+                });
+            });
+        }
+
+        getdata();
+    </script>
+{% endblock %}

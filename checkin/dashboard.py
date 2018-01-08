@@ -13,6 +13,7 @@ from django.shortcuts import HttpResponse, HttpResponseRedirect
 from django.db.models import Count, Case, When, Q, F, OuterRef, Subquery, IntegerField
 from school.models import Classtime, Department
 from django.views.decorators.cache import cache_page
+from django.db import connection, transaction
 
 
 def overview(request):
@@ -25,6 +26,10 @@ def today(request):
 
 def week(request):
     return render(request, 'dashboard_week.html', {})
+
+
+def term(request):
+    return render(request, 'dashboard_term.html', {})
 
 
 @cache_page(60)
@@ -335,6 +340,139 @@ def week_data(request):
                  'weektime_early_value': weektime_early_value,
                  'weektime_lateearly_value': weektime_lateearly_value,
                  'weektime_arrive_value': weektime_arrive_value})
+
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@cache_page(60)
+def term_data(request):
+    cursor = connection.cursor()
+    data = {}
+    now_lesson_time = getnowlessontime()
+    now_week = now_lesson_time['week']
+    now_term = now_lesson_time['term']
+
+    term_lessons = Lesson.objects.filter(term=now_term)
+    data['term_lessons'] = term_lessons.count()
+    term_start_lessons = term_lessons.filter(status__in=[LESSON_STATUS_NOW, LESSON_STATUS_CHECKIN,
+                                                         LESSON_STATUS_CHECKIN_ADD, LESSON_STATUS_CHECKIN_AGAIN,
+                                                         LESSON_STATUS_END])
+    data['term_start_lessons'] = term_start_lessons.count()
+    term_start_checkin_lessons = term_start_lessons.filter(checkincount__gt=0)
+    data['term_start_checkin_lessons'] = term_start_checkin_lessons.count()
+    # course_status
+    course_status_data = Checkin.objects.filter(lesson__in=term_start_lessons).aggregate(
+        normal=Count(Case(When(status=CHECKIN_STATUS_NORMAL, then=1))),
+        private_ask=Count(Case(When(status=CHECKIN_STATUS_PRIVATE_ASK, then=1))),
+        success=Count(Case(When(status=CHECKIN_STATUS_SUCCESS, then=1))),
+        early=Count(Case(When(status=CHECKIN_STATUS_EARLY, then=1))),
+        late=Count(Case(When(status=CHECKIN_STATUS_LATE, then=1))),
+        lateearly=Count(Case(When(status=CHECKIN_STATUS_LATEEARLY, then=1))),
+        public_ask=Count(Case(When(status=CHECKIN_STATUS_PUBLIC_ASK, then=1))),
+        sick_ask=Count(Case(When(status=CHECKIN_STATUS_SICK_ASK, then=1))),
+    )
+    course_status_data['arrive'] = course_status_data['success'] + course_status_data['early'] + \
+                                   course_status_data['late'] + course_status_data['lateearly']
+    course_status_data['ask'] = course_status_data['private_ask'] + course_status_data['public_ask'] + \
+                                course_status_data['sick_ask']
+
+    data['course_status_data'] = course_status_data
+    # student_status
+    student_all_count = Checkin.objects.filter(lesson__in=term_start_lessons).distinct('student').count()
+    # can't use because group_by don't work
+    # student_all_arrive = Checkin.objects.filter(lesson__in=term_start_lessons). \
+    #     annotate(all=Count('status'), num=Count(Case(When(status=CHECKIN_STATUS_SUCCESS, then=1)))).filter(num=F('all'))
+    # student_all_arrive.query.group_by = 'student'
+    # student_all_arrive = student_all_arrive.count()
+
+    cursor.execute(
+        'SELECT COUNT(*) FROM (SELECT "Checkin"."studentid" FROM "Checkin" WHERE "Checkin"."lessonid" IN (SELECT U0."id" AS Col1 FROM "Lesson" U0 WHERE (U0."term" = %s AND U0."status" IN (2, 3, 4, 10, 7))) GROUP BY "Checkin"."studentid" HAVING COUNT(CASE WHEN "Checkin"."status" = %s THEN 1 ELSE NULL END) = (COUNT("Checkin"."status"))) subquery;',
+        [now_term, CHECKIN_STATUS_SUCCESS])
+    student_all_arrive = cursor.fetchone()[0]
+    cursor.execute(
+        'SELECT COUNT(*) FROM (SELECT "Checkin"."studentid" FROM "Checkin" WHERE "Checkin"."lessonid" IN (SELECT U0."id" AS Col1 FROM "Lesson" U0 WHERE (U0."term" = %s AND U0."status" IN (2, 3, 4, 10, 7))) GROUP BY "Checkin"."studentid" HAVING COUNT(CASE WHEN "Checkin"."status" = %s THEN 1 ELSE NULL END) = (COUNT("Checkin"."status"))) subquery;',
+        [now_term, CHECKIN_STATUS_NORMAL])
+    student_all_normal = cursor.fetchone()[0]
+    student_public_ask = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        status=CHECKIN_STATUS_PUBLIC_ASK).distinct('student').count()
+    student_private_ask = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        status=CHECKIN_STATUS_PRIVATE_ASK).distinct('student').count()
+    student_sick_ask = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        status=CHECKIN_STATUS_SICK_ASK).distinct('student').count()
+    student_other = Checkin.objects.filter(lesson__in=term_start_lessons).exclude(
+        status__in=[CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_NORMAL, CHECKIN_STATUS_PUBLIC_ASK,
+                    CHECKIN_STATUS_PRIVATE_ASK, CHECKIN_STATUS_SICK_ASK]).distinct('student').count()
+    student_late_count = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        Q(status=CHECKIN_STATUS_LATE) | Q(status=CHECKIN_STATUS_LATEEARLY)).distinct('student').count()
+    student_early_count = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_LATEEARLY)).distinct('student').count()
+    student_normal_count = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        status=CHECKIN_STATUS_NORMAL).distinct('student').count()
+    course_late_count = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        Q(status=CHECKIN_STATUS_LATE) | Q(status=CHECKIN_STATUS_LATEEARLY)).count()
+    course_early_count = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        Q(status=CHECKIN_STATUS_EARLY) | Q(status=CHECKIN_STATUS_LATEEARLY)).count()
+    course_normal_count = Checkin.objects.filter(lesson__in=term_start_lessons).filter(
+        status=CHECKIN_STATUS_EARLY).count()
+    data.update({'student_all_arrive': student_all_arrive,
+                 'student_all_normal': student_all_normal,
+                 'student_public_ask': student_public_ask,
+                 'student_private_ask': student_private_ask,
+                 'student_sick_ask': student_sick_ask,
+                 'student_other': student_other,
+                 'student_late_count': student_late_count,
+                 'student_early_count': student_early_count,
+                 'course_late_count': course_late_count,
+                 'course_early_count': course_early_count,
+                 'course_normal_count': course_normal_count,
+                 'student_all_count': student_all_count,
+                 'student_normal_count': student_normal_count})
+
+    # term time status
+
+    termtime_normal_value = []
+    termtime_ask_value = []
+    termtime_success_value = []
+    termtime_late_value = []
+    termtime_early_value = []
+    termtime_lateearly_value = []
+    termtime_arrive_value = []
+    termtime_arrive_ratio = []
+
+    x = []
+    for week in range(1, now_week + 1):
+        for day in range(0, 7):
+            res = Checkin.objects.filter(lesson__in=term_start_lessons, lesson__day=day, lesson__week=week).aggregate(
+                normal=Count(Case(When(status=CHECKIN_STATUS_NORMAL, then=1))),
+                ask=Count(Case(When(status__in=[CHECKIN_STATUS_PRIVATE_ASK, CHECKIN_STATUS_PUBLIC_ASK,
+                                                CHECKIN_STATUS_SICK_ASK], then=1))),
+                success=Count(Case(When(status=CHECKIN_STATUS_SUCCESS, then=1))),
+                early=Count(Case(When(status=CHECKIN_STATUS_EARLY, then=1))),
+                late=Count(Case(When(status=CHECKIN_STATUS_LATE, then=1))),
+                lateearly=Count(Case(When(status=CHECKIN_STATUS_LATEEARLY, then=1))),
+            )
+            if res['lateearly'] + res['early'] + res['late'] + res['success'] == 0:
+                continue
+            termtime_normal_value.append(res['normal'])
+            termtime_ask_value.append(res['ask'])
+            termtime_success_value.append(res['success'])
+            termtime_late_value.append(res['late'])
+            termtime_early_value.append(res['early'])
+            termtime_lateearly_value.append(res['lateearly'])
+            arrive_count = res['lateearly'] + res['early'] + res['late'] + res['success']
+            should_count = arrive_count + res['normal']
+            termtime_arrive_value.append(arrive_count)
+            termtime_arrive_ratio.append(int(arrive_count * 100.0 / should_count))
+            x.append("%d-%d" % (week, day))
+    data.update({'xAxis': x,
+                 'termtime_normal_value': termtime_normal_value,
+                 'termtime_ask_value': termtime_ask_value,
+                 'termtime_success_value': termtime_success_value,
+                 'termtime_late_value': termtime_late_value,
+                 'termtime_early_value': termtime_early_value,
+                 'termtime_lateearly_value': termtime_lateearly_value,
+                 'termtime_arrive_ratio': termtime_arrive_ratio,
+                 'termtime_arrive_value': termtime_arrive_value})
 
     return HttpResponse(json.dumps(data), content_type="application/json")
 

@@ -321,7 +321,7 @@ class Courseresource(Filemodel):
 
 class Homeworkfile(Filemodel):
     title = models.CharField(max_length=100, blank=True, null=True)
-    file = models.FileField(upload_to='homeworkfile')
+    file = models.FileField(upload_to='homeworkfile/%Y/%m/%d/')
 
     class Meta:
         db_table = 'HomeworkFile'

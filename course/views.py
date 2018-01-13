@@ -561,3 +561,21 @@ def personalexam(request):
     if request.user.isteacher:
         return render(request, 'error.html', {'message': '教师无法查看'})
     return student_exam(request, request.user.academiccode)
+
+
+def course_history(request):
+    if request.user.isteacher:
+        teacher = Teacher.objects.get(user=request.user)
+        courses = teacher.course_set.order_by('schoolterm').all()
+    else:
+        student = Student.objects.get(user=request.user)
+        student_courses = Studentcourse.objects.filter(student=student).values_list('course', flat=True)
+        courses = Course.objects.filter(id__in=student_courses).order_by('schoolterm')
+    data = []
+    for course in courses:
+        data.append({"serialnumber": course.serialnumber,
+                     "title": course.title,
+                     "schoolterm": course.schoolterm,
+                     "id": course.id,
+                     })
+    return render(request, 'course_history.html', {'data': json.dumps(data)})

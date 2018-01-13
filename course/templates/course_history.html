@@ -1,0 +1,71 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load checkin_extra %}
+{% load school_extra %}
+{% block title %}历史课程{% endblock %}
+{% block page_css %}
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">历史课程</h3>
+                </div>
+                <div class="box-body">
+                    <div class="adv-table">
+                        <table id="table"
+                               data-search="false"
+                               data-pagination="false"
+                               data-striped="true"
+                               data-card-view="true"
+                        >
+                        </table>
+
+
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+
+        function titleFormatter(value, row, index) {
+            var clickurl = "{% url 'course:information' 0 %}";
+            clickurl = clickurl.substring(0, clickurl.length - 1);
+            if (row.id === null){
+                return value;
+            }
+            return "<a href='" + clickurl + row.id + "'>" + value + "</a>";
+        }
+
+        $table.bootstrapTable({
+            formatNoMatches: function () {
+                return '没有找到历史课程'
+            },
+            columns: [
+                {
+                    field: 'title',
+                    title: '课程',
+                    formatter: titleFormatter
+                }, {
+                    field: 'serialnumber',
+                    title: '课程编号'
+                }, {
+                    field: 'schoolterm',
+                    title: '学期'
+                }
+            ],
+            data:{{data|safe}}
+        });
+    </script>
+{% endblock %}

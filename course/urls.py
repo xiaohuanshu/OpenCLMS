@@ -36,5 +36,6 @@ urlpatterns = [
 
     url(r'^student_exam/([^/]*)$', views.student_exam, name='student_exam'),
     url(r'^personalexam$', views.personalexam, name='personal_exam'),
+    url(r'^history$', views.course_history, name='course_history'),
 
 ]

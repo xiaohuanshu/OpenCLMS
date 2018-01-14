@@ -12,3 +12,4 @@ dj-database-url
 cx_Oracle
 django-analytical
 icalendar
+xlsxwriter

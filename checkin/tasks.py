@@ -8,7 +8,11 @@ import xlsxwriter
 import datetime
 from celery import shared_task
 from django.conf import settings
-from checkin.models import CheckinHistory
+from checkin.models import CheckinHistory, DailySubscibe
+from django.core.mail import EmailMessage
+import logging
+
+logger = logging.getLogger(__name__)
 
 
 @shared_task(name='generate_checkin_daily_excel')
@@ -36,7 +40,8 @@ def generate_checkin_daily_excel():
     worksheet.merge_range('A1:N1', settings.SCHOOL_NAME + u'每日考勤记录', merge_format)
     worksheet.write('A2', now_term + u'学期', other)
     worksheet.write('B2', u'第%d周' % now_week, other)
-    worksheet.write('C2', day_to_week_string(now_day), other)
+    day_string = day_to_week_string(now_day)
+    worksheet.write('C2', day_string, other)
     worksheet.merge_range('D2:K2', '', other)
     worksheet.merge_range('L2:N2', datetime.datetime.now(), date_format)
 
@@ -106,4 +111,18 @@ def generate_checkin_daily_excel():
     ch = CheckinHistory(term=now_term, day=now_day, week=now_week, course_count=count)
     ch.file.name = name
     ch.save()
+
+    logger.info("[generate_checkin_daily_excel] Successful generate")
+    emails = DailySubscibe.objects.values_list('user__email', flat=True)
+    if len(emails) > 0:
+        email = EmailMessage(
+            u'【checkinsystem】%s学期 第%d周 %s 考勤数据' % (now_term, now_week, day_string),
+            u'自动发送，请勿回复此邮件',
+            settings.SERVER_EMAIL,
+            emails,
+        )
+        email.attach_file(ch.file.path)
+        email.send(fail_silently=True)
+        logger.info("[generate_checkin_daily_excel] Successful send email")
+
     return name

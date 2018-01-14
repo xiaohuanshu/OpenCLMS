@@ -114,3 +114,7 @@ class CheckinHistory(models.Model):
 
     class Meta:
         db_table = 'CheckinHistory'
+
+
+class DailySubscibe(models.Model):
+    user = models.ForeignKey('user_system.User', models.CASCADE)

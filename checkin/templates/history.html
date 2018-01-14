@@ -1,0 +1,94 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load checkin_extra %}
+{% load school_extra %}
+{% block title %}历史数据{% endblock %}
+{% block page_css %}
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    {% include 'dashboard_nav.html' %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="adv-table">
+                        <table id="table"
+                               data-search="false"
+                               data-pagination="false"
+                               data-striped="true"
+                        >
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-solid">
+                <div class="box-header">
+                    <h3 class="box-title">邮件订阅</h3>
+                </div>
+                <div class="box-body">
+                    <p>系统将每晚11点生成当日的考勤数据，您可以订阅邮件从而在邮箱中收到当日的数据</p>
+                    {% if request.user.username %}
+                        {% if subscibed %}
+                            <a class="btn btn-warning btn-sm" href="{% url 'checkin:dashboard_history' %}?subscibe=0">取消订阅</a>
+                            您已订阅邮件，每日考勤数据将发至{{ request.user.email }}
+                        {% else %}
+                            <a class="btn btn-info btn-sm"
+                               href="{% url 'checkin:dashboard_history' %}?subscibe=1">订阅</a>
+                            您还没有订阅邮件，如果您订阅邮件，每日考勤数据将发至{{ request.user.email }}
+                        {% endif %}
+                    {% else %}
+                        如果您要订阅邮件，请<a href="{% url 'user:register' %}">注册</a>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+        var $table = $('#table');
+
+        function urlFormatter(value) {
+            return "<a href='" + value + "'>下载</a>";
+        }
+
+        $table.bootstrapTable({
+            formatNoMatches: function () {
+                return '没有找到历史考勤数据'
+            },
+            columns: [
+                {
+                    field: 'term',
+                    title: '学期'
+                }, {
+                    field: 'week',
+                    title: '周'
+                }, {
+                    field: 'day',
+                    title: '天'
+                }, {
+                    field: 'course_count',
+                    title: '课程数量'
+                }, {
+                    field: 'generated_time',
+                    title: '生成时间'
+                }, {
+                    field: 'file',
+                    title: 'EXCEL',
+                    formatter: urlFormatter
+                }
+            ],
+            data:{{data|safe}}
+        });
+    </script>
+{% endblock %}

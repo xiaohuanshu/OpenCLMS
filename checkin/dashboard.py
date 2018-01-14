@@ -1,6 +1,6 @@
 from __future__ import division
 from course.models import Lesson
-from models import Checkin
+from checkin.models import Checkin, CheckinHistory, DailySubscibe
 from school.models import Student
 from school.function import getnowlessontime
 from constant import *
@@ -30,6 +30,31 @@ def week(request):
 
 def term(request):
     return render(request, 'dashboard_term.html', {})
+
+
+def history(request):
+    chs = CheckinHistory.objects.filter().all()
+    data = []
+    for ch in chs:
+        data.append({
+            'term': ch.term,
+            'week': ch.week,
+            'day': ch.day,
+            'file': ch.file.url,
+            'generated_time': datetime.datetime.strftime(ch.generated_time, '%Y-%m-%d %I:%M %p') \
+                if ch.generated_time else None,
+            'course_count': ch.course_count,
+        })
+    subscibe = request.GET.get("subscibe", default=None)
+    if subscibe == '1':
+        DailySubscibe.objects.get_or_create(user=request.user)
+        subscibed = True
+    elif subscibe == '0':
+        DailySubscibe.objects.filter(user=request.user).delete()
+        subscibed = False
+    else:
+        subscibed = DailySubscibe.objects.filter(user=request.user).exists()
+    return render(request, 'history.html', {'data': json.dumps(data), 'subscibed': subscibed})
 
 
 @cache_page(60)
@@ -486,7 +511,8 @@ def lesson_data(request):
     today_lessons = Lesson.objects.filter(week=now_week, day=now_day, term=now_term)
     checkindata = Checkin.objects.filter(lesson=OuterRef('id')).values('lesson_id').annotate(count=Count('*')).values(
         'count')
-    today_lessons = today_lessons.select_related('course').select_related('classroom').select_related('course__department')
+    today_lessons = today_lessons.select_related('course').select_related('classroom').select_related(
+        'course__department')
     today_lessons = today_lessons.annotate(
         actually=Subquery(checkindata.filter(
             status__in=[CHECKIN_STATUS_EARLY, CHECKIN_STATUS_SUCCESS, CHECKIN_STATUS_LATE, CHECKIN_STATUS_LATEEARLY]),

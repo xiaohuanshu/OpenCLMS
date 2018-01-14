@@ -9,7 +9,9 @@
     <li role="presentation" class="{% nav_active request.path 'term' %}">
         <a href="{% url 'checkin:dashboard_term' %}">学期</a>
     </li>
-    <li role="presentation" class="{% nav_active request.path 'history' %}">
-        <a href="{% url 'checkin:dashboard_history' %}">历史</a>
-    </li>
+    {% if perms.checkin_view %}
+        <li role="presentation" class="{% nav_active request.path 'history' %}">
+            <a href="{% url 'checkin:dashboard_history' %}">历史</a>
+        </li>
+    {% endif %}
 </ul>

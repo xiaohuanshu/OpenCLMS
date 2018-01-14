@@ -24,7 +24,7 @@ ENCODINGAESKEY = os.environ['WECHAT_ENCODINGAESKEY']
 WECHATQRCODEURL = os.environ['WECHATQRCODEURL']
 CONTACTSECRET = os.environ['CONTACTSECRET']
 WEEK_FIRST_DAY = os.environ['WEEK_FIRST_DAY']  # 0: Sunday 1:Monday
-
+SCHOOL_NAME = os.environ['SCHOOL_NAME'].decode('utf-8')
 # Database
 import dj_database_url
 

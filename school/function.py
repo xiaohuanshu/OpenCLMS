@@ -1,8 +1,10 @@
+# -*- coding: utf-8 -*-
 import datetime
 from center.cache import cache_func
 from models import Major, Schoolterm, Classtime, Department, Administration
 from django.db.models import ObjectDoesNotExist
 from django.core.cache import cache
+from django.conf import settings
 
 
 @cache_func('majordata', 60 * 60 * 24)
@@ -121,3 +123,27 @@ def timetoclasstime(time, move=0):  # move=   -1:lessontime back 0:lesson time 1
             if (time >= classtimedata[t][0] and time <= classtimedata[t][1]) or time >= classtimedata[t][1]:
                 return t
         return 0
+
+
+def day_to_week_string(day):
+    if settings.WEEK_FIRST_DAY == 1:
+        week_day_dict = {
+            0: u'星期一',
+            1: u'星期二',
+            2: u'星期三',
+            3: u'星期四',
+            4: u'星期五',
+            5: u'星期六',
+            6: u'星期日',
+        }
+    else:
+        week_day_dict = {
+            0: u'星期日',
+            1: u'星期一',
+            2: u'星期二',
+            3: u'星期三',
+            4: u'星期四',
+            5: u'星期五',
+            6: u'星期六',
+        }
+    return week_day_dict[day]

@@ -102,3 +102,15 @@ class Scoreregulation(models.Model):
 
     class Meta:
         db_table = 'ScoreRegulation'
+
+
+class CheckinHistory(models.Model):
+    term = models.CharField(max_length=20)
+    week = models.SmallIntegerField()
+    day = models.SmallIntegerField()
+    generated_time = models.DateTimeField(null=True, db_index=True, auto_now_add=True)
+    course_count = models.IntegerField()
+    file = models.FileField(upload_to='history')
+
+    class Meta:
+        db_table = 'CheckinHistory'

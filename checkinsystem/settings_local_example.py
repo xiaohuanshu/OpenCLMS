@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 # Develop Environment Settings
 
 # SECURITY WARNING: keep the secret key used in production secret!
@@ -12,6 +13,7 @@ CHECKINURL = 'http://DOMAIN/checkin/ck'
 SCHOOLEMAIL = ''
 QRCODEREFRESHTIME = 5  # MORE THAN 3
 WEEK_FIRST_DAY = 1  # 0: Sunday 1:Monday
+SCHOOL_NAME = u''
 
 # BROWSER_DOWNLOAD_URL = "" # html5 browser download url
 

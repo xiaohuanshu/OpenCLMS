@@ -14,6 +14,7 @@ from django.db.models import Count, Case, When, Q, F, OuterRef, Subquery, Intege
 from school.models import Classtime, Department
 from django.views.decorators.cache import cache_page
 from django.db import connection, transaction
+from user_system.auth import permission_required
 
 
 def overview(request):
@@ -32,6 +33,7 @@ def term(request):
     return render(request, 'dashboard_term.html', {})
 
 
+@permission_required(permission='checkin_view')
 def history(request):
     chs = CheckinHistory.objects.filter().all()
     data = []
@@ -220,7 +222,7 @@ def today_data(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@cache_page(60)
+@cache_page(600)
 def week_data(request):
     data = {}
     now_lesson_time = getnowlessontime()
@@ -369,7 +371,7 @@ def week_data(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
-@cache_page(60)
+@cache_page(600)
 def term_data(request):
     cursor = connection.cursor()
     data = {}
@@ -502,6 +504,8 @@ def term_data(request):
     return HttpResponse(json.dumps(data), content_type="application/json")
 
 
+@permission_required(permission='checkin_view')
+@cache_page(60)
 def lesson_data(request):
     now_lesson_time = getnowlessontime()
     now_week = now_lesson_time['week']

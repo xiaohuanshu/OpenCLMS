@@ -89,9 +89,12 @@ def datetoTermdate(date):
 
 def getnowlessontime():
     term = getCurrentSchoolYearTerm()['term']
-    startdate = getTermDate(term)[0]
+    startdate, enddate = getTermDate(term)
     thistermdate = datetime.datetime.strptime(str(startdate), '%Y-%m-%d').date()
+    endtermdatetime = datetime.datetime.strptime(str(enddate), '%Y-%m-%d')
     nowtime = datetime.datetime.now()
+    if nowtime.date() > endtermdatetime.date():
+        nowtime = endtermdatetime
     time = nowtime.date() - thistermdate
     day = time.days
     week = 0

@@ -69,13 +69,22 @@
             columns: [
                 {
                     field: 'term',
-                    title: '学期'
+                    title: '学期',
+                    formatter: function (value, row) {
+                        return "<a href='{% url 'checkin:dashboard_term' %}?term=" + value + "'>" + value + "</a>";
+                    }
                 }, {
                     field: 'week',
-                    title: '周'
+                    title: '周',
+                    formatter: function (value, row) {
+                        return "<a href='{% url 'checkin:dashboard_week' %}?term=" + row.term + "&week=" + value + "'>" + value + "</a>";
+                    }
                 }, {
                     field: 'day',
-                    title: '天'
+                    title: '天',
+                    formatter: function (value, row) {
+                        return "<a href='{% url 'checkin:dashboard_today' %}?term=" + row.term + "&week=" + row.week + "&day=" + value + "'>" + value + "</a>";
+                    }
                 }, {
                     field: 'course_count',
                     title: '课程数量'

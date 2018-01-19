@@ -24,8 +24,12 @@
 {% block beforecontent %}
     <section class="content-header">
         <h1>
-            今日总览
-            <small><b id="wait">0</b>s后自动刷新</small>
+            {% if not request.GET.day %}
+                今日总览
+                <small><b id="wait">0</b>s后自动刷新</small>
+            {% else %}
+                历史今日总览
+            {% endif %}
         </h1>
     </section>
 {% endblock %}
@@ -138,7 +142,7 @@
                                    data-page-size="10"
                                    data-page-list="[5,10, 25, 50, 100, ALL]"
                                    data-side-pagination="client"
-                                   data-url="{% url 'checkin:dashboard_lesson_data' %}"
+                                   data-url="{% url 'checkin:dashboard_lesson_data' %}?term={{ request.GET.term }}&week={{ request.GET.week }}&day={{ request.GET.day }}"
                                    data-striped="true"
                                    data-export-types="['excel','doc','png']"
                             >
@@ -191,7 +195,7 @@
 
         // 异步加载数据
         function getdata() {
-            $.get('{% url 'checkin:dashboard_today_data' %}', dataType = 'json').done(function (data) {
+            $.get('{% url 'checkin:dashboard_today_data' %}?term={{ request.GET.term }}&week={{ request.GET.week }}&day={{ request.GET.day }}', dataType = 'json').done(function (data) {
                 // 填入数据
                 var course_checkin_count = data.course_status_data.arrive + data.course_status_data.ask + data.course_status_data.normal;
                 $('#today_lessons').text(data.today_lessons);
@@ -486,17 +490,20 @@
                 });
             });
         }
-
-        var wait = document.getElementById('wait');
-        setInterval(function () {
-            var time = wait.innerHTML;
-            if (time === '0') {
-                getdata();
-                wait.innerHTML = '12';
-            } else {
-                --wait.innerHTML;
-            }
-        }, 1000);
+        {% if not request.GET.day %}
+            var wait = document.getElementById('wait');
+            setInterval(function () {
+                var time = wait.innerHTML;
+                if (time === '0') {
+                    getdata();
+                    wait.innerHTML = '12';
+                } else {
+                    --wait.innerHTML;
+                }
+            }, 1000);
+        {% else %}
+            getdata();
+        {% endif %}
         {% if perms.checkin_view %}
             function titleFormatter(value, row, index) {
                 var clickurl = "{% url 'checkin:lesson_data' 0 %}";

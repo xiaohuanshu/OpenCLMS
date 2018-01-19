@@ -24,7 +24,11 @@
 {% block beforecontent %}
     <section class="content-header">
         <h1>
-            学期总览
+            {% if not request.GET.term %}
+                学期总览
+            {% else %}
+                历史学期总览
+            {% endif %}
         </h1>
     </section>
 {% endblock %}
@@ -142,7 +146,7 @@
 
         // 异步加载数据
         function getdata() {
-            $.get('{% url 'checkin:dashboard_term_data' %}', dataType = 'json').done(function (data) {
+            $.get('{% url 'checkin:dashboard_term_data' %}?term={{ request.GET.term }}', dataType = 'json').done(function (data) {
                 // 填入数据
                 var course_checkin_count = data.course_status_data.arrive + data.course_status_data.ask + data.course_status_data.normal;
                 $('#term_lessons').text(data.term_lessons);

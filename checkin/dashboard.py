@@ -2,7 +2,7 @@ from __future__ import division
 from course.models import Lesson
 from checkin.models import Checkin, CheckinHistory, DailySubscibe
 from school.models import Student
-from school.function import getnowlessontime
+from school.function import getnowlessontime, getTermDate
 from constant import *
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
@@ -62,11 +62,16 @@ def history(request):
 @cache_page(60)
 def today_data(request):
     data = {}
-    now_lesson_time = getnowlessontime()
-    now_week = now_lesson_time['week']
-    now_day = now_lesson_time['day']
-    now_time = now_lesson_time['time']
-    now_term = now_lesson_time['term']
+    now_term = request.GET.get('term', None)
+    now_week = request.GET.get('week', None)
+    now_day = request.GET.get('day', None)
+    if not now_day:
+        now_lesson_time = getnowlessontime()
+        now_week = now_lesson_time['week']
+        now_day = now_lesson_time['day']
+        now_term = now_lesson_time['term']
+    else:
+        now_lesson_time = {'week': now_week, 'day': now_day, 'term': now_term}
 
     class_time_count = Classtime.objects.count()
     class_times = [(time, time + 1) for time in range(1, class_time_count, 2)]
@@ -225,9 +230,16 @@ def today_data(request):
 @cache_page(600)
 def week_data(request):
     data = {}
-    now_lesson_time = getnowlessontime()
-    now_week = now_lesson_time['week']
-    now_term = now_lesson_time['term']
+
+    now_term = request.GET.get('term', None)
+    now_week = request.GET.get('week', None)
+    if not now_week:
+        now_lesson_time = getnowlessontime()
+        now_week = now_lesson_time['week']
+        now_term = now_lesson_time['term']
+    else:
+        now_lesson_time = {'week': now_week, 'term': now_term}
+    data.update(**now_lesson_time)
 
     week_lessons = Lesson.objects.filter(week=now_week, term=now_term)
     data['week_lessons'] = week_lessons.count()
@@ -375,10 +387,27 @@ def week_data(request):
 def term_data(request):
     cursor = connection.cursor()
     data = {}
-    now_lesson_time = getnowlessontime()
-    now_week = now_lesson_time['week']
-    now_term = now_lesson_time['term']
 
+    now_lesson_time = getnowlessontime()
+    now_term = request.GET.get('term', None)
+    if not now_term:
+        now_week = now_lesson_time['week']
+        now_term = now_lesson_time['term']
+    else:
+        if now_term == now_lesson_time['term']:
+            now_week = now_lesson_time['week']
+        else:
+            now_lesson_time['term'] = now_term
+            startdate, enddate = getTermDate(now_term)
+            time = enddate - startdate
+            day = time.days
+            now_week = 0
+            while day >= 7:
+                day = day - 7
+                now_week += 1
+            now_week += 1
+
+    data.update(**now_lesson_time)
     term_lessons = Lesson.objects.filter(term=now_term)
     data['term_lessons'] = term_lessons.count()
     term_start_lessons = term_lessons.filter(status__in=[LESSON_STATUS_NOW, LESSON_STATUS_CHECKIN,
@@ -507,11 +536,15 @@ def term_data(request):
 @permission_required(permission='checkin_view')
 @cache_page(60)
 def lesson_data(request):
-    now_lesson_time = getnowlessontime()
-    now_week = now_lesson_time['week']
-    now_day = now_lesson_time['day']
-    now_time = now_lesson_time['time']
-    now_term = now_lesson_time['term']
+    now_term = request.GET.get('term', None)
+    now_week = request.GET.get('week', None)
+    now_day = request.GET.get('day', None)
+    if not now_day:
+        now_lesson_time = getnowlessontime()
+        now_week = now_lesson_time['week']
+        now_day = now_lesson_time['day']
+        now_term = now_lesson_time['term']
+
     today_lessons = Lesson.objects.filter(week=now_week, day=now_day, term=now_term)
     checkindata = Checkin.objects.filter(lesson=OuterRef('id')).values('lesson_id').annotate(count=Count('*')).values(
         'count')

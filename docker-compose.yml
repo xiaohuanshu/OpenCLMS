@@ -27,6 +27,7 @@ services:
       - web
     links:
       - web:web
+    env_file: .env
 
   postgres:
     restart: always

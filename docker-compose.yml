@@ -27,7 +27,6 @@ services:
       - web
     links:
       - web:web
-    env_file: .env
 
   postgres:
     restart: always
@@ -36,6 +35,7 @@ services:
       - "5432:5432"
     volumes:
       - pgdata:/var/lib/postgresql/data/
+    env_file: .env
 
   redis:
     restart: always

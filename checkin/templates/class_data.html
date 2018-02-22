@@ -1,0 +1,133 @@
+{% extends 'base.html' %}
+{% load staticfiles %}
+{% load checkin_extra %}
+{% load school_extra %}
+{% block title %}班级考勤数据{% endblock %}
+{% block page_css %}
+    <link href="{% static 'plugins/bootstrap-table/bootstrap-table.min.css' %}" rel="stylesheet">
+    <link rel="stylesheet" href="{% static 'plugins/chosen/chosen1.1.css' %}">
+    <style>
+        .bg-default {
+            background-color: lightcoral;
+        }
+    </style>
+{% endblock %}
+{% block page_js %}
+    <script src="{% static 'plugins/bootstrap-table/bootstrap-table.js' %}"></script>
+    <script src="{% static 'plugins/bootstrap-table/locale/bootstrap-table-zh-CN.min.js' %}"></script>
+
+    <script src="{% static 'plugins/chosen/chosen.jquery.min.js' %}"></script>
+{% endblock %}
+{% block content %}
+    <div class="row">
+        <div class="col-sm-12">
+            <div class="box box-primary">
+                <div class="box-header">
+                    <h3 class="box-title">班级考勤数据 - {{ class.name }}</h3>
+                </div>
+                <div class="box-body">
+                    <div class="adv-table">
+                        <div id="custom-toolbar">
+                            <div class="form-inline" role="form">
+                                <div class="form-group">
+                                    <select name="viewType2" id="schoolterm" data-placeholder="学年学期">
+                                        <option value selected></option>
+                                        {% getterm as termdata %}
+
+                                        {% for m in termdata %}
+                                            {% if m == schoolterm %}
+                                                <option value="{{ m }}" selected>{{ m }}</option>
+                                            {% else %}
+                                                <option value="{{ m }}">{{ m }}</option>
+                                            {% endif %}
+                                        {% endfor %}
+                                    </select>
+                                </div>
+                            </div>
+                        </div>
+                        生成班级考勤数据会占用大量服务器资源，尽量避免在考勤高峰期使用此功能。
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div class="row" id="students">
+    </div>
+
+    <!-- page end-->
+
+
+
+{% endblock %}
+{% block page_script %}
+    <script>
+        $.extend($.fn.bootstrapTable.defaults, $.fn.bootstrapTable.locales['zh-CN']);
+
+        {% CHECKIN_STATUS_STYLE_JSON as checkin_status_style_json %}
+        checkin_status_style_json ={{ checkin_status_style_json|safe }};
+        {% CHECKIN_STATUS_JSON as checkin_status_json %}
+        checkin_status_json ={{ checkin_status_json|safe }};
+
+        function identifierFormatter(value, row, index) {
+            return checkin_status_json[value];
+        }
+
+        function courseFormatter(value, row, index) {
+            var clickurl = "{% url 'course:information' 0 %}";
+            clickurl = clickurl.substring(0, clickurl.length - 1);
+            return "<a href='" + clickurl + row.courseid + "'>" + value + "</a>";
+        }
+
+        function cellStyle(value, row, index) {
+            if (value == null) {
+                return {}
+            }
+            return {
+                classes: 'bg-' + checkin_status_style_json[value]
+            };
+        }
+
+        $('#schoolterm').chosen();
+
+        $('#schoolterm').on('change', function (evt, params) {
+            window.location.href = '?schoolterm=' + params.selected;
+        });
+        students = {{ students|safe }};
+        $(document).ready(function () {
+            for (var s in students) {
+                var html = "<div class=\"col-sm-12\">\n" +
+                    "<div class=\"box box-primary\">\n" +
+                    "<div class=\"box-header\">\n" +
+                    "<h3 class=\"box-title\">" + students[s][1] + "(" + students[s][0] + ")</h3>\n" +
+                    "</div>\n" +
+                    "<div class=\"box-body\">\n" +
+                    "<div class=\"adv-table\">\n" +
+                    "<table id=\"table-" + students[s][0] + "\"\n" +
+                    " data-search=\"false\"\n" +
+                    " data-show-toggle=\"true\"\n" +
+                    " data-show-columns=\"true\"\n" +
+                    " data-show-export=\"true\"\n" +
+                    " data-minimum-count-columns=\"2\"\n" +
+                    " data-striped=\"true\"\n" +
+                    ">\n" +
+                    "</table>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</div>\n" +
+                    "</div>";
+                $("#students").append(html);
+            }
+        });
+        window.onload = function () {
+            for (var s in students) {
+                $.ajaxSetup({
+                    async: false
+                });
+                $.get("{% url "checkin:student_data" "" %}" + students[s][0] + "?schoolterm={{ schoolterm }}").done(function (data) {
+                    var $table = $('#table-' + data.studentid);
+                    $table.bootstrapTable({columns: JSON.parse(data.header), data: JSON.parse(data.rows)});
+                });
+            }
+        }
+    </script>
+{% endblock %}

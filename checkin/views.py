@@ -2,7 +2,7 @@
 from __future__ import division
 from course.models import Lesson, Studentcourse, Course
 from models import Checkin, Checkinrecord, Ask, Scoreregulation
-from school.models import Student, Teacher
+from school.models import Student, Teacher, Class
 from school.function import getCurrentSchoolYearTerm
 from constant import *
 from django.shortcuts import render
@@ -107,11 +107,7 @@ def lesson_data(request, lessonid):
     return render(request, 'lesson_data.html', t)
 
 
-def student_data(request, studentid):
-    student = Student.objects.get(studentid=studentid)
-    if not (student.user == request.user or request.user.has_perm('checkin_view')):
-        return render(request, 'error.html', {'message': '没有权限'})
-    schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
+def get_student_data(student, schoolterm):
     studentcourses = Studentcourse.objects.filter(student=student, course__schoolterm=schoolterm).values('course')
     courses = Course.objects.filter(pk__in=studentcourses).prefetch_related('scoreregulation_set').prefetch_related(
         Prefetch('lesson_set', queryset=Lesson.objects.order_by('week', 'day', 'time'))).all()
@@ -159,15 +155,6 @@ def student_data(request, studentid):
         ld['ratio'] = '%.1f%%' % (ratio * 100)
         ld['score'] = '%d' % (score)
         rows.append(ld)
-    '''
-    newrows = []
-    for new in rows:
-        a = {'name': new['name'], 'ratio': new['ratio']}
-        for (offset, item) in enumerate(new['data']):
-            a['lesson%d' % (offset)] = item
-        newrows.append(a)
-    print newrows
-    '''
 
     columns = [
         [
@@ -183,8 +170,33 @@ def student_data(request, studentid):
         columns[1].append(
             {'field': 'lesson%d' % i, 'title': i + 1, 'cellStyle': 'cellStyle', 'formatter': 'identifierFormatter',
              'align': 'center'})
-    data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns)}
+    data = {'total': coursecount, 'rows': json.dumps(rows), 'header': json.dumps(columns),
+            "studentid": student.studentid}
+    return data
+
+
+def student_data(request, studentid):
+    student = Student.objects.get(studentid=studentid)
+    if not (student.user == request.user or request.user.has_perm('checkin_view')):
+        return render(request, 'error.html', {'message': '没有权限'})
+    schoolterm = request.GET.get('schoolterm', default="")
+    if schoolterm == "":
+        schoolterm = getCurrentSchoolYearTerm()['term']
+    data = get_student_data(student, schoolterm)
+    if request.is_ajax():
+        return HttpResponse(json.dumps(data), content_type='application/json')
     return render(request, 'student_data.html', {'student': student, 'data': data, 'schoolterm': schoolterm})
+
+
+def class_data(request, classid):
+    classid = Class.objects.get(id=classid)
+    if not request.user.has_perm('checkin_view'):
+        return render(request, 'error.html', {'message': '没有权限'})
+    schoolterm = request.GET.get('schoolterm', default=getCurrentSchoolYearTerm()['term'])
+    students = Student.objects.filter(classid=classid).order_by('studentid').all()
+    students = [[student.studentid, student.name] for student in students]
+    return render(request, 'class_data.html',
+                  {'class': classid, 'students': json.dumps(students), 'schoolterm': schoolterm})
 
 
 def teacher_data(request, teacherid):
@@ -215,7 +227,7 @@ def teacher_data(request, teacherid):
             course[c['lesson__course']]['checkindata'][c['lesson']]['status'] = None
         else:
             course[c['lesson__course']]['checkindata'][c['lesson']]['status'] = "%.1f" % (
-                c['actually'] / c['should'] * 100)
+                    c['actually'] / c['should'] * 100)
 
     rows = []
     for (k, v) in course.items():

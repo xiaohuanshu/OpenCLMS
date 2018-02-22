@@ -87,10 +87,10 @@
             };
         }
 
-        $('#schoolterm').chosen();
+        $('#schoolterm').chosen({width: 60});
 
         $('#schoolterm').on('change', function (evt, params) {
-            window.location.href = '?schoolterm=' + params.selected;
+            window.location.href = '?schoolterm=' + $('#schoolterm').val();
         });
         students = {{ students|safe }};
         $(document).ready(function () {

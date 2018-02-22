@@ -18,6 +18,7 @@ urlpatterns = [
 
     url(r'^data/student_data/([^/]*)$', views.student_data, name='student_data'),
     url(r'^data/teacher_data/([^/]*)$', views.teacher_data, name='teacher_data'),
+    url(r'^data/class_data/([^/]*)$', views.class_data, name='class_data'),
     url(r'^data/personal_data$', views.personaldata, name='personal_data'),
     url(r'^data/lesson_data/(\d+)$', views.lesson_data, name='lesson_data'),
 

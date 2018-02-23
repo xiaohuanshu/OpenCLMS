@@ -60,3 +60,30 @@ def send_homework_notification(homeworkid):
         "image": "%s/static/img/homework.png"
     }
     wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=userid, articles=[article])
+
+
+@shared_task(name='send_homework_remind')
+def send_homework_remind(homeworkid):
+    homework = Coursehomework.objects.get(pk=homeworkid)
+    course = homework.course
+    studentcourses = Studentcourse.objects.select_related("student__user").filter(course=course).only(
+        "student__user__openid").all()
+    userid = []
+    for sc in studentcourses:
+        if sc.student.user and sc.student.user.openid:
+            userid.append(sc.student.user.openid)
+    # 剔除已经交过作业的名单
+    for sc in homework.homeworkcommit_set.select_related("student__user").only("student__user__openid").all():
+        if sc.student.user and sc.student.user.openid:
+            try:
+                userid.remove(sc.student.user.openid)
+            except ValueError:
+                pass
+    description = "%s\n教师发送了催交作业提醒，点击提交或查看详情，电脑提交请访问%s" % (homework.title, settings.DOMAIN)
+    article = {
+        "title": "[%s]催交作业提醒!" % (course.title),
+        "description": description,
+        "url": "%s%s" % (settings.DOMAIN, reverse('course:homework', args=[course.id]) + '?homeworkid=%d' % homeworkid),
+        "image": "%s/static/img/homework.png"
+    }
+    wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=userid, articles=[article])

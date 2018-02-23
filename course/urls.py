@@ -18,6 +18,7 @@ urlpatterns = [
     url(r'^control/sethomeworkscore/$', control.sethomeworkscore, name='control.sethomeworkscore'),
     url(r'^control/leavehomeworkcomment/$', control.leavehomeworkcomment, name='control.leavehomeworkcomment'),
     url(r'^control/setperformance_score/(\d+)$', control.setperformance_score, name='control.setperformance_score'),
+    url(r'^control/remind_homework/(\d+)$', control.remind_homework, name='control.remind_homework'),
     url(r'^resource/(\d+)$', views.resource, name='resource'),
     url(r'^resource/upload$', views.resourceupload, name='resourceupload'),
     url(r'^resource/delete$', views.resourcedelete, name='resourcedelete'),

@@ -134,5 +134,5 @@ def remind_homework(request, homeworkid):
     homework = Coursehomework.objects.select_related('course').get(id=homeworkid)
     if not has_course_permission(request.user, homework.course):
         return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
-    send_homework_remind.delay(homeworkid)
+    send_homework_remind.delay(homework.id)
     return HttpResponse(json.dumps({'error': 0, 'message': '催交成功'}), content_type="application/json")

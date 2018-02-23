@@ -1,5 +1,5 @@
 # coding=utf-8
-from models import Lesson, Homeworkcommit, Course, Studentcourse
+from models import Lesson, Homeworkcommit, Course, Studentcourse, Coursehomework
 from school.models import Student
 from constant import *
 from django.http import HttpResponse
@@ -10,6 +10,7 @@ from course.auth import has_course_permission
 from django.db.models import F
 from django.conf import settings
 from wechat.client import wechat_client
+from course.tasks import send_homework_remind
 
 
 def startLesson(request):
@@ -127,3 +128,11 @@ def setperformance_score(request, courseid):
     sc.save()
     return HttpResponse(json.dumps({'error': 0, 'message': '加分成功', 'performance_score': sc.performance_score}),
                         content_type="application/json")
+
+
+def remind_homework(request, homeworkid):
+    homework = Coursehomework.objects.select_related('course').get(id=homeworkid)
+    if not has_course_permission(request.user, homework.course):
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+    send_homework_remind.delay(homeworkid)
+    return HttpResponse(json.dumps({'error': 0, 'message': '催交成功'}), content_type="application/json")

@@ -4,9 +4,9 @@
 {% block title %}首页{% endblock %}
 {% block page_css %}
     <style>
-    table {
-        border: 2px solid transparent !important;
-    }
+        table {
+            border: 2px solid transparent !important;
+        }
     </style>
 {% endblock %}
 {% block content %}
@@ -19,11 +19,17 @@
         <div class="col-md-3 col-sm-6 col-xs-12">
             <div class="info-box">
                 <span class="info-box-icon bg-aqua"><i class="fa fa-tags"></i></span>
-
-                <div class="info-box-content">
-                    <span class="info-box-text">未交作业</span>
-                    <span class="info-box-number">{{ uncommithomework|length }}</span>
-                </div>
+                {% if request.user.isteacher %}
+                    <div class="info-box-content">
+                        <span class="info-box-text">未判作业</span>
+                        <span class="info-box-number">{{ unscorehomework }}</span>
+                    </div>
+                {% else %}
+                    <div class="info-box-content">
+                        <span class="info-box-text">未交作业</span>
+                        <span class="info-box-number">{{ uncommithomework|length }}</span>
+                    </div>
+                {% endif %}
                 <!-- /.info-box-content -->
             </div>
             <!-- /.info-box -->
@@ -77,15 +83,28 @@
             <!-- Custom Tabs (Pulled to the right) -->
             <div class="nav-tabs-custom">
                 <ul class="nav nav-tabs pull-right">
-                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期<d class="hidden-xs">课程</d></a></li>
-                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周<d class="hidden-xs">课程</d></a></li>
+                    <li class=""><a href="#tab_3-2" data-toggle="tab" aria-expanded="false">学期
+                        <d class="hidden-xs">课程</d>
+                    </a></li>
+                    <li class=""><a href="#tab_2-2" data-toggle="tab" aria-expanded="false">本周
+                        <d class="hidden-xs">课程</d>
+                    </a></li>
                     {% if uncommithomework %}
-                        <li><a href="#tab_1-1" data-toggle="tab" aria-expanded="false">今日<d class="hidden-xs">课程</d></a></li>
-                        <li class="active"><a href="#tab_0-0" data-toggle="tab" aria-expanded="true"><d class="hidden-xs">未交</d>作业</a></li>
+                        <li><a href="#tab_1-1" data-toggle="tab" aria-expanded="false">今日
+                            <d class="hidden-xs">课程</d>
+                        </a></li>
+                        <li class="active"><a href="#tab_0-0" data-toggle="tab" aria-expanded="true">
+                            <d class="hidden-xs">未交</d>
+                            作业</a></li>
                     {% else %}
-                        <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日<d class="hidden-xs">课程</d></a></li>
+                        <li class="active"><a href="#tab_1-1" data-toggle="tab" aria-expanded="true">今日
+                            <d class="hidden-xs">课程</d>
+                        </a></li>
                     {% endif %}
-                    <li class="pull-left header"><i class="fa fa-th"></i><d class="hidden-xs">课程</d>信息</li>
+                    <li class="pull-left header"><i class="fa fa-th"></i>
+                        <d class="hidden-xs">课程</d>
+                        信息
+                    </li>
                 </ul>
                 <div class="tab-content">
                     <div class="tab-pane {% if uncommithomework %}active{% endif %}" id="tab_0-0">
@@ -102,7 +121,8 @@
                                             <a href="{% url 'course:information' uch.course.id %}">{{ uch.course.title }}</a>
                                         </td>
                                         <td class="hidden-xs">{{ uch.type|COURSE_HOMEWORK_TYPE }}</td>
-                                        <td><d class="hidden-xs">{{ uch.deadline|date:'Y-m-d H:i' }}</d>
+                                        <td>
+                                            <d class="hidden-xs">{{ uch.deadline|date:'Y-m-d H:i' }}</d>
                                             {% if uch.isend %}<span class="badge bg-red">已过期</span>{% endif %}</td>
                                     </tr>
                                 {% endfor %}

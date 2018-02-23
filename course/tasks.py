@@ -4,12 +4,13 @@ from __future__ import absolute_import, unicode_literals
 from celery import shared_task
 
 from school.function import getnowlessontime
-from course.models import Lesson, Coursehomework, Studentcourse
+from course.models import Lesson, Coursehomework, Studentcourse, Courseresource
 from course.constant import LESSON_STATUS_NOW, LESSON_STATUS_END, COURSE_HOMEWORK_TYPE_NOSUBMIT
 from wechat.client import wechat_client
 from django.conf import settings
 from django.db.models import Q, F
 from django.core.urlresolvers import reverse
+from django.core.cache import cache
 import logging
 
 logger = logging.getLogger(__name__)
@@ -85,5 +86,28 @@ def send_homework_remind(homeworkid):
         "description": description,
         "url": "%s%s" % (settings.DOMAIN, reverse('course:homework', args=[course.id]) + '?homeworkid=%d' % homeworkid),
         "image": "%s/static/img/homework.png"
+    }
+    wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=userid, articles=[article])
+
+
+@shared_task(name='send_resource_notification')
+def send_resource_notification(resourceid):
+    resource = Courseresource.objects.select_related('course').get(pk=resourceid)
+    course = resource.course
+    if cache.get("course_resource_notification_lock_%s" % course.id):
+        return  # 同课程五分钟内只发送一个提醒
+    cache.set("course_resource_notification_lock_%s" % course.id, True, 5 * 60)
+    studentcourses = Studentcourse.objects.select_related("student__user").filter(course=course).only(
+        "student__user__openid").all()
+    userid = []
+    for sc in studentcourses:
+        if sc.student.user and sc.student.user.openid:
+            userid.append(sc.student.user.openid)
+    description = "%s\n教师上传了新的课程资源，点击查看详情，电脑下载请访问%s" % (resource.title, settings.DOMAIN)
+    article = {
+        "title": "[%s]新资源!" % (course.title),
+        "description": description,
+        "url": "%s%s" % (settings.DOMAIN, reverse('course:resource', args=[course.id])),
+        "image": "%s/static/img/resource.png"
     }
     wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=userid, articles=[article])

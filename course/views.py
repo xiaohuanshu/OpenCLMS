@@ -17,7 +17,7 @@ from user_system.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
 from message import sendmessagetocoursestudent
-from course.tasks import send_homework_notification
+from course.tasks import send_homework_notification, send_resource_notification
 from django.utils.http import urlquote
 from checkin.constant import *
 from django.core.exceptions import ValidationError
@@ -127,6 +127,7 @@ def resourceupload(request):
     res.file = request.FILES['file_data']
     res.title = res.file.name
     res.save()
+    send_resource_notification.delay(res.id)
     deleteurl = reverse('course:resourcedelete', args=[])
     initialpreviewdata = res.initialPreview()
     data = {

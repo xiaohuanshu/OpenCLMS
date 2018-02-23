@@ -33,3 +33,6 @@
         {% endwith %}
     </div>
 </div>
+{% if commit.comment %}
+    <div class="row"><div class="col-xs-12"><pre>教师留言：{{ commit.comment }}</pre></div></div>
+{% endif %}

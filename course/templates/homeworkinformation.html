@@ -143,6 +143,9 @@
                                   enctype="multipart/form-data">
                                 {% csrf_token %}
                                 <div class="box-body">
+                                    {% if commitdata.comment %}
+                                        <pre>教师留言：{{ commitdata.comment }}</pre>
+                                    {% endif %}
                                     <div class="form-group">
                                         <div class="btn-toolbar" data-role="editor-toolbar" data-target="#editor">
                                             <div class="btn-group hidden-xs">
@@ -318,6 +321,13 @@
                                     {% endwith %}
                                 </div>
                             </div>
+                            {% if commitdata.comment %}
+                                <div class="row">
+                                    <div class="col-xs-12">
+                                        <pre>教师留言：{{ commitdata.comment }}</pre>
+                                    </div>
+                                </div>
+                            {% endif %}
                             <div class="row">
                                 <div class="col-xs-6">
                                     提交时间:{{ commitdata.submittime|date:'Y-m-d H:i' }}
@@ -423,6 +433,11 @@
                                     <span class="input-group-btn">
                       <button type="button" class="btn btn-primary sethomeworkscore">评分</button>
                     </span>
+                                    <span class="input-group-btn">
+                      <button type="button" class="btn btn-warning leavemessage" data-toggle="modal"
+                              href="#CommentHomeworkModal">留言
+                                    </button>
+                    </span>
                                 </div>
                             </div>
                         </div>
@@ -449,6 +464,27 @@
                         <a href="{% url 'course:homework' homework.course_id %}?delhomeworkid={{ homework.id }}">
                             <button class="btn btn-warning" type="button"> 确认</button>
                         </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="modal fade modal-dialog-center top-modal-with-space" id="CommentHomeworkModal" tabindex="-1"
+             role="dialog"
+             aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header">
+                        <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
+                        <h4 class="modal-title">作业留言</h4>
+                    </div>
+                    <div class="modal-body">
+                        <textarea style="width:100%" placeholder="请在此处输入留言内容..." id="leavemessage_comment"></textarea>
+                        <input type="hidden" id="leavemessage_commitid">
+                        留言内容将通过微信通知同学
+                    </div>
+                    <div class="modal-footer">
+                        <button data-dismiss="modal" class="btn btn-default" type="button">取消</button>
+                        <button class="btn btn-warning" type="button" id="leavemessage_commit"> 留言</button>
                     </div>
                 </div>
             </div>
@@ -604,6 +640,10 @@
                         }
                     });
                 });
+                var leavemessage = $(this).find('.leavemessage');
+                leavemessage.click(function () {
+                    $("#leavemessage_commitid").val(homeworkcommitid);
+                });
             });
             $(document).on('click', '.previewbutton', function () {
                 previewurl = $(this).data('previewurl');
@@ -629,7 +669,31 @@
                         $homework.boxWidget('expand');
                     }
                 });
-
+            });
+            $("#leavemessage_commit").click(function () {
+                var commitid = $("#leavemessage_commitid").val();
+                var comment = $("#leavemessage_comment").val();
+                $.ajax({
+                    url: '{% url 'course:control.leavehomeworkcomment' %}',
+                    type: 'POST',
+                    dataType: "json",
+                    contentType: "application/x-www-form-urlencoded; charset=utf-8",
+                    data: {
+                        homeworkcommitid: commitid,
+                        comment: comment
+                    },
+                    success: function (data) {
+                        if (data.error != 0) {
+                            toastr['error'](data.message, "操作失败");
+                        } else {
+                            toastr['success'](data.message, "操作成功");
+                            $('#CommentHomeworkModal').modal('hide')
+                            $(".commit[data-homeworkcommitid=" + commitid + "]").find(".box-body").append('<div class="row"><div class="col-xs-12"><pre>教师留言：' + comment + '</pre></div></div>');
+                        }
+                    }, error: function (XMLHttpRequest, textStatus) {
+                        toastr['error'](textStatus, "与服务器连接失败");
+                    }
+                });
             });
         </script>
     {% endif %}

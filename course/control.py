@@ -8,6 +8,8 @@ from django.shortcuts import redirect, render
 import json
 from course.auth import has_course_permission
 from django.db.models import F
+from django.conf import settings
+from wechat.client import wechat_client
 
 
 def startLesson(request):
@@ -89,6 +91,29 @@ def sethomeworkscore(request):
     homeworkcommit.score = score
     homeworkcommit.save()
     return HttpResponse(json.dumps({'error': 0, 'score': score, 'message': '评分成功'}), content_type="application/json")
+
+
+def leavehomeworkcomment(request):
+    homeworkcommit = Homeworkcommit.objects.select_related('coursehomework').get(
+        id=request.POST.get('homeworkcommitid'))
+    comment = request.POST.get('comment', '')
+    if comment == '':
+        return HttpResponse(json.dumps({'error': 101, 'message': '留言不能为空'}), content_type="application/json")
+    if not has_course_permission(request.user, homeworkcommit.coursehomework.course):
+        return HttpResponse(json.dumps({'error': 101, 'message': '没有权限'}), content_type="application/json")
+    homeworkcommit.comment = comment
+    homeworkcommit.save()
+    # send wechat notification
+    article = {
+        "title": u"作业留言提醒!",
+        "description": u"教师留言：" + comment,
+        "url": "%s%s" % (settings.DOMAIN, reverse('course:homework', args=[
+            homeworkcommit.coursehomework.course_id]) + '?homeworkid=%d' % homeworkcommit.coursehomework_id),
+        "image": "%s/static/img/homework.png"
+    }
+    wechat_client.message.send_articles(agent_id=settings.AGENTID, user_ids=[homeworkcommit.student.user.openid],
+                                        articles=[article])
+    return HttpResponse(json.dumps({'error': 0, 'message': '留言成功'}), content_type="application/json")
 
 
 def setperformance_score(request, courseid):

@@ -357,6 +357,7 @@ class Homeworkcommit(Dealbase64imgmodel):
     student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
     submittime = models.DateTimeField(auto_now=True)
     text = models.TextField(blank=True, null=True)
+    comment = models.TextField(blank=True, null=True)
     attachment = models.ManyToManyField(Homeworkfile)
     score = models.SmallIntegerField(blank=True, null=True)
 

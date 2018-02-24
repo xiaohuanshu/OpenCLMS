@@ -177,13 +177,27 @@ def startCheckin(request, lessonid):
     if not has_course_permission(request.user, lesson.course):
         return render(request, 'error.html', {'message': '没有权限'})
     mode = request.GET.get('mode', default='first')
+    auto_start = False
+    if mode == 'startfirst':  # 自动开启课程模式
+        mode = 'first'
+        auto_start = True
+
     if lesson.status == LESSON_STATUS_AWAIT:
-        return render(request, 'error.html',
-                      {'message': '课程还未开始',
-                       'submessage': lesson.course.title,
-                       'jumpurl': str(
-                           reverse('course:information', args=[lesson.course.id]))})
-    elif lesson.status == LESSON_STATUS_NOW:
+        if auto_start:
+            re = lesson.startlesson()
+            if re['error'] != 0:
+                return render(request, 'error.html',
+                              {'message': re['message'],
+                               'submessage': lesson.course.title,
+                               'jumpurl': str(
+                                   reverse('course:information', args=[lesson.course.id]))})
+        else:
+            return render(request, 'error.html',
+                          {'message': '课程还未开始',
+                           'submessage': lesson.course.title,
+                           'jumpurl': str(
+                               reverse('course:information', args=[lesson.course.id]))})
+    if lesson.status == LESSON_STATUS_NOW:
         re = startcheckin(lessonid, mode)
         if re['error'] != 0:
             return render(request, 'error.html', {'message': re['message'], 'submessage': lesson.course.title})
@@ -234,7 +248,7 @@ def addask(request):
     students = Student.objects.in_bulk(student)
 
     if (Ask.objects.filter(student__in=students, schoolterm=schoolterm).filter(
-                Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).exists()):
+            Q(starttime__range=(starttime, endtime)) | Q(endtime__range=(starttime, endtime))).exists()):
         return HttpResponse(json.dumps({'error': 101, 'message': "部分学生在此时间段内有请假信息,时间冲突!"}),
                             content_type="application/json")
     ask = Ask()

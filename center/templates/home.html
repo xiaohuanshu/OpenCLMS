@@ -151,6 +151,27 @@
                                         <td class="hidden-xs">
                                             <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
+                                        {% if request.user.isteacher %}
+                                            <td>
+                                                {% if lesson.status|LESSON_STATUS == '未开始' %}
+                                                    <a class="btn btn-xs btn-info"
+                                                       href="{% url "course:control.startlesson" %}?lessonid={{ lesson.id }}">开启课程</a>
+                                                {% elif lesson.status|LESSON_STATUS == '正在签到' or lesson.status|LESSON_STATUS == '正在上课' %}
+                                                    <a class="btn btn-xs btn-info"
+                                                       href="{% url 'checkin:lesson_data' lesson.id %}">进入考勤</a>
+                                                {% endif %}
+                                                {% if lesson.checkincount == 0 %}
+                                                    <a class="btn btn-xs btn-warning"
+                                                       href="{% url "checkin:startcheckin" lesson.id %}?mode=startfirst">快速考勤</a>
+                                                {% endif %}
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:resource' lesson.course.id %}">资源</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:homework' lesson.course.id %}">作业</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:sendmessage' lesson.course.id %}">群发</a>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                                 </tbody>

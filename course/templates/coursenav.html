@@ -28,7 +28,7 @@
     {% endif %}
     {% if courseperms %}
         <li role="presentation" class="{% nav_active request.path 'sendmessage' %}">
-            <a href="{% url 'course:sendmessage' coursedata.id %}">消息</a>
+            <a href="{% url 'course:sendmessage' coursedata.id %}">群发</a>
         </li>
         <li role="presentation" class="{% nav_active request.path 'settings' %}">
             <a href="{% url 'course:settings' coursedata.id %}">设置</a>

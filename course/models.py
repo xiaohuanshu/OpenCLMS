@@ -174,7 +174,7 @@ class Lesson(models.Model):
 
     def startlesson(self):
         if self.course.status != 0:
-            return {'error': 101, 'message': u'课程时间冲突'}
+            return {'error': 101, 'message': u'课程时间冲突,请关闭未结束的课程'}
         if self.status not in (LESSON_STATUS_AWAIT, LESSON_STATUS_NEW_AWAIT):
             return {'error': 101, 'message': u'课程不能开启'}
         nowtime = time.localtime()

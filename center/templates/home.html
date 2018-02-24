@@ -154,7 +154,7 @@
                                         {% if request.user.isteacher %}
                                             <td>
                                                 {% if lesson.status|LESSON_STATUS == '未开始' %}
-                                                    <a class="btn btn-xs btn-info"
+                                                    <a class="btn btn-xs btn-info hidden-xs"
                                                        href="{% url "course:control.startlesson" %}?lessonid={{ lesson.id }}">开启课程</a>
                                                 {% elif lesson.status|LESSON_STATUS == '正在签到' or lesson.status|LESSON_STATUS == '正在上课' %}
                                                     <a class="btn btn-xs btn-info"
@@ -164,11 +164,11 @@
                                                     <a class="btn btn-xs btn-warning"
                                                        href="{% url "checkin:startcheckin" lesson.id %}?mode=startfirst">快速考勤</a>
                                                 {% endif %}
-                                                <a class="btn btn-xs btn-default"
+                                                <a class="btn btn-xs btn-default hidden-xs"
                                                    href="{% url 'course:resource' lesson.course.id %}">资源</a>
-                                                <a class="btn btn-xs btn-default"
+                                                <a class="btn btn-xs btn-default hidden-xs"
                                                    href="{% url 'course:homework' lesson.course.id %}">作业</a>
-                                                <a class="btn btn-xs btn-default"
+                                                <a class="btn btn-xs btn-default hidden-xs"
                                                    href="{% url 'course:sendmessage' lesson.course.id %}">群发</a>
                                             </td>
                                         {% endif %}
@@ -198,6 +198,18 @@
                                         <td class="hidden-xs">
                                             <small class="label label-{{ lesson.status|LESSON_STATUS_STYLE }}">{{ lesson.status|LESSON_STATUS }}</small>
                                         </td>
+                                        {% if request.user.isteacher %}
+                                            <td class="hidden-xs">
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:resource' lesson.course.id %}">资源</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:homework' lesson.course.id %}">作业</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:sendmessage' lesson.course.id %}">群发</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:course_data' lesson.course.id %}">数据</a>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                                 </tbody>
@@ -220,10 +232,22 @@
                                         <td style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis"
                                             width="25%" class="hidden-xs">{{ course.time }}</td>
                                         <td style="overflow: hidden;white-space: nowrap;text-overflow:ellipsis"
-                                            width="25%" class="hidden-xs">{{ course.location|default:'' }}</td>
-                                        <td width="15%" class="hidden-xs">
+                                            width="15%" class="hidden-xs">{{ course.location|default:'' }}</td>
+                                        <td width="10%" class="hidden-xs">
                                             <small class="label label-{{ course.status|COURSE_STATUS_STYLE }}">{{ course.status|COURSE_STATUS }}</small>
                                         </td>
+                                        {% if request.user.isteacher %}
+                                            <td class="visible-lg" width="20%">
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:resource' course.id %}">资源</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:homework' course.id %}">作业</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:sendmessage' course.id %}">群发</a>
+                                                <a class="btn btn-xs btn-default"
+                                                   href="{% url 'course:course_data' course.id %}">数据</a>
+                                            </td>
+                                        {% endif %}
                                     </tr>
                                 {% endfor %}
                                 </tbody>

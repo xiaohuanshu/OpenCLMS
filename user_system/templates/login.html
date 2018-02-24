@@ -9,7 +9,8 @@
     <body class="hold-transition login-page">
     <div class="login-box">
         <div class="login-logo">
-            <a href="#"><b>CHECKIN</b>SYSTEM</a>
+            <b>{{ SCHOOL_NAME }}</b><br/>
+            <p style="font-size: 20px">课程管理系统</p>
         </div>
         <!-- /.login-logo -->
         <div class="login-box-body" id="normalloginbody">
@@ -53,7 +54,6 @@
             {% if browserdownload %}
                 <a style="float:right;color:red" id="browserdownload" href="{{ browserdownload }}">下载客户端</a><br>
             {% endif %}
-
         </div>
         <!-- /.login-box-body -->
 
@@ -67,6 +67,8 @@
         </div>
         <!-- /.wxlogin-box-body -->
 
+        <p class="login-box-msg"><strong>Powered by
+            <a href="https://github.com/xiaohuanshu/OpenCLMS">OpenCLMS</a></strong><br></p>
 
     </div>
     <!-- /.login-box -->

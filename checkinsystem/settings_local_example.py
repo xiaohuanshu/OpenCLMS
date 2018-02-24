@@ -67,7 +67,7 @@ EMAIL_HOST = ''  # SMTP
 EMAIL_PORT = 25  # SMTP port
 EMAIL_HOST_USER = ''  # email address
 EMAIL_HOST_PASSWORD = ''  # email password
-EMAIL_SUBJECT_PREFIX = '[CheckinSystem]'  # subject-line prefix
+EMAIL_SUBJECT_PREFIX = '[OpenCLMS]'  # subject-line prefix
 EMAIL_USE_TLS = True
 # admin email
 SERVER_EMAIL = ''  # The email address that error messages come from, such as those sent to ADMINS and MANAGERS.

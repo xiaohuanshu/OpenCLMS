@@ -94,5 +94,5 @@ def CHECKIN_ABNORMAL(status):
 
 @register.assignment_tag
 def CHECKIN_ABNORMAL_JSON():
-    data = {CHECKIN_ABNORMAL_ACCOUNT: u"帐号异常", CHECKIN_ABNORMAL_LOCATION: u"位置异常"}
+    data = {CHECKIN_ABNORMAL_ACCOUNT: u"疑似代签", CHECKIN_ABNORMAL_LOCATION: u"位置异常"}
     return json.dumps(data)

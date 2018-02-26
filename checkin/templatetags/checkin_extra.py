@@ -87,7 +87,7 @@ def CHECKINURL():
 @register.filter
 def CHECKIN_ABNORMAL(status):
     if status == CHECKIN_ABNORMAL_ACCOUNT:
-        return u'帐号异常'
+        return u'疑似代签'  # 账号异常
     elif status == CHECKIN_ABNORMAL_LOCATION:
         return u'位置异常'
 

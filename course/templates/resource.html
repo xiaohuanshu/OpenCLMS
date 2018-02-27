@@ -108,6 +108,11 @@
                                 <div class="callout callout-warning">
                                     <p>资源文件可在电脑端下载</p>
                                 </div>
+                            {% else %}
+                                <div class="callout callout-warning">
+                                    <p>Office文件(Word、PPT等)可能无法在线预览，请点击标题下载后查看。
+                                        {% if request.user.isteacher %}推荐上传PDF格式文件{% endif %}</p>
+                                </div>
                             {% endif %}
                             {% for resource in resources %}
                                 <div class="file-box">

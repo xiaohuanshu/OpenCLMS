@@ -200,7 +200,7 @@ def sync_course(continuous=None):
             data.save()
             data.simplifytime()
             if (data.time != last_time or data.location != last_location) and \
-                            data.time is not None and data.location is not None:
+                    data.time is not None and data.location is not None:
                 data.generatelesson()
         except Exception as e:
             logger.exception("[sync_course]error on serialnumber:%s\n%s" % (serialnumber, e))
@@ -232,15 +232,19 @@ def sync_studentcourse(continuous=None):
             continue
         exempt_students = course.exempt_students.all()
         student_course_list = []
-        for student_id in z_course.xs.read().split(','):
+        old_students = set(Studentcourse.objects.filter(course=course).values_list('student_id', flat=True))
+        should_students = set(student_id.strip() for student_id in z_course.xs.read().split(','))
+        delete_students = old_students.difference(should_students)
+        new_students = should_students.difference(old_students)
+        Studentcourse.objects.filter(course=course, student_id__in=delete_students).all().delete()
+        for student_id in new_students:
             try:
-                student = Student.objects.get(studentid=student_id.strip())
+                student = Student.objects.get(studentid=student_id)
             except ObjectDoesNotExist:
                 studentnotfound += 1
                 continue
             if student not in exempt_students:
                 student_course_list.append(Studentcourse(course=course, student=student))
-        Studentcourse.objects.filter(course=course).all().delete()
         Studentcourse.objects.bulk_create(student_course_list)
     logger.info("[sync_studentcourse]Finished count:%d,coursenotfound:%d,studentnotfound:%d" % (
         count, coursenotfound, studentnotfound))
@@ -289,7 +293,7 @@ def sync_studentexam(continuous=None):
                                                                  })
         if not created:
             if starttime != studentexam.starttime or endtime != studentexam.endtime or \
-                            location != studentexam.location or z_exam.zwh != studentexam.seat:
+                    location != studentexam.location or z_exam.zwh != studentexam.seat:
                 studentexam.starttime = starttime
                 studentexam.endtime = endtime
                 studentexam.location = location

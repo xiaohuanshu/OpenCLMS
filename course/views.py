@@ -495,7 +495,11 @@ def course_data(request, courseid):
     except ObjectDoesNotExist:
         scoreregulation = Scoreregulation(course=course)
     for s in studentdata:
-        studentdata = {'studentid': s.student.studentid, 'name': s.student.name, 'class': s.student.classid.name}
+        studentdata = {
+            'studentid': s.student.studentid,
+            'name': s.student.name,
+            'class': s.student.classid.name if s.student.classid else None
+        }
         homeworkdata = Homeworkcommit.objects.filter(student=s.student, coursehomework__in=allhomework).all()
         for h in homeworkdata:
             studentdata['homework%d' % (h.coursehomework_id)] = h.score if h.score else '未评'

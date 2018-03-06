@@ -92,7 +92,7 @@ def lesson_data(request, lessonid):
     for c in checkindata:
         students.append({'studentid': c.student_id,
                          'name': c.student.name,
-                         'class': c.student.classid.name,
+                         'class': c.student.classid.name if c.student.classid else None,
                          'score': c.score,
                          'status': c.status,
                          'abnormal': c.abnormal,

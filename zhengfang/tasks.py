@@ -197,8 +197,8 @@ def sync_course(continuous=None):
                         data.teachclass = Class.objects.get(name=teachclass.strip())
                     except:
                         pass
-            data.save()
             data.simplifytime()
+            data.save()
             if (data.time != last_time or data.location != last_location) and \
                     data.time is not None and data.location is not None:
                 data.generatelesson()

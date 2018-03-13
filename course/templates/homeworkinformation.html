@@ -280,7 +280,11 @@
                                 </div>
 
                                 <div class="box-footer">
-                                    <button type="submit" class="btn btn-info pull-right">提交</button>
+                                    {% if commitdata %}
+                                        <button type="submit" class="btn btn-info pull-right">修改</button>
+                                    {% else %}
+                                        <button type="submit" class="btn btn-info pull-right">提交</button>
+                                    {% endif %}
                                 </div>
                             </form>
                         </div>

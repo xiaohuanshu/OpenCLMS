@@ -268,7 +268,7 @@ def role(request):
         for tu in teacher_users:
             cache.delete('perm_%d_cache' % tu.id)
             create_list.append(Usertorole(role=role, user=tu))
-            logger.warning("add role %s to user %s by user %s" % (rolename, tu.id, request.user.id))
+            logger.info("add role %s to user %s by user %s" % (rolename, tu.id, request.user.id))
         Usertorole.objects.filter(role=role).delete()
         Usertorole.objects.bulk_create(create_list)
         return HttpResponse('{error:0}', content_type="application/json")

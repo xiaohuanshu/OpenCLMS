@@ -181,7 +181,7 @@ LOGGING = {
             'propagate': True,
             'level': 'WARNING',
         },
-        'user': {
+        'user_system': {
             'handlers': ['userfile', 'console'],
             'propagate': True,
             'level': 'INFO',

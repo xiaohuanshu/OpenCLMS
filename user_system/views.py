@@ -124,6 +124,7 @@ def loginProcess(request):
                 response.set_cookie('userid', user.id, None, datetime.now() + timedelta(days=365))
             return response
         except ObjectDoesNotExist:
+            logger.info("wrong password when login %s" % username)
             return redirect(reverse('user:login', args=[]) + u"?error=用户名或密码错误")
 
 
@@ -215,6 +216,7 @@ def add_permission(request):
         newpermission = request.POST.getlist('checked[]')
         role.permission = newpermission
         role.save()
+        logger.info("role %s permission changed by user %s" % (rolename, request.user.id))
         return HttpResponse('{error:0}', content_type="application/json")
     else:
         roledata = Role.objects.all()

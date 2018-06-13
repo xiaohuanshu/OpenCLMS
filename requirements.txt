@@ -1,4 +1,4 @@
-django==1.11.12
+django==1.11.13
 psycopg2-binary
 wechatpy
 cryptography
@@ -6,7 +6,7 @@ uwsgi
 django_redis
 Pillow
 django-debug-toolbar
-celery==4.1.0
+celery==4.2.0
 xlrd
 dj-database-url
 cx_Oracle

@@ -225,11 +225,11 @@ CELERY_BEAT_SCHEDULE = {
     },
     'sync_zhengfang': {
         'task': 'sync_zhengfang',
-        'schedule': crontab(hour=19, minute=30),  # because of celery timezone bug
+        'schedule': crontab(hour=3, minute=30),  # because of celery timezone bug
     },
     'generate_checkin_daily_excel': {
         'task': 'generate_checkin_daily_excel',
-        'schedule': crontab(hour=15, minute=0),  # because of celery timezone bug
+        'schedule': crontab(hour=23, minute=0),  # because of celery timezone bug
     },
     # 'send_birthday_blessing': {
     #    'task': 'send_birthday_blessing',  # the same goes in the task name

@@ -11,7 +11,7 @@ RUN \
     unzip "/tmp/instantclient*.zip" -d /opt/oracle
 
 COPY requirements.txt ./
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir --index-url https://pypi.douban.com/simple -r requirements.txt
 
 COPY . .
 RUN cp /usr/src/app/checkinsystem/settings_env.py /usr/src/app/checkinsystem/settings_local.py

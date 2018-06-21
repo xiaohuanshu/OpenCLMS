@@ -10,6 +10,5 @@ celery==4.2.0
 xlrd
 dj-database-url
 cx_Oracle
-django-analytical
 icalendar
 xlsxwriter

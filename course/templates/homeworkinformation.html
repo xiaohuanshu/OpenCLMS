@@ -536,18 +536,8 @@
             $fileupload.fileinput({
                 language: "zh",
                 theme: "explorer",
-                initialPreview: [
-                    {% for resource in resources %}
-                        "<a href='{{ resource.file.url }}' download='{{ resource.title }}'><h2><i class='glyphicon glyphicon-file'></i></h2></a>",
-                    {% endfor %}
-                ],
-                initialPreviewConfig: [
-                    {% for resource in resources %}
-                        {
-                            caption: '{{ resource.title }}'
-                        },
-                    {% endfor %}
-                ]
+                dropZoneEnabled: false,
+                showPreview: false,
             });
 
         </script>

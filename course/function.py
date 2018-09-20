@@ -120,7 +120,7 @@ def simplifytime(timestr, classroomstr):
         for s in simplifydata:
             # print simplifydata
             if ((s['day'] == d['day'] and
-                         s['location'] == s['location'] and
+                         s['location'] == d['location'] and
                          s['time'] == d['time'] and
                          s['length'] == d['length'] and
                              s['weeklength'] + s['week'] == d['week'] and
@@ -128,7 +128,7 @@ def simplifytime(timestr, classroomstr):
                 s['weeklength'] += 1
                 addflag = True
                 break
-            elif s['day'] == d['day'] and s['location'] == s['location'] and s['time'] == d['time'] and s['length'] == \
+            elif s['day'] == d['day'] and s['location'] == d['location'] and s['time'] == d['time'] and s['length'] == \
                     d['length'] and s['weeklength'] + s['week'] + 1 == d['week'] and (
                             'interval' in s or s['weeklength'] == 1):
                 s['weeklength'] += 2

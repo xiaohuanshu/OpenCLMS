@@ -1,4 +1,4 @@
-django==1.11.13
+django==1.11.16
 psycopg2-binary
 wechatpy
 cryptography

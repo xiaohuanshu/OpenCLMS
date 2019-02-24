@@ -230,6 +230,10 @@ CELERY_BEAT_SCHEDULE = {
         'task': 'generate_checkin_daily_excel',
         'schedule': crontab(hour=23, minute=0),  # because of celery timezone bug
     },
+    'update_avatar_from_wechat': {
+        'task': 'update_avatar_from_wechat',
+        'schedule': crontab(hour=1, minute=0, day_of_week=1),  # because of celery timezone bug
+    },
     # 'send_birthday_blessing': {
     #    'task': 'send_birthday_blessing',  # the same goes in the task name
     #    'schedule': crontab(hour=2, minute=56),

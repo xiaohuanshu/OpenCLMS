@@ -91,7 +91,10 @@ def sync_student(continuous=None):
             data.sex = sex
             if z_student.xzb is not None and z_student.xzb != '' and z_student.xzb != ' ':
                 data.classid = Class.objects.get(name=z_student.xzb)
-            data.department = Department.objects.get(name=z_student.xy)
+            try:
+                data.department = Department.objects.get(name=z_student.xy)
+            except Department.DoesNotExist:
+                data.department = Department.objects.create(name=z_student.xy)
             data.available = True
             try:
                 data.major = Major.objects.get(name=z_student.zymc)
@@ -131,8 +134,10 @@ def sync_teacher(continuous=None):
             else:
                 sex = 2
             data.sex = sex
-
-            department = Department.objects.get(name=z_teacher.bm)
+            try:
+                department = Department.objects.get(name=z_teacher.bm)
+            except Department.DoesNotExist:
+                department = Department.objects.create(name=z_teacher.bm)
             Teachertodepartment.objects.filter(teacher=data).delete()
             Teachertodepartment(teacher=data, department=department).save()
             if z_teacher.ks is not None and z_teacher.ks != '' and z_teacher.ks != ' ':

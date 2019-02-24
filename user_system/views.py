@@ -19,6 +19,7 @@ from permission import permission_data
 from auth import permission_required
 from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
+from wechat.tasks import sync_wechat_user
 import uuid
 import logging
 
@@ -104,6 +105,7 @@ def registerProcess(request):
     user.ip = request.META['REMOTE_ADDR']
 
     user.save()
+    sync_wechat_user.delay(user_id=user.id)  # 向微信中更新
     request.session['userid'] = user.id
     origin = request.session.get('origin', '')
     if origin != '':
@@ -387,6 +389,7 @@ def changepassword(request):
         request.user.email = email
         request.user.phone = phone
         request.user.save()
+        sync_wechat_user.delay(user_id=request.user.id)  # 向微信中更新
 
         return render(request, 'success.html', {'message': u'修改成功', 'submessage': u'信息修改成功',
                                                 'jumpurl': reverse('home', args=[])})

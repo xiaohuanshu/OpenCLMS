@@ -294,3 +294,22 @@ def sync_wechat(continuous=None):
     logger.info("[sync_wechat] Finished Tag user for schoolyear")
 
     logger.info("[sync_wechat] All Finished")
+
+
+@shared_task(name='sync_wechat_user')
+def sync_wechat_user(user_id):
+    """
+    用户修改信息(Email、Phone)后，立刻异步向微信更新
+    """
+
+    user = User.objects.get(id=user_id)
+    if user.openid:
+        openid = user.openid
+    elif user.isstudent:
+        openid = 'S%s' % user.academiccode
+    elif user.isteacher:
+        openid = 'T%s' % user.academiccode
+
+    contact_helper.user.update(openid, email=user.email, mobile=user.phone)
+
+    logger.info("[sync_wechat_user] %s Finished" % openid)

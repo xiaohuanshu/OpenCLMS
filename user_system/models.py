@@ -30,6 +30,7 @@ class User(models.Model):
     ip = models.GenericIPAddressField(protocol='IPv4', null=True)
     lastlogintime = models.DateTimeField(null=True)
     email = models.CharField(max_length=40, null=True, unique=True)
+    phone = models.CharField(max_length=20, null=True, unique=True)
     role = models.ManyToManyField(Role, through='Usertorole', through_fields=('user', 'role'))
     avatar = models.ImageField(upload_to='avatar', default='avatar/default.png')
     checkinaccountabnormal = models.BooleanField(default=False)

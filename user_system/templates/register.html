@@ -22,7 +22,13 @@
                     <span class="glyphicon glyphicon-user form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
-                    <input type="email" class="form-control" placeholder="Email" name="email" id="email">
+                    <input type="email" class="form-control" placeholder="Email" name="email" id="email"
+                           value="{{ request.user.email|default:'' }}">
+                    <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
+                </div>
+                <div class="form-group has-feedback">
+                    <input type="number" class="form-control" placeholder="手机号" name="phone" id="phone"
+                           value="{{ request.user.phone|default:'' }}">
                     <span class="glyphicon glyphicon-envelope form-control-feedback"></span>
                 </div>
                 <div class="form-group has-feedback">
@@ -97,6 +103,22 @@
                         remote: {
                             message: '此用户名已被注册',
                             url: '{% url 'user:check_username' %}',
+                            type: 'POST'
+                        }
+                    }
+                },
+                phone: {
+                    validators: {
+                        notEmpty: {
+                            message: '请输入您的手机号码'
+                        },
+                        stringLength: {
+                            max: 11,
+                            min: 11,
+                            message: '手机号码为11位'
+                        }, remote: {
+                            message: '此手机号已被注册',
+                            url: '{% url 'user:check_phone' %}',
                             type: 'POST'
                         }
                     }

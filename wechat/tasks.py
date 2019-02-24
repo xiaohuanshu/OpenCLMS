@@ -112,13 +112,18 @@ def sync_wechat(continuous=None):
             s_depid = s.classid.wechatdepartmentid
         else:
             s_depid = 1
+        email = s.user.email or '%s@%s' % (s.studentid, settings.SCHOOLEMAIL)
+        mobile = s.user.phone
         if userinfo:
             existcount += 1
-            if userinfo['department'][0] != s_depid or getverifycode(userinfo) != s.idnumber[-6:]:
+            if userinfo['department'][0] != s_depid or getverifycode(userinfo) != s.idnumber[-6:] or userinfo[
+                'email'] != email or userinfo['mobile'] != mobile:
                 logger.debug("%s update" % s.studentid)
                 updatecount += 1
-                contact_helper.user.update(userinfo['userid'], department=[s_depid], extattr={
-                    "attrs": [{"name": u"学工号", "value": s.studentid}, {"name": u"验证码", "value": s.idnumber[-6:]}]})
+                contact_helper.user.update(userinfo['userid'], department=[s_depid], email=email, mobile=mobile,
+                                           extattr={
+                                               "attrs": [{"name": u"学工号", "value": s.studentid},
+                                                         {"name": u"验证码", "value": s.idnumber[-6:]}]})
             else:
                 logger.debug("%s exist" % s.studentid)
             userlist.remove(userinfo)
@@ -126,7 +131,8 @@ def sync_wechat(continuous=None):
             create_list.append(dict(user_id='S%s' % s.studentid, name=s.name,
                                     department=s_depid, position=u'学生',
                                     gender=s.sex,
-                                    email='%s@%s' % (s.studentid, settings.SCHOOLEMAIL),
+                                    email=email,
+                                    mobile=mobile,
                                     extattr={"attrs": [{"name": u"学工号", "value": s.studentid},
                                                        {"name": u"验证码", "value": s.idnumber[-6:]}]}))
 

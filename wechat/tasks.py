@@ -166,6 +166,8 @@ def sync_wechat(continuous=None):
 
     # delete
     for user in userlist:
+        if user['userid'][0] not in ('T', 'S'):
+            continue  # T和S开头的不要删除
         logger.debug("%s delete" % user['userid'])
         deletecount += 1
         contact_helper.user.delete(user['userid'])

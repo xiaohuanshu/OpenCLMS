@@ -141,13 +141,16 @@ def sync_wechat(continuous=None):
     for t in teachers:
         userinfo = getinfomation(t.teacherid)
         tdeps = [de.wechatdepartmentid for de in t.department.all()]
+        email = s.user.email or '%s@%s' % (s.studentid, settings.SCHOOLEMAIL)
+        mobile = s.user.phone or ''
 
         if userinfo:
             existcount += 1
-            if sorted(userinfo['department']) != sorted(tdeps) or getverifycode(userinfo) != t.idnumber[-6:]:
+            if sorted(userinfo['department']) != sorted(tdeps) or getverifycode(userinfo) != t.idnumber[-6:] or \
+                    userinfo['email'] != email or userinfo['mobile'] != mobile:
                 logger.debug("%s update" % t.teacherid)
                 updatecount += 1
-                contact_helper.user.update(userinfo['userid'], department=tdeps,
+                contact_helper.user.update(userinfo['userid'], department=tdeps, email=email, mobile=mobile,
                                            extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
                                                               {"name": u"验证码", "value": t.idnumber[-6:]}]})
             else:
@@ -156,7 +159,8 @@ def sync_wechat(continuous=None):
         else:
             create_list.append(dict(user_id='T%s' % t.teacherid, name=t.name, department=tdeps, position=u'教师',
                                     gender=t.sex,
-                                    email='%s@gengdan.edu.cn' % t.teacherid,
+                                    email=email,
+                                    mobile=mobile,
                                     extattr={"attrs": [{"name": u"学工号", "value": t.teacherid},
                                                        {"name": u"验证码", "value": t.idnumber[-6:]}]}))
 

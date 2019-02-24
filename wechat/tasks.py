@@ -63,6 +63,19 @@ def sync_wechat(continuous=None):
 
     # 部门
     departmentlist = contact_helper.department.get()
+
+    for dep in Department.objects.filter(wechatdepartmentid=None).all():
+        exist = False
+        for d in departmentlist:
+            if dep.name == d['name']:
+                exist = True
+                break
+        if not exist:
+            depid = contact_helper.department.create(dep.name, 1)['id']
+            dep.wechatdepartmentid = depid
+            dep.save()
+            logger.info("[sync_wechat] add department %s" % dep.name)
+    departmentlist = contact_helper.department.get()
     for dep in departmentlist:
         if dep['parentid'] == 1:
             thisdepartmentid = dep['id']
@@ -117,7 +130,7 @@ def sync_wechat(continuous=None):
         if userinfo:
             existcount += 1
             if userinfo['department'][0] != s_depid or getverifycode(userinfo) != s.idnumber[-6:] or userinfo[
-                'email'] != email or userinfo['mobile'] != mobile:
+                'email'] != email or (mobile != '' and userinfo['mobile'] != mobile):
                 logger.debug("%s update" % s.studentid)
                 updatecount += 1
                 contact_helper.user.update(userinfo['userid'], department=[s_depid], email=email, mobile=mobile,
@@ -141,13 +154,13 @@ def sync_wechat(continuous=None):
     for t in teachers:
         userinfo = getinfomation(t.teacherid)
         tdeps = [de.wechatdepartmentid for de in t.department.all()]
-        email = s.user.email or '%s@%s' % (s.studentid, settings.SCHOOLEMAIL)
-        mobile = s.user.phone or ''
+        email = t.user.email or '%s@%s' % (t.teacherid, settings.SCHOOLEMAIL)
+        mobile = t.user.phone or ''
 
         if userinfo:
             existcount += 1
             if sorted(userinfo['department']) != sorted(tdeps) or getverifycode(userinfo) != t.idnumber[-6:] or \
-                    userinfo['email'] != email or userinfo['mobile'] != mobile:
+                    userinfo['email'] != email or (mobile != '' and userinfo['mobile'] != mobile):
                 logger.debug("%s update" % t.teacherid)
                 updatecount += 1
                 contact_helper.user.update(userinfo['userid'], department=tdeps, email=email, mobile=mobile,

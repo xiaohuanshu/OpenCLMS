@@ -113,7 +113,7 @@ def sync_wechat(continuous=None):
         else:
             s_depid = 1
         email = s.user.email or '%s@%s' % (s.studentid, settings.SCHOOLEMAIL)
-        mobile = s.user.phone
+        mobile = s.user.phone or ''
         if userinfo:
             existcount += 1
             if userinfo['department'][0] != s_depid or getverifycode(userinfo) != s.idnumber[-6:] or userinfo[

@@ -56,6 +56,8 @@ def check_username(request):
 @csrf_exempt
 def check_email(request):
     email = request.POST.get('email')
+    if email:
+        email = email.lower()
     isAvailable = True
     check_query = User.objects.filter(email=email)
     if request.user:
@@ -82,6 +84,8 @@ def check_phone(request):
 def registerProcess(request):
     username = request.POST.get('username')
     email = request.POST.get('email')
+    if email:
+        email = email.lower()
     password = request.POST.get('password')
     phone = request.POST.get('phone')
 
@@ -377,6 +381,8 @@ def changepassword(request):
             else:
                 return redirect(reverse('user:changepassword', args=[]) + u'?error=原密码错误')
         email = request.POST.get('email')
+        if email:
+            email = email.lower()
         phone = request.POST.get('phone')
         if User.objects.filter(email=email).exclude(pk=request.user.pk).exists():
             redirect(reverse('user:changepassword', args=[]) + u'?error=Email被其他人使用')

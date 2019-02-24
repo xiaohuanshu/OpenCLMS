@@ -57,6 +57,8 @@ def data(request):
             ld.update({
                 'user_id': p.user_id,
                 'username': p.user.username,
+                'email': p.user.email if request.user.has_perm('school_privacy') else u'无权查看',
+                'phone': p.user.phone if request.user.has_perm('school_privacy') else u'无权查看',
                 'ip': p.user.ip,
                 'iswechat': (p.user.openid and [u'是'] or [u'否'])[0],
                 'lastlogintime': p.user.lastlogintime.strftime('%Y-%m-%d %H:%M:%S') if p.user.lastlogintime else '',

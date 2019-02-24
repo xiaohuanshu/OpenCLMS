@@ -17,11 +17,11 @@ class UserMiddleware(object):
         urlname = resolve(request.path)
         urlname = "%s:%s" % (urlname.namespace, urlname.url_name)
         allow_url = ['user:login', 'user:loginProcess', 'user:logout',
-                     'user:check_username', 'user:check_email',
+                     'user:check_username', 'user:check_email', 'user:check_phone',
                      'wechat:api', 'wechat:oauth', 'user:forgetpassword', 'user:resetpassword',
                      'wechat:wxauth', 'wechat:wechatlogin', 'course:ics', 'checkin:checkin_success_test']
         wechat_allow_url = ['wechat:oauth', 'wechat:wxauth', 'user:register', 'user:check_username', 'user:check_email',
-                            'user:registerProcess', 'checkin:checkin_success_test']
+                            'user:check_phone', 'user:registerProcess', 'checkin:checkin_success_test']
         if request.session.get('userid', '') == '':
             if 'userid' in request.COOKIES:
                 remembercode = request.COOKIES['remembercode']

@@ -56,7 +56,23 @@ def check_username(request):
 def check_email(request):
     email = request.POST.get('email')
     isAvailable = True
-    if User.objects.filter(email=email).exists():
+    check_query = User.objects.filter(email=email)
+    if request.user:
+        check_query = check_query.exclude(pk=request.user.pk)
+    if check_query.exists():
+        isAvailable = False
+    data = {'valid': isAvailable}
+    return HttpResponse(json.dumps(data), content_type="application/json")
+
+
+@csrf_exempt
+def check_phone(request):
+    phone = request.POST.get('phone')
+    isAvailable = True
+    check_query = User.objects.filter(phone=phone)
+    if request.user:
+        check_query = check_query.exclude(pk=request.user.pk)
+    if check_query.exists():
         isAvailable = False
     data = {'valid': isAvailable}
     return HttpResponse(json.dumps(data), content_type="application/json")
@@ -66,13 +82,14 @@ def registerProcess(request):
     username = request.POST.get('username')
     email = request.POST.get('email')
     password = request.POST.get('password')
+    phone = request.POST.get('phone')
 
     if username == '' or not re.search('^\w*[a-zA-Z]+\w*$', username) or email == '' or not re.search(
             "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
-            email) or password == '' or User.objects.filter(
-        Q(email=email) | Q(username=username)).exists():
+            email) or password == '' or phone == '' or User.objects.filter(
+        Q(email=email) | Q(username=username) | Q(phone=phone)).exists():
         return redirect(
-            reverse('user:register', args=[]) + u"?error=用户名或邮箱错误")
+            reverse('user:register', args=[]) + u"?error=用户名信息(用户名、邮箱、手机)错误")
 
     m = hashlib.md5()
     m.update(password)
@@ -82,6 +99,7 @@ def registerProcess(request):
     user.username = username
     user.password = password
     user.email = email
+    user.phone = phone
     user.lastlogintime = nowtime
     user.ip = request.META['REMOTE_ADDR']
 
@@ -113,6 +131,9 @@ def loginProcess(request):
             origin = request.session.get('origin', '')
             if not user.username:
                 return redirect(reverse('user:register', args=[]))
+            # 旧系统没有录入手机号码，没有手机号码的补录一下
+            if not user.phone:
+                return redirect(reverse('user:changepassword', args=[]) + u"?error=请配合系统升级补录手机号码")
             if origin != '':
                 del request.session['origin']
                 response = HttpResponseRedirect(origin)
@@ -340,19 +361,35 @@ def changepassword(request):
     if request.META['REQUEST_METHOD'] == 'POST':
         oldpassword = request.POST.get('oldpassword')
         password = request.POST.get('newpassword')
-        m = hashlib.md5()
-        m.update(password)
-        password = m.hexdigest()
-        m = hashlib.md5()
-        m.update(oldpassword)
-        oldpassword = m.hexdigest()
-        if request.user.password == oldpassword:
-            request.user.password = password
-            request.user.save()
-            logger.info('userid %d changed password')
-            return render(request, 'success.html', {'message': u'修改成功', 'submessage': u'密码修改成功',
-                                                    'jumpurl': reverse('home', args=[])})
-        else:
-            return redirect(reverse('user:changepassword', args=[]) + u'?error=原密码错误')
+        if oldpassword and password:
+            m = hashlib.md5()
+            m.update(password)
+            password = m.hexdigest()
+            m = hashlib.md5()
+            m.update(oldpassword)
+            oldpassword = m.hexdigest()
+            if request.user.password == oldpassword:
+                request.user.password = password
+                request.user.save()
+                logger.info('userid %d changed password')
+            else:
+                return redirect(reverse('user:changepassword', args=[]) + u'?error=原密码错误')
+        email = request.POST.get('email')
+        phone = request.POST.get('phone')
+        if User.objects.filter(email=email).exclude(pk=request.user.pk).exists():
+            redirect(reverse('user:changepassword', args=[]) + u'?error=Email被其他人使用')
+        if re.search(
+                "^([A-Za-z0-9_\-\.])+\@([A-Za-z0-9_\-\.])+\.([A-Za-z]{2,4})$",
+                email):
+            redirect(reverse('user:changepassword', args=[]) + u'?error=email格式不正确')
+        if User.objects.filter(phone=phone).exclude(pk=request.user.pk).exists():
+            redirect(reverse('user:changepassword', args=[]) + u'?error=手机号被其他人使用')
+        request.user.email = email
+        request.user.phone = phone
+        request.user.save()
+
+        return render(request, 'success.html', {'message': u'修改成功', 'submessage': u'信息修改成功',
+                                                'jumpurl': reverse('home', args=[])})
+
     else:
         return render(request, 'changepassword.html', {})

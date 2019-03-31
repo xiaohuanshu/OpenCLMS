@@ -31,8 +31,5 @@
 1. 更新数据表: python manage.py migrate
 1. 配置uwsgi与nginx
 
-## License(临时)
-* 禁止再分发
-* 仅允许中国大陆地区教育部认定的各高校免费使用
-* 欢迎提交代码
-* 此协议为临时协议，最终解释权由作者所有
+## License
+本项目在GNU Affero General Public License version 3协议下开源

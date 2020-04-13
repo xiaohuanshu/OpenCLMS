@@ -1,4 +1,4 @@
-django==1.11.23
+django==1.11.28
 psycopg2-binary==2.7.7
 wechatpy==1.7.6
 cryptography==2.5
@@ -11,5 +11,5 @@ kombu==4.3.0
 xlrd==1.2.0
 dj-database-url==0.5.0
 cx_Oracle==7.1.1
-icalendar==4.0.3
-xlsxwriter==1.1.5
+icalendar==4.0.5
+xlsxwriter==1.2.8

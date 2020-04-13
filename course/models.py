@@ -355,7 +355,7 @@ class Coursehomework(Dealbase64imgmodel):
 class Homeworkcommit(Dealbase64imgmodel):
     coursehomework = models.ForeignKey(Coursehomework, models.CASCADE, db_column='coursehomeworkid')
     student = models.ForeignKey('school.Student', models.CASCADE, db_column='studentid')
-    submittime = models.DateTimeField(auto_now=True)
+    submittime = models.DateTimeField(auto_now_add=True)
     text = models.TextField(blank=True, null=True)
     comment = models.TextField(blank=True, null=True)
     attachment = models.ManyToManyField(Homeworkfile)

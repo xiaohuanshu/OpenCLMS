@@ -1,5 +1,5 @@
 django==1.11.29
-psycopg2-binary==2.7.7
+psycopg2-binary==2.8.5
 wechatpy==1.7.6
 cryptography==2.5
 uwsgi==2.0.18

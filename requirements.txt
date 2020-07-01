@@ -1,4 +1,4 @@
-django==1.11.29
+django==3.0.8
 psycopg2-binary==2.7.7
 wechatpy==1.7.6
 cryptography==2.5

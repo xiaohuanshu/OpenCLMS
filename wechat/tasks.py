@@ -31,8 +31,13 @@ def update_avatar_from_wechat():
         if 'avatar' not in userinfo:
             continue
         avatar_url = userinfo['avatar']
+        if not avatar_url:
+            continue
         img_temp = NamedTemporaryFile(delete=True)
-        img_temp.write(urllib2.urlopen(avatar_url).read())
+        try:
+            img_temp.write(urllib2.urlopen(avatar_url).read())
+        except:
+            logger.exception("download %s avatar error" % avatar_url)
         img_temp.flush()
         if u.avatar != 'avatar/default.png':
             u.avatar.delete()

@@ -4,7 +4,7 @@ wechatpy==1.7.6
 cryptography==3.3.2
 uwsgi==2.0.18
 django_redis==4.10.0
-Pillow==6.2.2
+Pillow==8.3.2
 django-debug-toolbar==1.11.1
 celery==4.2.0
 kombu==4.3.0

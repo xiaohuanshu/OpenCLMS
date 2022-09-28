@@ -3,6 +3,7 @@ from models import User
 from django.http import HttpResponse
 import json
 from user_system.auth import permission_required
+from user_system.utils import generate_password
 import hashlib
 
 
@@ -19,8 +20,12 @@ def unbindwechat(request):
 def resetpassword(request):
     userid = request.GET.get('userid')
     user = User.objects.get(id=userid)
+    newpassword = generate_password(8)
     m = hashlib.md5()
-    m.update('123456')
+    m.update(newpassword)
     user.password = m.hexdigest()
     user.save()
-    return HttpResponse(json.dumps({'error': 0, 'message': '已重置为123456'}), content_type="application/json")
+    return HttpResponse(
+        json.dumps({'error': 0, 'message': '已重置为%s' % newpassword}),
+        content_type="application/json"
+    )

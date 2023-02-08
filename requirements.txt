@@ -1,7 +1,7 @@
 django==1.11.29
 psycopg2-binary==2.7.7
 wechatpy==1.7.6
-cryptography==3.3.2
+cryptography==39.0.1
 uwsgi==2.0.18
 django_redis==4.10.0
 Pillow==6.2.2

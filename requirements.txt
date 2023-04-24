@@ -6,7 +6,7 @@ uwsgi==2.0.18
 django_redis==4.10.0
 Pillow==6.2.2
 django-debug-toolbar==1.11.1
-celery==4.2.0
+celery==5.2.2
 kombu==4.3.0
 xlrd==1.2.0
 dj-database-url==0.5.0

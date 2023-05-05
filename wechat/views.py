@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.http.response import HttpResponseBadRequest
-from client import wechat_client
+from .client import wechat_client
 from school.models import Student, Teacher
 from django.db.models import ObjectDoesNotExist
 from django.core.urlresolvers import reverse

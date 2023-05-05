@@ -1,8 +1,9 @@
 from django.conf.urls import url
-import control
-import views
-import dashboard
+from . import control
+from . import views
+from . import dashboard
 
+app_name = 'checkin'
 urlpatterns = [
 
     url(r'^qrcheckin/(\d+)$', views.checkin, name='qrcheckin'),

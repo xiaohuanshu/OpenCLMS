@@ -5,7 +5,7 @@ import time
 from django.db.models import Q
 from django.http import HttpResponse
 from school.models import Student
-from models import Studentcourse, Lesson, Course
+from .models import Studentcourse, Lesson, Course
 from django.core.exceptions import ObjectDoesNotExist
 import datetime
 from django.core.urlresolvers import reverse

@@ -6,7 +6,7 @@ from django.contrib.auth.hashers import make_password
 from datetime import datetime, timedelta
 from user_system.models import User
 from django.http.response import HttpResponse, HttpResponseBadRequest
-from client import wechat_client
+from .client import wechat_client
 from django.views.decorators.csrf import csrf_exempt
 from django.conf import settings
 

@@ -5,10 +5,11 @@ except ImportError:  # django < 1.4
 '''
 # place app url patterns here
 from django.conf.urls import url
-import api
-import oauth
-import views
+from . import api
+from . import oauth
+from . import views
 
+app_name = 'wechat'
 urlpatterns = [
     url(r'^api$', api.api, name='api'),
     url(r'^wxauth$', views.wxauth, name='wxauth'),

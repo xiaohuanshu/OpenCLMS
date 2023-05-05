@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-from models import User
+from .models import User
 from django.http import HttpResponse
 import json
 from user_system.auth import permission_required

@@ -1,8 +1,9 @@
 from django.conf.urls import url
-import student
-import managementview
-import teacher
+from . import student
+from . import managementview
+from . import teacher
 
+app_name = 'school'
 urlpatterns = [
 
     url(r'^studentlist$', student.studentlist, name='studentlist'),

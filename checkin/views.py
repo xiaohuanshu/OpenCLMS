@@ -1,10 +1,10 @@
 # coding:utf-8
 from __future__ import division
 from course.models import Lesson, Studentcourse, Course
-from models import Checkin, Checkinrecord, Ask, Scoreregulation
+from .models import Checkin, Checkinrecord, Ask, Scoreregulation
 from school.models import Student, Teacher, Class
 from school.function import getCurrentSchoolYearTerm
-from constant import *
+from .constant import *
 from django.shortcuts import render
 from django.core.urlresolvers import reverse
 from course.constant import *
@@ -12,7 +12,7 @@ from django.db.models import ObjectDoesNotExist
 import json
 from django.shortcuts import redirect, HttpResponse, HttpResponseRedirect
 from course.auth import has_course_permission
-from function import generateqrstr
+from .function import generateqrstr
 import datetime
 from django.db.models import Count, Case, When, Q, OuterRef, Subquery
 from django.core.cache import cache

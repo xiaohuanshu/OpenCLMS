@@ -2,7 +2,7 @@
 import json
 from django.http import HttpResponse
 from django.db.models import Q
-from models import User, Usertorole, Role
+from .models import User, Usertorole, Role
 from school.models import Student, Teacher
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
@@ -15,8 +15,8 @@ import re
 from django.core.exceptions import ObjectDoesNotExist
 from django.contrib.auth.hashers import make_password
 from django.conf import settings
-from permission import permission_data
-from auth import permission_required
+from .permission import permission_data
+from .auth import permission_required
 from django.core.cache import cache
 from django.core.mail import EmailMultiAlternatives
 from wechat.tasks import sync_wechat_user

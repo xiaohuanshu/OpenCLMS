@@ -18,6 +18,7 @@ from django.conf.urls.static import static
 from django.conf import settings
 from center.views import home
 
+app_name = 'checkinsystem'
 urlpatterns = [
     url(r'^$', home, name='home'),
 

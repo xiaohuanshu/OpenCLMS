@@ -7,16 +7,16 @@ from django.utils.http import urlunquote
 from django.shortcuts import render, redirect, get_object_or_404
 from django.core.urlresolvers import reverse
 from course.auth import has_course_permission, is_course_student
-from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit, \
+from .models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit, \
     CourseMessage, StudentExam
 from school.models import Student, Teacher
 from checkin.models import Scoreregulation, Checkin
 from django.db.models import ObjectDoesNotExist
-from constant import *
+from .constant import *
 from user_system.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
-from message import sendmessagetocoursestudent
+from .message import sendmessagetocoursestudent
 from course.tasks import send_homework_notification, send_resource_notification
 from django.utils.http import urlquote
 from checkin.constant import *

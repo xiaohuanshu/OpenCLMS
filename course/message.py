@@ -1,4 +1,4 @@
-from models import Studentcourse, CourseMessage
+from .models import Studentcourse, CourseMessage
 from wechat.client import wechat_client
 from django.conf import settings
 

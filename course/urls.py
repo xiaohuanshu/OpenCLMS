@@ -1,9 +1,10 @@
 from django.conf.urls import url
-import schedule
-import views
-import control
-import ics
+from . import schedule
+from . import views
+from . import control
+from . import ics
 
+app_name = 'course'
 urlpatterns = [
 
     url(r'^schedule$', schedule.schedule, name='schedule'),

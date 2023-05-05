@@ -1,7 +1,7 @@
 # coding=utf-8
-from models import Lesson, Homeworkcommit, Course, Studentcourse, Coursehomework
+from .models import Lesson, Homeworkcommit, Course, Studentcourse, Coursehomework
 from school.models import Student
-from constant import *
+from .constant import *
 from django.http import HttpResponse
 from django.core.urlresolvers import reverse
 from django.shortcuts import redirect, render

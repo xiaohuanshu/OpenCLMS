@@ -9,7 +9,7 @@ from wechat.contact import contact_helper
 from django.core.files import File
 from django.core.files.temp import NamedTemporaryFile
 from django.db.models import Q
-import urllib2
+from urllib import request
 import logging
 import datetime
 
@@ -35,7 +35,7 @@ def update_avatar_from_wechat():
             continue
         img_temp = NamedTemporaryFile(delete=True)
         try:
-            img_temp.write(urllib2.urlopen(avatar_url).read())
+            img_temp.write(request.urlopen(avatar_url).read())
         except:
             logger.exception("download %s avatar error" % avatar_url)
         img_temp.flush()

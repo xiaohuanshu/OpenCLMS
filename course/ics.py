@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from course.models import Course, Studentcourse, StudentExam
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from icalendar import Calendar, Event
 from datetime import datetime, timedelta
 from course.function import getweek, gettime, getday

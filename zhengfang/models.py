@@ -48,7 +48,7 @@ class Xsxkb(models.Model):  # 学生选课表
 
 class JxrwbviewXy2(models.Model):  # 课程表
     xn = models.CharField(max_length=10, blank=True, null=True)  # 学年
-    xq = models.NullBooleanField()  # 学期
+    xq = models.BooleanField(null=True)  # 学期
     kcdm = models.CharField(max_length=10, blank=True, null=True)  # 课程代码
     kcmc = models.CharField(max_length=250, blank=True, null=True)  # 课程名称
     kkxy = models.CharField(max_length=30, blank=True, null=True)  # 开课学院

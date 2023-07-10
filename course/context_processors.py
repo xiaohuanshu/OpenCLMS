@@ -1,4 +1,4 @@
-from models import Studentcourse, Lesson
+from .models import Studentcourse, Lesson
 from school.function import getnowlessontime
 
 

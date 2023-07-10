@@ -6,10 +6,10 @@ from course.models import Lesson, Studentcourse
 from course.constant import *
 from checkin.constant import *
 from django.shortcuts import redirect, render
-from django.core.urlresolvers import reverse
-from function import startcheckin, endcheckin, student_checkin, generateqrstr, addaskinformationinstartedlesson, \
+from django.urls import reverse
+from .function import startcheckin, endcheckin, student_checkin, generateqrstr, addaskinformationinstartedlesson, \
     delaskinformationinstartedlesson, clear_checkin, clear_last_checkin
-from models import Checkin, Ask, Asktostudent
+from .models import Checkin, Ask, Asktostudent
 from user_system.models import User
 from school.models import Student
 from django.db.models import ObjectDoesNotExist, Q

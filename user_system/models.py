@@ -27,7 +27,7 @@ class User(models.Model):
     wechatdeviceid = models.CharField(max_length=32, null=True)
     password = models.CharField(max_length=32)
     sex = models.IntegerField(blank=True, null=True, default=1)
-    ip = models.GenericIPAddressField(protocol='IPv4', null=True)
+    ip = models.GenericIPAddressField(protocol='ipv4', null=True)
     lastlogintime = models.DateTimeField(null=True)
     email = models.CharField(max_length=40, null=True, unique=True)
     phone = models.CharField(max_length=20, null=True, unique=True)

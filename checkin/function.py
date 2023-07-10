@@ -2,8 +2,8 @@
 from course.models import Course, Lesson, Studentcourse
 from course.constant import *
 from django.core.exceptions import ObjectDoesNotExist
-from models import Checkin, Checkinrecord
-from constant import *
+from .models import Checkin, Checkinrecord
+from .constant import *
 from django.db.models import F, Q
 import time
 import os

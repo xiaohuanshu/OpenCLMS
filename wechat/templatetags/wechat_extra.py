@@ -8,7 +8,7 @@ import time
 register = template.Library()
 
 
-@register.assignment_tag
+@register.simple_tag
 def wxconfig(url, jsApiList='closeWindow'):
     ticket = wechat_client.jsapi.get_jsapi_ticket()
     noncestr = uuid.uuid4().hex

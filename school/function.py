@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 import datetime
 from center.cache import cache_func
-from models import Major, Schoolterm, Classtime, Department, Administration
+from .models import Major, Schoolterm, Classtime, Department, Administration
 from django.db.models import ObjectDoesNotExist
 from django.core.cache import cache
 from django.conf import settings

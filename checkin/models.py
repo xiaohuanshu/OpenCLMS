@@ -1,7 +1,7 @@
 from __future__ import unicode_literals
 
 from django.db import models
-from constant import *
+from .constant import *
 
 
 # Create your models here.

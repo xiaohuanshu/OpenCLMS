@@ -3,22 +3,22 @@ import json
 
 from django.db.models import Q, Subquery, OuterRef
 from django.http import HttpResponse
-from django.utils.http import urlunquote
+from urllib.parse import unquote
 from django.shortcuts import render, redirect, get_object_or_404
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from course.auth import has_course_permission, is_course_student
-from models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit, \
+from .models import Course, Lesson, Studentcourse, Courseresource, Coursehomework, Homeworkfile, Homeworkcommit, \
     CourseMessage, StudentExam
 from school.models import Student, Teacher
 from checkin.models import Scoreregulation, Checkin
 from django.db.models import ObjectDoesNotExist
-from constant import *
+from .constant import *
 from user_system.auth import permission_required
 from school.function import getCurrentSchoolYearTerm
 import time
-from message import sendmessagetocoursestudent
+from .message import sendmessagetocoursestudent
 from course.tasks import send_homework_notification, send_resource_notification
-from django.utils.http import urlquote
+from urllib.parse import quote
 from checkin.constant import *
 from django.core.exceptions import ValidationError
 
@@ -285,13 +285,13 @@ def homework(request, courseid):
 
 def codeview(request):
     url = request.GET.get('url')
-    url = urlunquote(url)
+    url = unquote(url)
     return render(request, 'codeview.html', {'url': url})
 
 
 def imgview(request):
     url = request.GET.get('url')
-    url = urlunquote(url)
+    url = unquote(url)
     return render(request, 'imgview.html', {'imgurl': url})
 
 
@@ -425,14 +425,14 @@ def office_preview(request):
     url = request.GET.get('url')
     agent = request.META.get('HTTP_USER_AGENT', '')
     if 'iPhone' in agent or 'iPad' in agent or 'iPod' in agent:
-        url = urlunquote(url)
+        url = unquote(url)
     else:
         if url.endswith('.xlsx') or url.endswith('.xls'):
             url = "https://sheet.zoho.com/sheet/view.do?url=%s" % url
         else:
             url = url.replace('a.ngrok.idv.tw', 'xiaohuanshu.xicp.net')  # for gengdan temporarily
             url = "https://view.officeapps.live.com/op/embed.aspx?src=%s&wdStartOn=1&wdEmbedCode=0" % \
-                  urlquote(url, safe=None)
+                  quote(url, safe=None)
     return redirect(url)
 
 

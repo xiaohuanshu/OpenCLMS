@@ -9,7 +9,7 @@ from course.constant import LESSON_STATUS_NOW, LESSON_STATUS_END, COURSE_HOMEWOR
 from wechat.client import wechat_client
 from django.conf import settings
 from django.db.models import Q, F
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core.cache import cache
 import logging
 

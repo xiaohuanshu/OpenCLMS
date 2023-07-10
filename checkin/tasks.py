@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 from school.function import getnowlessontime, day_to_week_string
 from course.models import Lesson
-from models import Checkin
+from .models import Checkin
 from django.db.models import Count, Case, When, Q, F, OuterRef, Subquery, IntegerField
 from checkin.constant import *
 import xlsxwriter

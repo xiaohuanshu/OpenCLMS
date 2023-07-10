@@ -3,16 +3,16 @@ from django.db import models
 import datetime
 from school.function import getTermDate, getClassTime
 from school.models import Classroom
-from constant import *
+from .constant import *
 from checkin.constant import *
 from checkin.models import Checkin, Asktostudent, Ask
 from django.db.models import ObjectDoesNotExist, Q, F
 import time
-from function import getweek, gettime, getday, t, splitlesson, simplifytime
+from .function import getweek, gettime, getday, t, splitlesson, simplifytime
 from django.utils.functional import cached_property
 from django.conf import settings
 import os.path
-from django.utils.http import urlquote
+from urllib.parse import quote
 from center.models import Filemodel, Dealbase64imgmodel
 import logging
 

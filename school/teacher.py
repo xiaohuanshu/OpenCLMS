@@ -4,7 +4,7 @@ import json
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from models import Teacher
+from .models import Teacher
 from user_system.auth import permission_required
 from django.db.models import Q
 

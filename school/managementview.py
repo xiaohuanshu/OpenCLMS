@@ -1,9 +1,9 @@
 # -*- coding: utf-8 -*-
 import json
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.http import HttpResponse
 from django.shortcuts import render, redirect
-from models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
+from .models import Schoolterm, Classtime, Class, Major, Department, Administration, Classroom
 from user_system.auth import permission_required
 import logging
 

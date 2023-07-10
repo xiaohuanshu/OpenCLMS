@@ -4,13 +4,13 @@ from django.conf import settings
 import time
 from django.views.decorators.csrf import csrf_exempt
 from user_system.models import User
-from models import Wechatkeyword
+from .models import Wechatkeyword
 from wechatpy.enterprise.crypto import WeChatCrypto
 from wechatpy.exceptions import InvalidSignatureException
 from wechatpy.enterprise.exceptions import InvalidCorpIdException
 from wechatpy.enterprise import parse_message
 from wechatpy.replies import TextReply, EmptyReply
-from client import wechat_client
+from .client import wechat_client
 import logging
 
 logger = logging.getLogger(__name__)

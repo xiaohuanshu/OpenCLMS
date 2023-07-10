@@ -12,6 +12,10 @@ https://docs.djangoproject.com/en/1.9/ref/settings/
 # new view
 import os
 
+# with OpenCLMS/local_test_without_docker.sh
+# load env config without docker
+from checkinsystem.settings_env import *
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 

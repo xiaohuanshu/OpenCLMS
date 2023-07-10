@@ -5,7 +5,7 @@ from django.db.models import Q
 from django.http import HttpResponse
 from django.shortcuts import render
 
-from models import Student
+from .models import Student
 from user_system.auth import permission_required
 
 

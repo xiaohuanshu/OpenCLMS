@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 from django.core.exceptions import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
 from django.contrib.auth.hashers import make_password
 from datetime import datetime, timedelta

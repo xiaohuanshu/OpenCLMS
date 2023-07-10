@@ -6,7 +6,7 @@ import json
 register = template.Library()
 
 
-@register.assignment_tag
+@register.simple_tag
 def CHECKIN_STATUS_JSON():
     data = {CHECKIN_STATUS_NORMAL: u"未到", CHECKIN_STATUS_SUCCESS: u"正常", CHECKIN_STATUS_EARLY: u"早退",
             CHECKIN_STATUS_LATEEARLY: u"迟&早", CHECKIN_STATUS_PRIVATE_ASK: u"事假", CHECKIN_STATUS_SICK_ASK: u"病假",
@@ -14,7 +14,7 @@ def CHECKIN_STATUS_JSON():
     return json.dumps(data)
 
 
-@register.assignment_tag
+@register.simple_tag
 def CHECKIN_STATUS_STYLE_JSON():
     data = {CHECKIN_STATUS_NORMAL: "gray", CHECKIN_STATUS_SUCCESS: "green", CHECKIN_STATUS_EARLY: "fuchsia",
             CHECKIN_STATUS_LATEEARLY: "purple", CHECKIN_STATUS_PRIVATE_ASK: "blue", CHECKIN_STATUS_SICK_ASK: "blue",
@@ -22,13 +22,13 @@ def CHECKIN_STATUS_STYLE_JSON():
     return json.dumps(data)
 
 
-@register.assignment_tag
+@register.simple_tag
 def ASK_STATUS_STYLE_JSON():
     data = {ASK_STATUS_WAITING: "info", ASK_STATUS_APPROVE: "success", ASK_STATUS_CANCEL: "danger"}
     return json.dumps(data)
 
 
-@register.assignment_tag
+@register.simple_tag
 def ASK_STATUS_JSON():
     data = {ASK_STATUS_WAITING: u"等待批准", ASK_STATUS_APPROVE: u"批准", ASK_STATUS_CANCEL: u"取消"}
     return json.dumps(data)
@@ -78,7 +78,7 @@ def CHECKIN_STATUS_STYLE(status):
         return 'yellow'
 
 
-@register.assignment_tag
+@register.simple_tag
 def CHECKINURL():
     from django.conf import settings
     return settings.CHECKINURL
@@ -92,7 +92,7 @@ def CHECKIN_ABNORMAL(status):
         return u'位置异常'
 
 
-@register.assignment_tag
+@register.simple_tag
 def CHECKIN_ABNORMAL_JSON():
     data = {CHECKIN_ABNORMAL_ACCOUNT: u"疑似代签", CHECKIN_ABNORMAL_LOCATION: u"位置异常"}
     return json.dumps(data)

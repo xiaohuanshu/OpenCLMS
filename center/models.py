@@ -1,8 +1,8 @@
 from django.db import models
 import os
-from django.utils.http import urlquote
+from urllib.parse import quote
 from django.conf import settings
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 import re
 import uuid
 from base64 import b64decode
@@ -23,14 +23,14 @@ class Filemodel(models.Model):
         image_extension = ['.bmp', '.jpg', '.jpeg', '.png', '.gif']
         if extension in office_extension:
             url = "%s?url=%s" % (reverse('course:office_preview', args=[]), (
-                urlquote("%s%s" % (settings.DOMAIN, self.file.url), safe=None)))
+                quote("%s%s" % (settings.DOMAIN, self.file.url), safe=None)))
             return url
         elif extension in image_extension:
-            url = "%s?url=%s" % (reverse('course:imgview', args=[]), urlquote(self.file.url, safe=None))
+            url = "%s?url=%s" % (reverse('course:imgview', args=[]), quote(self.file.url, safe=None))
             return url
         elif extension in [".bsh", ".c", ".cc", ".cpp", ".cs", ".csh", ".cyc", ".cv", ".htm", ".html", ".java", ".js",
                            ".m", ".mxml", ".perl", ".pl", ".pm", ".py", ".rb", ".sh", ".xhtml", ".xml", ".xsl"]:
-            url = "%s?url=%s" % (reverse('course:codeview', args=[]), urlquote(self.file.url, safe=None))
+            url = "%s?url=%s" % (reverse('course:codeview', args=[]), quote(self.file.url, safe=None))
             return url
         elif extension == '.pdf':
             return self.file.url

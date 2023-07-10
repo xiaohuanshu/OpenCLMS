@@ -83,7 +83,7 @@ def LESSON_STATUS_STYLE(status):
         return 'warning'
 
 
-@register.assignment_tag
+@register.simple_tag
 def LESSON_STATUS_JSON():
     data = {LESSON_STATUS_AWAIT: u"未开始", LESSON_STATUS_AGREE: u"允许开始", LESSON_STATUS_CHECKIN: u"正在签到",
             LESSON_STATUS_NOW: u"正在上课", LESSON_STATUS_CHECKIN_ADD: u"正在签到", LESSON_STATUS_CHECKIN_AGAIN: u"正在签到",
@@ -92,7 +92,7 @@ def LESSON_STATUS_JSON():
     return json.dumps(data)
 
 
-@register.assignment_tag
+@register.simple_tag
 def LESSON_STATUS_STYLE_JSON():
     data = {LESSON_STATUS_AWAIT: "default", LESSON_STATUS_AGREE: "warning", LESSON_STATUS_CHECKIN: "info",
             LESSON_STATUS_NOW: "success", LESSON_STATUS_CHECKIN_ADD: "info", LESSON_STATUS_CHECKIN_AGAIN: "info",
@@ -101,7 +101,7 @@ def LESSON_STATUS_STYLE_JSON():
     return json.dumps(data)
 
 
-@register.assignment_tag
+@register.simple_tag
 def student_submit_homework(student, homework):
     try:
         return Homeworkcommit.objects.filter(coursehomework=homework, student=student).get()

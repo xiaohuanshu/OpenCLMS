@@ -12,7 +12,7 @@ from .function import getweek, gettime, getday, t, splitlesson, simplifytime
 from django.utils.functional import cached_property
 from django.conf import settings
 import os.path
-from django.utils.http import urlquote
+from urllib.parse import quote
 from center.models import Filemodel, Dealbase64imgmodel
 import logging
 

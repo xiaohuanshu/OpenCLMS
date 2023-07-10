@@ -4,7 +4,7 @@ from django import template
 register = template.Library()
 
 
-@register.assignment_tag
+@register.simple_tag
 def getmajor():
     try:
         return getMajor()
@@ -12,7 +12,7 @@ def getmajor():
         return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def getadministration():
     try:
         return getAdministration()
@@ -20,7 +20,7 @@ def getadministration():
         return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def getdepartment():
     try:
         return getDepartment()
@@ -28,7 +28,7 @@ def getdepartment():
         return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def getterm():
     try:
         return getTerm()
@@ -36,7 +36,7 @@ def getterm():
         return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def gettermdate(term):
     try:
         return getTermDate(term)
@@ -44,7 +44,7 @@ def gettermdate(term):
         return ''
 
 
-@register.assignment_tag
+@register.simple_tag
 def getschoolyear():
     try:
         return getSchoolyear()

@@ -6,7 +6,7 @@ from .models import User, Usertorole, Role
 from school.models import Student, Teacher
 from django.views.decorators.csrf import csrf_exempt
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect, HttpResponseRedirect
 from datetime import datetime, timedelta
 import time

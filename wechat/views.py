@@ -3,7 +3,7 @@ from django.http.response import HttpResponseBadRequest
 from .client import wechat_client
 from school.models import Student, Teacher
 from django.db.models import ObjectDoesNotExist
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.core import signing
 from django.core.cache import cache
 from django.shortcuts import HttpResponseRedirect, render, redirect

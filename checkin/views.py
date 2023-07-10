@@ -6,7 +6,7 @@ from school.models import Student, Teacher, Class
 from school.function import getCurrentSchoolYearTerm
 from .constant import *
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from course.constant import *
 from django.db.models import ObjectDoesNotExist
 import json

@@ -5,7 +5,7 @@ from school.models import Student
 from school.function import getnowlessontime, getTermDate
 from .constant import *
 from django.shortcuts import render
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from course.constant import *
 import json
 import datetime

@@ -3,7 +3,7 @@ from .models import Lesson, Homeworkcommit, Course, Studentcourse, Coursehomewor
 from school.models import Student
 from .constant import *
 from django.http import HttpResponse
-from django.core.urlresolvers import reverse
+from django.urls import reverse
 from django.shortcuts import redirect, render
 import json
 from course.auth import has_course_permission

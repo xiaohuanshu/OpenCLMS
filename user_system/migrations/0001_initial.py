@@ -90,7 +90,7 @@ class Migration(migrations.Migration):
                 ('wechatdeviceid', models.CharField(blank=True, max_length=32, null=True)),
                 ('password', models.CharField(blank=True, max_length=32, null=True)),
                 ('sex', models.IntegerField(blank=True, default=1, null=True)),
-                ('ip', models.GenericIPAddressField(blank=True, null=True, protocol=b'IPv4')),
+                ('ip', models.GenericIPAddressField(blank=True, null=True, protocol='ipv4')),
                 ('lastlogintime', models.DateTimeField(blank=True, null=True)),
                 ('email', models.CharField(blank=True, max_length=40, null=True, unique=True)),
                 ('avatar', models.ImageField(default=b'avatar/default.png', upload_to=b'avatar')),

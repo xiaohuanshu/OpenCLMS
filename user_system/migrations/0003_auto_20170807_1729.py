@@ -36,7 +36,7 @@ class Migration(migrations.Migration):
         migrations.AlterField(
             model_name='user',
             name='ip',
-            field=models.GenericIPAddressField(null=True, protocol=b'IPv4'),
+            field=models.GenericIPAddressField(null=True, protocol='ipv4'),
         ),
         migrations.AlterField(
             model_name='user',

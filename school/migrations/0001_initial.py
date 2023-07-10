@@ -86,7 +86,7 @@ class Migration(migrations.Migration):
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
                 ('schoolyear', models.IntegerField(blank=True, null=True)),
                 ('description', models.CharField(blank=True, max_length=20, null=True)),
-                ('now', models.NullBooleanField()),
+                ('now', models.BooleanField(null=True)),
                 ('startdate', models.DateField(blank=True, null=True)),
                 ('enddate', models.DateField(blank=True, null=True)),
             ],

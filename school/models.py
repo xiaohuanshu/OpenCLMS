@@ -105,7 +105,7 @@ class Major(models.Model):
 class Schoolterm(models.Model):
     schoolyear = models.IntegerField()
     description = models.CharField(max_length=20)
-    now = models.NullBooleanField()
+    now = models.BooleanField(null=True)
     startdate = models.DateField()
     enddate = models.DateField()
 
